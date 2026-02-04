@@ -1,0 +1,257 @@
+version: '3.8'
+
+services:
+  eureka-server:
+    image: eureka-server:0.0.1-SNAPSHOT
+    ports:
+      - "8070:8070"
+    networks:
+      - tamir
+
+  gateway-server:
+    image: gateway-server:0.0.1-SNAPSHOT
+    ports:
+      - "5000:5000"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8070/eureka/
+      - SPRING_APPLICATION_NAME=gateway-server
+    depends_on:
+      - eureka-server
+    networks:
+      - tamir
+
+  booking-service:
+    image: booking-service:0.0.1-SNAPSHOT
+    ports:
+      - "5005:5005"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8070/eureka/
+      - SPRING_APPLICATION_NAME=booking-service
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://booking-db:5432/BookingServiceDB
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - booking-db
+      - eureka-server
+    networks:
+      - tamir
+
+  booking-db:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=BookingServiceDB
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - booking-data:/var/lib/postgresql/data
+    networks:
+      - tamir
+
+  category-service:
+    image: category-service:0.0.1-SNAPSHOT
+    ports:
+      - "5003:5003"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8070/eureka/
+      - SPRING_APPLICATION_NAME=category-service
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://category-db:5432/CategoryServiceDB
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - category-db
+      - eureka-server
+    networks:
+      - tamir
+
+  category-db:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=CategoryServiceDB
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - category-data:/var/lib/postgresql/data
+    networks:
+      - tamir
+
+  payment-service:
+    image: payment-service:0.0.1-SNAPSHOT
+    ports:
+      - "5006:5006"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8070/eureka/
+      - SPRING_APPLICATION_NAME=payment-service
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://payment-db:5432/PaymentServiceDB
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+    depends_on:
+      - payment-db
+      - eureka-server
+    networks:
+      - tamir
+
+  payment-db:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=PaymentServiceDB
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - payment-data:/var/lib/postgresql/data
+    networks:
+      - tamir
+
+  salon-service:
+    image: salon-service:0.0.1-SNAPSHOT
+    ports:
+      - "5002:5002"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8070/eureka/
+      - SPRING_APPLICATION_NAME=salon-service
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://salon-db:5432/SalonServiceDB
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - salon-db
+      - eureka-server
+    networks:
+      - tamir
+
+  salon-db:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=SalonServiceDB
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - salon-data:/var/lib/postgresql/data
+    networks:
+      - tamir
+
+  service-offering-service:
+    image: service-offering-service:0.0.1-SNAPSHOT
+    ports:
+      - "5004:5004"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8070/eureka/
+      - SPRING_APPLICATION_NAME=service-offering-service
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://service-offering-db:5432/ServiceOfferingDB
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - service-offering-db
+      - eureka-server
+    networks:
+      - tamir
+
+  service-offering-db:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=ServiceOfferingDB
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - offering-data:/var/lib/postgresql/data
+    networks:
+      - tamir
+
+  user-service:
+    image: user-service:0.0.1-SNAPSHOT
+    ports:
+      - "5001:5001"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8070/eureka/
+      - SPRING_APPLICATION_NAME=user-service
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://user-db:5432/UserServiceDB
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - KEYCLOAK_CLIENT_SECRET=${KEYCLOAK_CLIENT_SECRET}
+      - KEYCLOAK_ADMIN_USERNAME=${KEYCLOAK_ADMIN_USERNAME}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
+      - KEYCLOAK_DB_ID=${KEYCLOAK_DB_ID}
+    depends_on:
+      - user-db
+      - keycloak
+      - eureka-server
+    networks:
+      - tamir
+
+  user-db:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=UserServiceDB
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - user-data:/var/lib/postgresql/data
+    networks:
+      - tamir
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.4
+    command: start-dev
+    environment:
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN_USERNAME}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
+    ports:
+      - "8080:8080"
+    networks:
+      - tamir
+    volumes:
+      - keycloak-data:/opt/keycloak/data
+
+  notification-service:
+    image: notification-service:0.0.1-SNAPSHOT
+    ports:
+      - "5007:5007"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8070/eureka/
+      - SPRING_APPLICATION_NAME=notification-service
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://notification-db:5432/NotificationServiceDB
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      # RabbitMQ connection (inside Docker use service name, not localhost)
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=guest
+      - SPRING_RABBITMQ_PASSWORD=guest
+    depends_on:
+      - notification-db
+      - rabbitmq
+      - eureka-server
+    networks:
+      - tamir
+
+  notification-db:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=NotificationServiceDB
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - notification-data:/var/lib/postgresql/data
+    networks:
+      - tamir
+
+  # RabbitMQ broker for notifications (and future async stuff)
+  rabbitmq:
+    image: rabbitmq:4.1.6-alpine
+    ports:
+      - "5672:5672"   # AMQP
+    networks:
+      - tamir
+
+volumes:
+  booking-data:
+  category-data:
+  payment-data:
+  salon-data:
+  offering-data:
+  user-data:
+  keycloak-data:
+  notification-data:
+
+networks:
+  tamir:
+    name: tamir
