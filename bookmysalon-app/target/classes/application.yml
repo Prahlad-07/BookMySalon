@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: bookmysalon-app
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/bookmysalon?useSSL=false&serverTimezone=UTC&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true
+    username: root
+    password: "@anuram1008"
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+stripe:
+  api:
+    key: ${STRIPE_API_KEY:sk_test_your_key_here}
+
+logging:
+  level:
+    root: INFO
+    com.bookmysalon: DEBUG

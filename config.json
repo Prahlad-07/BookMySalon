@@ -1,0 +1,174 @@
+{
+  "project": "BookMySalon",
+  "version": "1.0.0",
+  "description": "Modern Salon Booking Platform",
+  
+  "backend": {
+    "framework": "Spring Boot 3.5.4",
+    "language": "Java 21",
+    "port": 8080,
+    "baseUrl": "http://localhost:8080",
+    "endpoints": {
+      "auth": "/api/auth",
+      "salons": "/api/salons",
+      "bookings": "/api/bookings",
+      "reviews": "/api/reviews",
+      "payments": "/api/payments",
+      "categories": "/api/categories",
+      "notifications": "/api/notifications"
+    },
+    "database": {
+      "type": "MySQL",
+      "version": "9.0.0",
+      "host": "localhost",
+      "port": 3306,
+      "name": "bookmysalon",
+      "username": "root",
+      "password": "root"
+    }
+  },
+
+  "frontend": {
+    "framework": "React 18.2.0",
+    "buildTool": "Vite",
+    "language": "JavaScript/JSX",
+    "port": 5173,
+    "baseUrl": "http://localhost:5173",
+    "routing": {
+      "home": "/",
+      "login": "/login",
+      "signup": "/signup",
+      "salons": "/salons",
+      "salonDetail": "/salon/:salonId",
+      "bookings": "/bookings",
+      "profile": "/profile"
+    }
+  },
+
+  "api_endpoints": {
+    "authentication": {
+      "signup": "POST /api/auth/signup",
+      "login": "POST /api/auth/login",
+      "getUserInfo": "GET /api/auth/user/{id}"
+    },
+    "salons": {
+      "getAllSalons": "GET /api/salons",
+      "getSalonById": "GET /api/salons/{id}",
+      "createSalon": "POST /api/salons",
+      "updateSalon": "PUT /api/salons/{id}",
+      "deleteSalon": "DELETE /api/salons/{id}",
+      "searchByCity": "GET /api/salons/city/{city}",
+      "searchByOwner": "GET /api/salons/owner/{ownerId}"
+    },
+    "bookings": {
+      "createBooking": "POST /api/bookings/{userId}",
+      "getAllBookings": "GET /api/bookings",
+      "getBookingById": "GET /api/bookings/{id}",
+      "updateBooking": "PUT /api/bookings/{id}",
+      "cancelBooking": "DELETE /api/bookings/{id}",
+      "getUserBookings": "GET /api/bookings/user/{userId}",
+      "getSalonBookings": "GET /api/bookings/salon/{salonId}"
+    },
+    "reviews": {
+      "createReview": "POST /api/reviews/{userId}",
+      "getReviewById": "GET /api/reviews/{id}",
+      "getSalonReviews": "GET /api/reviews/salon/{salonId}",
+      "updateReview": "PUT /api/reviews/{id}",
+      "deleteReview": "DELETE /api/reviews/{id}"
+    },
+    "payments": {
+      "createPayment": "POST /api/payments/{bookingId}/{userId}",
+      "getPaymentById": "GET /api/payments/{id}",
+      "getUserPayments": "GET /api/payments/user/{userId}",
+      "paymentSuccess": "POST /api/payments/success/{paymentId}",
+      "paymentFailure": "POST /api/payments/failure/{paymentId}"
+    }
+  },
+
+  "test_credentials": {
+    "customer": {
+      "name": "John Doe",
+      "email": "john@example.com",
+      "phone": "9876543210",
+      "password": "Password@123",
+      "role": "CUSTOMER"
+    },
+    "salon_owner": {
+      "name": "Jane Smith",
+      "email": "jane@example.com",
+      "phone": "9876543211",
+      "password": "Password@123",
+      "role": "SALON_OWNER"
+    }
+  },
+
+  "dependencies": {
+    "backend": {
+      "spring-boot": "3.5.4",
+      "spring-data-jpa": "latest",
+      "mysql-connector": "9.0.0",
+      "lombok": "1.18.38",
+      "stripe": "29.3.0"
+    },
+    "frontend": {
+      "react": "18.2.0",
+      "react-dom": "18.2.0",
+      "react-router-dom": "6.16.0",
+      "axios": "1.6.0",
+      "tailwindcss": "3.3.0",
+      "framer-motion": "10.16.0"
+    }
+  },
+
+  "folder_structure": {
+    "root": {
+      "bookmysalon-app": "Spring Boot backend application",
+      "frontend": "React frontend application",
+      "setup.sh": "Automated setup and launch script",
+      "architecture-images": "Architecture documentation images",
+      ".git": "Git version control"
+    },
+    "backend": {
+      "src/main/java/com/bookmysalon": {
+        "controller": "REST API endpoints",
+        "service": "Business logic",
+        "repository": "Data access layer",
+        "entity": "Database models",
+        "dto": "Data transfer objects",
+        "exception": "Custom exceptions",
+        "config": "Spring configurations"
+      }
+    },
+    "frontend": {
+      "src": {
+        "pages": "Page components",
+        "components": "Reusable components",
+        "context": "React context for state",
+        "config": "API configuration",
+        "styles": "CSS and Tailwind"
+      }
+    }
+  },
+
+  "setup_instructions": {
+    "quick_start": [
+      "Run: ./setup.sh",
+      "Wait for both services to start",
+      "Open: http://localhost:5173",
+      "Done! Application is ready"
+    ],
+    "manual_start": [
+      "Start MySQL: brew services start mysql",
+      "Create DB: mysql -u root -p -e 'CREATE DATABASE bookmysalon;'",
+      "Backend: cd bookmysalon-app && java -jar target/bookmysalon-app-1.0.0.jar",
+      "Frontend: cd frontend && npm install && npm run dev"
+    ]
+  },
+
+  "troubleshooting": {
+    "mysql_not_running": "Run: brew services start mysql",
+    "port_already_in_use": "Change port in configuration or kill existing process",
+    "build_failed": "Run: mvn clean install -DskipTests",
+    "frontend_not_loading": "Check if npm packages installed: cd frontend && npm install"
+  }
+}
