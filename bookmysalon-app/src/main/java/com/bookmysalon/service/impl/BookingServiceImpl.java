@@ -4,11 +4,15 @@ import com.bookmysalon.dto.BookingDto;
 import com.bookmysalon.dto.BookingRequestDto;
 import com.bookmysalon.entity.Booking;
 import com.bookmysalon.entity.BookingStatus;
+import com.bookmysalon.entity.NotificationType;
+import com.bookmysalon.entity.Salon;
 import com.bookmysalon.entity.ServiceOffering;
 import com.bookmysalon.exception.BookingNotFoundException;
 import com.bookmysalon.repository.BookingRepository;
+import com.bookmysalon.repository.SalonRepository;
 import com.bookmysalon.repository.ServiceOfferingRepository;
 import com.bookmysalon.service.BookingService;
+import com.bookmysalon.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +28,8 @@ public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
     private final ServiceOfferingRepository serviceOfferingRepository;
+    private final SalonRepository salonRepository;
+    private final NotificationService notificationService;
 
     @Override
     public BookingDto createBooking(BookingRequestDto bookingRequestDto, Long customerId) {
@@ -95,12 +101,14 @@ public class BookingServiceImpl implements BookingService {
     public BookingDto updateBooking(Long id, BookingDto bookingDto) {
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new BookingNotFoundException("Booking not found with id: " + id));
+        BookingStatus previousStatus = booking.getStatus();
 
         if (bookingDto.getStartTime() != null) booking.setStartTime(bookingDto.getStartTime());
         if (bookingDto.getEndTime() != null) booking.setEndTime(bookingDto.getEndTime());
         if (bookingDto.getStatus() != null) booking.setStatus(bookingDto.getStatus());
 
         Booking updatedBooking = bookingRepository.save(booking);
+        notifyOnStatusChange(updatedBooking, previousStatus);
         return mapToDto(updatedBooking);
     }
 
@@ -108,8 +116,10 @@ public class BookingServiceImpl implements BookingService {
     public void cancelBooking(Long id) {
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new BookingNotFoundException("Booking not found with id: " + id));
+        BookingStatus previousStatus = booking.getStatus();
         booking.setStatus(BookingStatus.CANCELLED);
-        bookingRepository.save(booking);
+        Booking updatedBooking = bookingRepository.save(booking);
+        notifyOnStatusChange(updatedBooking, previousStatus);
     }
 
     @Override
@@ -133,5 +143,45 @@ public class BookingServiceImpl implements BookingService {
                 .status(booking.getStatus())
                 .totalPrice(booking.getTotalPrice())
                 .build();
+    }
+
+    private void notifyOnStatusChange(Booking booking, BookingStatus previousStatus) {
+        if (booking.getStatus() == previousStatus) {
+            return;
+        }
+
+        NotificationType type;
+        String description;
+
+        if (booking.getStatus() == BookingStatus.CONFIRMED) {
+            type = NotificationType.BOOKING_CONFIRMATION;
+            description = "Booking #" + booking.getId() + " has been confirmed";
+        } else if (booking.getStatus() == BookingStatus.CANCELLED) {
+            type = NotificationType.BOOKING_CANCELLATION;
+            description = "Booking #" + booking.getId() + " has been cancelled";
+        } else {
+            return;
+        }
+
+        notificationService.createAndPushNotification(
+                booking.getCustomerId(),
+                type,
+                description,
+                booking.getId(),
+                null,
+                null
+        );
+
+        Salon salon = salonRepository.findById(booking.getSalonId()).orElse(null);
+        if (salon != null && salon.getOwnerId() != null && !salon.getOwnerId().equals(booking.getCustomerId())) {
+            notificationService.createAndPushNotification(
+                    salon.getOwnerId(),
+                    type,
+                    description,
+                    booking.getId(),
+                    null,
+                    null
+            );
+        }
     }
 }

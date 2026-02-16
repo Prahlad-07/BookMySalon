@@ -1,148 +1,83 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { Facebook, Instagram, Twitter, Mail, Phone, MapPin } from 'lucide-react';
+import { Mail, Phone, MapPin, Github, Linkedin } from 'lucide-react';
+import { SITE_PROFILE } from '../config/site';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
-
   return (
-    <footer className="bg-gradient-to-b from-secondary-900 to-secondary-950 text-white">
+    <footer className="bg-slate-900 text-slate-200 border-t border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12"
-        >
-          {/* Brand */}
-          <motion.div variants={itemVariants}>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
+          <div>
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-r from-primary-500 to-pink-500 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold">B</span>
               </div>
-              <span className="font-bold text-xl">BookMySalon</span>
+              <span className="font-bold text-xl text-white">BookMySalon</span>
             </div>
-            <p className="text-secondary-400">
-              Your premier platform for booking salon services with ease and confidence.
+            <p className="text-slate-400 text-sm leading-6">
+              Book appointments, manage salons, and track bookings in one place.
             </p>
-          </motion.div>
+          </div>
 
-          {/* Quick Links */}
-          <motion.div variants={itemVariants}>
-            <h3 className="font-bold text-lg mb-4">Quick Links</h3>
-            <ul className="space-y-2 text-secondary-400">
-              <li>
-                <a href="/" className="hover:text-primary-400 transition">
-                  Home
-                </a>
-              </li>
-              <li>
-                <a href="/salons" className="hover:text-primary-400 transition">
-                  Find Salons
-                </a>
-              </li>
-              <li>
-                <a href="/bookings" className="hover:text-primary-400 transition">
-                  My Bookings
-                </a>
-              </li>
-              <li>
-                <a href="/profile" className="hover:text-primary-400 transition">
-                  Profile
+          <div>
+            <h3 className="font-semibold text-white mb-4">Quick Links</h3>
+            <ul className="space-y-2 text-slate-400 text-sm">
+              <li><a href="/" className="hover:text-white">Home</a></li>
+              <li><a href="/salons" className="hover:text-white">Find Salons</a></li>
+              <li><a href="/bookings" className="hover:text-white">My Bookings</a></li>
+              <li><a href="/profile" className="hover:text-white">Profile</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="font-semibold text-white mb-4">Support</h3>
+            <ul className="space-y-2 text-slate-400 text-sm">
+              <li><a href="#" className="hover:text-white">Help Center</a></li>
+              <li><a href="#" className="hover:text-white">About Us</a></li>
+              <li><a href="#" className="hover:text-white">Terms</a></li>
+              <li><a href="#" className="hover:text-white">Privacy</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="font-semibold text-white mb-4">Contact</h3>
+            <ul className="space-y-3 text-slate-400 text-sm">
+              <li className="flex items-center gap-2"><Mail size={16} className="text-slate-300" /> Founder: {SITE_PROFILE.founderName}</li>
+              <li className="flex items-center gap-2"><Phone size={16} className="text-slate-300" /> {SITE_PROFILE.phone}</li>
+              <li className="flex items-start gap-2">
+                <MapPin size={16} className="text-slate-300 mt-0.5" />
+                <a href={SITE_PROFILE.locationUrl} target="_blank" rel="noreferrer" className="hover:text-white">
+                  {SITE_PROFILE.locationLabel}
                 </a>
               </li>
             </ul>
-          </motion.div>
+          </div>
+        </div>
 
-          {/* Support */}
-          <motion.div variants={itemVariants}>
-            <h3 className="font-bold text-lg mb-4">Support</h3>
-            <ul className="space-y-2 text-secondary-400">
-              <li>
-                <a href="#" className="hover:text-primary-400 transition">
-                  Help Center
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-primary-400 transition">
-                  About Us
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-primary-400 transition">
-                  Terms of Service
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-primary-400 transition">
-                  Privacy Policy
-                </a>
-              </li>
-            </ul>
-          </motion.div>
-
-          {/* Contact */}
-          <motion.div variants={itemVariants}>
-            <h3 className="font-bold text-lg mb-4">Contact</h3>
-            <ul className="space-y-3 text-secondary-400">
-              <li className="flex items-center gap-3">
-                <Mail size={18} className="text-primary-400" />
-                <span>info@bookmysalon.com</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <Phone size={18} className="text-primary-400" />
-                <span>+1 (555) 123-4567</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <MapPin size={18} className="text-primary-400 mt-1" />
-                <span>123 Salon Street, Beauty City, BC 12345</span>
-              </li>
-            </ul>
-          </motion.div>
-        </motion.div>
-
-        {/* Social Media */}
-        <motion.div
-          variants={itemVariants}
-          className="flex justify-center gap-4 mb-8 pb-8 border-b border-secondary-700"
-        >
-          <a
-            href="#"
-            className="w-10 h-10 rounded-full bg-secondary-800 flex items-center justify-center hover:bg-primary-500 transition"
-          >
-            <Facebook size={20} />
-          </a>
-          <a
-            href="#"
-            className="w-10 h-10 rounded-full bg-secondary-800 flex items-center justify-center hover:bg-primary-500 transition"
-          >
-            <Instagram size={20} />
-          </a>
-          <a
-            href="#"
-            className="w-10 h-10 rounded-full bg-secondary-800 flex items-center justify-center hover:bg-primary-500 transition"
-          >
-            <Twitter size={20} />
-          </a>
-        </motion.div>
-
-        {/* Copyright */}
-        <div className="text-center text-secondary-400">
-          <p>&copy; {currentYear} BookMySalon. All rights reserved.</p>
+        <div className="flex items-center justify-between gap-4 flex-wrap border-t border-slate-800 pt-6">
+          <p className="text-slate-400 text-sm">&copy; {currentYear} BookMySalon. All rights reserved.</p>
+          <div className="flex gap-3">
+            <a
+              href={SITE_PROFILE.linkedinUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="w-9 h-9 rounded-full bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 flex items-center justify-center"
+              aria-label="LinkedIn"
+            >
+              <Linkedin size={16} />
+            </a>
+            <a
+              href={SITE_PROFILE.githubUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="w-9 h-9 rounded-full bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 flex items-center justify-center"
+              aria-label="GitHub"
+            >
+              <Github size={16} />
+            </a>
+          </div>
         </div>
       </div>
     </footer>

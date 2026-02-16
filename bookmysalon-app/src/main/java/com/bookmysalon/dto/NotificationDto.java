@@ -19,5 +19,7 @@ public class NotificationDto {
     private Long userId;
     private Long bookingId;
     private Long salonId;
+    private Long conversationId;
+    private Long messageId;
     private LocalDateTime createdAt;
 }

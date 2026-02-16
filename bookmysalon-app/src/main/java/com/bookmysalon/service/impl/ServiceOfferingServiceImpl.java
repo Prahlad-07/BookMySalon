@@ -90,6 +90,7 @@ public class ServiceOfferingServiceImpl implements ServiceOfferingService {
         if (serviceOfferingDto.getDescription() != null) serviceOffering.setDescription(serviceOfferingDto.getDescription());
         if (serviceOfferingDto.getPrice() != null) serviceOffering.setPrice(serviceOfferingDto.getPrice());
         if (serviceOfferingDto.getDuration() != null) serviceOffering.setDuration(serviceOfferingDto.getDuration());
+        if (serviceOfferingDto.getCategoryId() != null) serviceOffering.setCategoryId(serviceOfferingDto.getCategoryId());
 
         ServiceOffering updatedServiceOffering = serviceOfferingRepository.save(serviceOffering);
         return mapToDto(updatedServiceOffering);

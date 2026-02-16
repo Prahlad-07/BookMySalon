@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
@@ -6,8 +6,8 @@ import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
 import SalonOwnerRoute from './components/SalonOwnerRoute';
 import CustomerRoute from './components/CustomerRoute';
+import AdminRoute from './components/AdminRoute';
 
-// Pages
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -16,6 +16,9 @@ import SalonDetail from './pages/SalonDetail';
 import MyBookings from './pages/MyBookings';
 import Profile from './pages/Profile';
 import SalonOwnerDashboard from './pages/SalonOwnerDashboard';
+import AdminDashboard from './pages/AdminDashboard';
+
+const ChatRoute = lazy(() => import('./pages/ChatRoute'));
 
 export default function App() {
   return (
@@ -23,15 +26,13 @@ export default function App() {
       <AuthProvider>
         <div className="flex flex-col min-h-screen">
           <Navbar />
-          
-          <main className="flex-1">
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
 
-              {/* Customer Routes */}
+            <main className="flex-1">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+
               <Route
                 path="/salons"
                 element={
@@ -63,7 +64,6 @@ export default function App() {
                 }
               />
 
-              {/* Salon Owner Routes */}
               <Route
                 path="/salon/dashboard"
                 element={
@@ -75,37 +75,60 @@ export default function App() {
                 }
               />
 
-              {/* Profile Route (Protected) */}
               <Route
-                path="/profile"
+                path="/admin/dashboard"
                 element={
                   <ProtectedRoute>
-                    <Profile />
+                    <AdminRoute>
+                      <AdminDashboard />
+                    </AdminRoute>
                   </ProtectedRoute>
                 }
               />
 
-              {/* 404 Route */}
+                <Route
+                  path="/profile"
+                  element={
+                    <ProtectedRoute>
+                      <Profile />
+                    </ProtectedRoute>
+                  }
+                />
               <Route
-                path="*"
+                path="/chat"
                 element={
-                  <div className="min-h-screen flex items-center justify-center">
-                    <div className="text-center">
-                      <h1 className="text-4xl font-bold text-secondary-900 mb-4">
-                        404
-                      </h1>
-                      <p className="text-lg text-secondary-600 mb-8">
-                        Page not found
-                      </p>
-                      <a href="/" className="btn-primary inline-block">
-                        Go Home
-                      </a>
-                    </div>
-                  </div>
+                  <ProtectedRoute>
+                    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading chat...</div>}>
+                      <ChatRoute />
+                    </Suspense>
+                  </ProtectedRoute>
                 }
               />
-            </Routes>
-          </main>
+              <Route
+                path="/chat/:participantId"
+                element={
+                  <ProtectedRoute>
+                    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading chat...</div>}>
+                      <ChatRoute />
+                    </Suspense>
+                  </ProtectedRoute>
+                }
+              />
+
+                <Route
+                  path="*"
+                  element={
+                    <div className="min-h-screen flex items-center justify-center">
+                      <div className="text-center">
+                        <h1 className="text-4xl font-bold text-secondary-900 mb-4">404</h1>
+                        <p className="text-lg text-secondary-600 mb-8">Page not found</p>
+                        <a href="/" className="btn-primary inline-block">Go Home</a>
+                      </div>
+                    </div>
+                  }
+                />
+              </Routes>
+            </main>
 
           <Footer />
         </div>

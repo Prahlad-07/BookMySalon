@@ -2,10 +2,13 @@ package com.bookmysalon.service.impl;
 
 import com.bookmysalon.dto.NotificationDto;
 import com.bookmysalon.entity.Notification;
+import com.bookmysalon.entity.NotificationType;
 import com.bookmysalon.exception.UserNotFoundException;
 import com.bookmysalon.repository.NotificationRepository;
 import com.bookmysalon.service.NotificationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +21,7 @@ import java.util.stream.Collectors;
 public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository notificationRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Override
     public NotificationDto createNotification(NotificationDto notificationDto) {
@@ -36,15 +40,39 @@ public class NotificationServiceImpl implements NotificationService {
         }
 
         Notification notification = new Notification();
-        notification.setType(notificationDto.getType().trim());
+        notification.setType(NotificationType.valueOf(notificationDto.getType().trim().toUpperCase()));
         notification.setDescription(notificationDto.getDescription().trim());
         notification.setWasRead(false);
         notification.setUserId(notificationDto.getUserId());
         notification.setBookingId(notificationDto.getBookingId());
         notification.setSalonId(notificationDto.getSalonId());
+        notification.setConversationId(notificationDto.getConversationId());
+        notification.setMessageId(notificationDto.getMessageId());
 
         Notification savedNotification = notificationRepository.save(notification);
         return mapToDto(savedNotification);
+    }
+
+    @Override
+    public NotificationDto createAndPushNotification(Long userId,
+                                                     NotificationType type,
+                                                     String description,
+                                                     Long bookingId,
+                                                     Long conversationId,
+                                                     Long messageId) {
+        Notification notification = new Notification();
+        notification.setUserId(userId);
+        notification.setType(type);
+        notification.setDescription(description);
+        notification.setWasRead(false);
+        notification.setBookingId(bookingId);
+        notification.setConversationId(conversationId);
+        notification.setMessageId(messageId);
+
+        Notification saved = notificationRepository.save(notification);
+        NotificationDto dto = mapToDto(saved);
+        messagingTemplate.convertAndSendToUser(String.valueOf(userId), "/queue/notifications", dto);
+        return dto;
     }
 
     @Override
@@ -63,7 +91,15 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public List<NotificationDto> getNotificationsByUserId(Long userId) {
-        return notificationRepository.findByUserId(userId).stream()
+        return notificationRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<NotificationDto> getNotificationsByUserId(Long userId, int limit) {
+        int safeLimit = Math.max(1, Math.min(limit, 200));
+        return notificationRepository.findByUserIdOrderByCreatedAtDesc(userId, PageRequest.of(0, safeLimit)).stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
@@ -76,12 +112,25 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
+    public long getUnreadNotificationCount(Long userId) {
+        return notificationRepository.countByUserIdAndWasReadFalse(userId);
+    }
+
+    @Override
     public NotificationDto markAsRead(Long id) {
         Notification notification = notificationRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("Notification not found with id: " + id));
         notification.setWasRead(true);
         Notification updatedNotification = notificationRepository.save(notification);
         return mapToDto(updatedNotification);
+    }
+
+    @Override
+    public NotificationDto markAsRead(Long id, Long userId) {
+        Notification notification = notificationRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new UserNotFoundException("Notification not found with id: " + id));
+        notification.setWasRead(true);
+        return mapToDto(notificationRepository.save(notification));
     }
 
     @Override
@@ -95,12 +144,14 @@ public class NotificationServiceImpl implements NotificationService {
     private NotificationDto mapToDto(Notification notification) {
         return NotificationDto.builder()
                 .id(notification.getId())
-                .type(notification.getType())
+                .type(notification.getType() == null ? null : notification.getType().name())
                 .description(notification.getDescription())
                 .wasRead(notification.getWasRead())
                 .userId(notification.getUserId())
                 .bookingId(notification.getBookingId())
                 .salonId(notification.getSalonId())
+                .conversationId(notification.getConversationId())
+                .messageId(notification.getMessageId())
                 .createdAt(notification.getCreatedAt())
                 .build();
     }

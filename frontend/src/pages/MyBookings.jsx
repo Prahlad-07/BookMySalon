@@ -1,220 +1,173 @@
-import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { Calendar, Clock, MapPin, DollarSign, CheckCircle, XCircle } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Calendar, Clock, RefreshCcw, XCircle } from 'lucide-react';
 import api from '../config/api';
 import { useAuth } from '../context/AuthContext';
 
+const formatDateTime = (iso) => {
+  const dt = new Date(iso);
+  return Number.isNaN(dt.getTime()) ? 'NA' : dt.toLocaleString();
+};
+
+const toLocalInput = (iso) => {
+  const dt = new Date(iso);
+  if (Number.isNaN(dt.getTime())) return '';
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}T${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
+};
+
 export default function MyBookings() {
-  const [bookings, setBookings] = useState([]);
-  const [loading, setLoading] = useState(true);
   const { user } = useAuth();
+  const [bookings, setBookings] = useState([]);
+  const [salons, setSalons] = useState([]);
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [rescheduleDraft, setRescheduleDraft] = useState({});
 
-  useEffect(() => {
-    fetchBookings();
-  }, []);
-
-  const fetchBookings = async () => {
+  const loadData = async () => {
+    if (!user?.id) return;
     try {
-      const response = await api.get('/api/bookings/customer');
-      setBookings(response.data);
+      setLoading(true);
+      setError('');
+      const [bookingData, salonData, serviceData] = await Promise.all([
+        api.get(`/api/bookings/user/${user.id}`),
+        api.get('/api/salons'),
+        api.get('/api/service-offerings'),
+      ]);
+      setBookings(Array.isArray(bookingData) ? bookingData : []);
+      setSalons(Array.isArray(salonData) ? salonData : []);
+      setServices(Array.isArray(serviceData) ? serviceData : []);
     } catch (err) {
-      console.error('Failed to fetch bookings:', err);
+      setError(err?.response?.data?.error || 'Failed to load bookings');
     } finally {
       setLoading(false);
     }
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'CONFIRMED':
-        return 'bg-green-100 text-green-700';
-      case 'CANCELLED':
-        return 'bg-red-100 text-red-700';
-      case 'COMPLETED':
-        return 'bg-blue-100 text-blue-700';
-      default:
-        return 'bg-yellow-100 text-yellow-700';
+  useEffect(() => {
+    loadData();
+  }, [user?.id]);
+
+  const salonMap = useMemo(() => salons.reduce((acc, salon) => ({ ...acc, [salon.id]: salon }), {}), [salons]);
+  const serviceMap = useMemo(() => services.reduce((acc, service) => ({ ...acc, [service.id]: service }), {}), [services]);
+
+  const cancelBooking = async (bookingId) => {
+    try {
+      await api.delete(`/api/bookings/${bookingId}`);
+      setBookings((prev) => prev.map((booking) => (booking.id === bookingId ? { ...booking, status: 'CANCELLED' } : booking)));
+    } catch (err) {
+      setError(err?.response?.data?.error || 'Failed to cancel booking');
     }
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 },
-    },
-  };
+  const rescheduleBooking = async (booking) => {
+    const draft = rescheduleDraft[booking.id];
+    if (!draft) return;
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
+    const newStart = new Date(draft);
+    if (Number.isNaN(newStart.getTime())) return;
+
+    const durationMs = new Date(booking.endTime).getTime() - new Date(booking.startTime).getTime();
+    const nextEnd = new Date(newStart.getTime() + Math.max(durationMs, 30 * 60 * 1000));
+
+    try {
+      const updated = await api.put(`/api/bookings/${booking.id}`, {
+        startTime: newStart.toISOString(),
+        endTime: nextEnd.toISOString(),
+      });
+      setBookings((prev) => prev.map((item) => (item.id === booking.id ? { ...item, ...updated } : item)));
+    } catch (err) {
+      setError(err?.response?.data?.error || 'Failed to reschedule booking');
+    }
   };
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity }}
-          className="w-12 h-12 border-4 border-primary-200 border-t-primary-600 rounded-full"
-        ></motion.div>
+        <div className="w-14 h-14 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto">
-        {/* Header */}
-        <motion.div
-          variants={itemVariants}
-          initial="hidden"
-          animate="visible"
-          className="mb-12"
-        >
-          <h1 className="text-4xl font-bold text-secondary-900 mb-4">
-            My <span className="gradient-text">Bookings</span>
-          </h1>
-          <p className="text-lg text-secondary-600">
-            Manage your salon appointments
-          </p>
-        </motion.div>
+      <div className="max-w-6xl mx-auto space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-extrabold text-slate-900">My Bookings</h1>
+            <p className="text-slate-600 mt-2">Reschedule or cancel upcoming appointments.</p>
+          </div>
+          <button type="button" onClick={loadData} className="btn-secondary flex items-center gap-2"><RefreshCcw size={16} /> Refresh</button>
+        </div>
 
-        {/* Bookings List */}
-        {bookings.length > 0 ? (
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="space-y-6"
-          >
-            {bookings.map((booking) => (
-              <motion.div
-                key={booking.id}
-                variants={itemVariants}
-                className="bg-white rounded-2xl shadow-lg p-8 border-l-4 border-primary-600"
-              >
-                <div className="flex items-start justify-between mb-6">
-                  <div>
-                    <h2 className="text-2xl font-bold text-secondary-900 mb-2">
-                      {booking.salonName || 'Salon Name'}
-                    </h2>
-                    <p className="text-secondary-600">
-                      Booking ID: #{booking.id}
-                    </p>
-                  </div>
-                  <span className={`px-4 py-2 rounded-full font-semibold ${getStatusColor(booking.status)}`}>
-                    {booking.status}
-                  </span>
-                </div>
+        {error && <div className="rounded-xl border border-red-300 bg-red-50 text-red-700 p-4">{error}</div>}
 
-                {/* Details Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-                  {/* Date */}
-                  <div className="flex items-start gap-3">
-                    <Calendar className="text-primary-600 mt-1" size={20} />
+        {bookings.length === 0 ? (
+          <div className="card-base p-10 text-center text-slate-600">No bookings yet. Start by booking a salon service.</div>
+        ) : (
+          <div className="space-y-4">
+            {bookings.map((booking) => {
+              const salon = salonMap[booking.salonId];
+              const bookingServices = (booking.serviceOfferingIds || []).map((id) => serviceMap[id]).filter(Boolean);
+
+              return (
+                <div key={booking.id} className="card-base p-6">
+                  <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
                     <div>
-                      <p className="text-sm text-secondary-600 font-medium">Date</p>
-                      <p className="text-lg font-semibold text-secondary-900">
-                        {new Date(booking.bookingDate).toLocaleDateString('en-US', {
-                          weekday: 'short',
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric',
-                        })}
-                      </p>
+                      <h2 className="text-2xl font-bold text-slate-900">{salon?.name || `Salon #${booking.salonId}`}</h2>
+                      <p className="text-slate-600">Booking #{booking.id}</p>
                     </div>
+                    <span className="px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-sm">{booking.status}</span>
                   </div>
 
-                  {/* Time */}
-                  <div className="flex items-start gap-3">
-                    <Clock className="text-primary-600 mt-1" size={20} />
-                    <div>
-                      <p className="text-sm text-secondary-600 font-medium">Time</p>
-                      <p className="text-lg font-semibold text-secondary-900">
-                        {booking.startTime}
-                      </p>
-                    </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-slate-700 mb-4">
+                    <p className="flex items-center gap-2"><Calendar size={16} /> {formatDateTime(booking.startTime)}</p>
+                    <p className="flex items-center gap-2"><Clock size={16} /> Ends {formatDateTime(booking.endTime)}</p>
+                    <p>City: {salon?.city || 'NA'}</p>
+                    <p>Total: ${(booking.totalPrice || 0).toFixed(2)}</p>
                   </div>
 
-                  {/* Location */}
-                  <div className="flex items-start gap-3">
-                    <MapPin className="text-primary-600 mt-1" size={20} />
-                    <div>
-                      <p className="text-sm text-secondary-600 font-medium">Location</p>
-                      <p className="text-lg font-semibold text-secondary-900">
-                        {booking.salonCity || 'City'}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Price */}
-                  <div className="flex items-start gap-3">
-                    <DollarSign className="text-primary-600 mt-1" size={20} />
-                    <div>
-                      <p className="text-sm text-secondary-600 font-medium">Price</p>
-                      <p className="text-lg font-semibold text-secondary-900">
-                        ${booking.totalPrice || '0.00'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Services */}
-                <div className="mb-6 pb-6 border-b border-secondary-200">
-                  <h3 className="font-bold text-secondary-900 mb-3">Services</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {booking.services && booking.services.length > 0 ? (
-                      booking.services.map((service, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-center gap-2 text-secondary-700"
-                        >
-                          <CheckCircle size={16} className="text-green-500" />
-                          <span>{service.name}</span>
-                        </div>
-                      ))
+                  <div className="mb-5">
+                    <p className="text-slate-900 font-semibold mb-2">Services</p>
+                    {bookingServices.length === 0 ? (
+                      <p className="text-slate-500">No service names available.</p>
                     ) : (
-                      <p className="text-secondary-600">Service details coming soon</p>
+                      <div className="flex flex-wrap gap-2">
+                        {bookingServices.map((service) => (
+                          <span key={service.id} className="px-3 py-1 bg-slate-100 border border-slate-200 rounded-full text-sm text-slate-700">{service.name}</span>
+                        ))}
+                      </div>
                     )}
                   </div>
-                </div>
 
-                {/* Actions */}
-                <div className="flex gap-3">
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="btn-primary flex-1"
-                  >
-                    Reschedule
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="btn-secondary flex-1"
-                  >
-                    Add Review
-                  </motion.button>
+                  {booking.status !== 'CANCELLED' && booking.status !== 'COMPLETED' && (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <input
+                        type="datetime-local"
+                        value={rescheduleDraft[booking.id] || toLocalInput(booking.startTime)}
+                        onChange={(e) => setRescheduleDraft((prev) => ({ ...prev, [booking.id]: e.target.value }))}
+                        className="input-field md:col-span-2"
+                      />
+                      <button type="button" onClick={() => rescheduleBooking(booking)} className="btn-secondary">Reschedule</button>
+
+                      <button type="button" onClick={() => cancelBooking(booking.id)} className="md:col-span-3 w-full bg-red-600 hover:bg-red-700 text-white rounded-xl px-4 py-3 flex items-center justify-center gap-2">
+                        <XCircle size={18} /> Cancel Booking
+                      </button>
+                    </div>
+                  )}
+
+                  {salon?.ownerId && (
+                    <div className="mt-3">
+                      <Link to={`/chat/${salon.ownerId}`} className="btn-secondary inline-block">
+                        Chat with Salon Owner
+                      </Link>
+                    </div>
+                  )}
                 </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="bg-white rounded-2xl shadow-lg p-12 text-center"
-          >
-            <p className="text-2xl text-secondary-600 mb-4">No bookings yet</p>
-            <p className="text-secondary-500 mb-8">Start booking your favorite salon services</p>
-            <a
-              href="/salons"
-              className="btn-primary inline-block"
-            >
-              Find Salons
-            </a>
-          </motion.div>
+              );
+            })}
+          </div>
         )}
       </div>
     </div>
