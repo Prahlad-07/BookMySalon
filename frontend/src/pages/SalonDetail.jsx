@@ -1,507 +1,240 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import {
-  Star,
-  MapPin,
-  Clock,
-  Phone,
-  Calendar,
-  ChevronRight,
-  Heart,
-  ArrowLeft,
-  Sparkles,
-  CheckCircle,
-} from 'lucide-react';
+/**
+ * @author Prahlad Yadav
+ * @version 1.0
+ * @since 2026-02-14
+ */
+import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft, Calendar, Clock, MapPin, Star } from 'lucide-react';
 import api from '../config/api';
 import { useAuth } from '../context/AuthContext';
+
+const toDateTimeInput = (date) => {
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes() - (date.getMinutes() % 15))}`;
+};
+
+const buildEndTimeIso = (startDate, totalMinutes) => new Date(startDate.getTime() + totalMinutes * 60 * 1000).toISOString();
 
 export default function SalonDetail() {
   const { salonId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+
   const [salon, setSalon] = useState(null);
   const [services, setServices] = useState([]);
   const [reviews, setReviews] = useState([]);
-  const [selectedServices, setSelectedServices] = useState(new Set());
-  const [bookingDate, setBookingDate] = useState('');
-  const [bookingTime, setBookingTime] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [selectedServiceIds, setSelectedServiceIds] = useState(new Set());
+  const [startTimeInput, setStartTimeInput] = useState(toDateTimeInput(new Date(Date.now() + 3600 * 1000)));
+  const [bookingError, setBookingError] = useState('');
+  const [bookingSuccess, setBookingSuccess] = useState('');
   const [isBooking, setIsBooking] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [reviewInput, setReviewInput] = useState({ rating: 5, text: '' });
+  const [reviewError, setReviewError] = useState('');
+  const [reviewSuccess, setReviewSuccess] = useState('');
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchSalonDetails();
-    fetchServices();
-    fetchReviews();
-  }, [salonId]);
-
-  const fetchSalonDetails = async () => {
+  const loadData = async () => {
     try {
-      const response = await api.get(`/api/salons/${salonId}`);
-      setSalon(response.data);
-    } catch (err) {
-      console.error('Failed to fetch salon details:', err);
-    }
-  };
-
-  const fetchServices = async () => {
-    try {
-      const response = await api.get(`/api/service-offering/salon/${salonId}`);
-      setServices(response.data);
-    } catch (err) {
-      console.error('Failed to fetch services:', err);
+      setLoading(true);
+      const [salonData, serviceData, reviewData] = await Promise.all([
+        api.get(`/api/salons/${salonId}`),
+        api.get(`/api/service-offerings/salon/${salonId}`),
+        api.get(`/api/reviews/salon/${salonId}`),
+      ]);
+      setSalon(salonData);
+      setServices(Array.isArray(serviceData) ? serviceData : []);
+      setReviews(Array.isArray(reviewData) ? reviewData : []);
+    } catch {
+      setSalon(null);
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchReviews = async () => {
-    try {
-      const response = await api.get(`/api/reviews/salon/${salonId}`);
-      setReviews(response.data);
-    } catch (err) {
-      console.error('Failed to fetch reviews:', err);
-    }
-  };
+  useEffect(() => {
+    loadData();
+  }, [salonId]);
 
-  const handleServiceToggle = (serviceId) => {
-    const newSelected = new Set(selectedServices);
-    if (newSelected.has(serviceId)) {
-      newSelected.delete(serviceId);
-    } else {
-      newSelected.add(serviceId);
-    }
-    setSelectedServices(newSelected);
+  const selectedServices = useMemo(() => services.filter((service) => selectedServiceIds.has(service.id)), [services, selectedServiceIds]);
+  const totalPrice = useMemo(() => selectedServices.reduce((sum, service) => sum + (service.price || 0), 0), [selectedServices]);
+  const totalMinutes = useMemo(() => selectedServices.reduce((sum, service) => sum + (service.duration || 0), 0), [selectedServices]);
+  const averageRating = useMemo(() => (reviews.length === 0 ? 0 : reviews.reduce((sum, review) => sum + (review.rating || 0), 0) / reviews.length), [reviews]);
+
+  const toggleService = (serviceId) => {
+    setSelectedServiceIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(serviceId)) next.delete(serviceId);
+      else next.add(serviceId);
+      return next;
+    });
   };
 
   const handleBooking = async () => {
-    if (!user) {
-      navigate('/login');
-      return;
-    }
+    if (!user) return navigate('/login');
+    if (selectedServiceIds.size === 0) return setBookingError('Select at least one service before booking.');
+    if (!startTimeInput) return setBookingError('Please choose start date and time.');
 
-    if (selectedServices.size === 0 || !bookingDate || !bookingTime) {
-      alert('Please select services and date/time');
-      return;
-    }
-
-    setIsBooking(true);
+    const startDate = new Date(startTimeInput);
+    if (Number.isNaN(startDate.getTime()) || startDate <= new Date()) return setBookingError('Start time must be in the future.');
 
     try {
-      const response = await api.post('/api/bookings', {
-        salonId,
-        serviceOfferingIds: Array.from(selectedServices),
-        bookingDate,
-        startTime: bookingTime,
-      }, {
-        params: { paymentMethod: 'STRIPE' },
+      setIsBooking(true);
+      setBookingError('');
+      setBookingSuccess('');
+      await api.post(`/api/bookings/${user.id}`, {
+        salonId: Number(salonId),
+        startTime: startDate.toISOString(),
+        endTime: buildEndTimeIso(startDate, Math.max(totalMinutes, 30)),
+        serviceOfferingIds: Array.from(selectedServiceIds),
       });
-
-      navigate('/bookings', { state: { bookingSuccess: true } });
+      setBookingSuccess('Booking created successfully. You can track it in My Bookings.');
+      setSelectedServiceIds(new Set());
     } catch (err) {
-      alert('Booking failed. Please try again.');
-      console.error('Booking error:', err);
+      setBookingError(err?.response?.data?.error || 'Booking failed, please try again.');
     } finally {
       setIsBooking(false);
     }
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
-  };
+  const submitReview = async (e) => {
+    e.preventDefault();
+    if (!user) return navigate('/login');
+    if (!reviewInput.text || reviewInput.text.trim().length < 10) return setReviewError('Review must be at least 10 characters.');
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }
-    },
+    try {
+      setIsSubmittingReview(true);
+      setReviewError('');
+      setReviewSuccess('');
+      await api.post(`/api/reviews/${user.id}`, {
+        salonId: Number(salonId),
+        rating: Number(reviewInput.rating),
+        text: reviewInput.text.trim(),
+      });
+      setReviewInput({ rating: 5, text: '' });
+      setReviewSuccess('Review submitted successfully.');
+      loadData();
+    } catch (err) {
+      setReviewError(err?.response?.data?.error || 'Failed to submit review.');
+    } finally {
+      setIsSubmittingReview(false);
+    }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-          className="w-16 h-16 border-4 border-violet-200/30 border-t-violet-600 rounded-full"
-        />
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-14 h-14 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
       </div>
     );
   }
 
   if (!salon) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <p className="text-slate-300 text-xl">Salon not found</p>
-      </div>
-    );
+    return <div className="min-h-screen flex items-center justify-center text-slate-700">Unable to load salon details.</div>;
   }
 
-  const totalPrice = services
-    .filter((s) => selectedServices.has(s.id))
-    .reduce((sum, s) => sum + s.price, 0);
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
-      {/* Background Animations */}
-      <motion.div
-        animate={{ y: [0, 40, 0] }}
-        transition={{ duration: 20, repeat: Infinity }}
-        className="fixed top-20 left-10 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl -z-10"
-      />
-      <motion.div
-        animate={{ y: [0, -40, 0] }}
-        transition={{ duration: 25, repeat: Infinity }}
-        className="fixed bottom-20 right-10 w-96 h-96 bg-pink-600/10 rounded-full blur-3xl -z-10"
-      />
+    <div className="min-h-screen py-10 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto space-y-8">
+        <button type="button" onClick={() => navigate('/salons')} className="text-blue-700 font-semibold hover:text-blue-800 flex items-center gap-2">
+          <ArrowLeft size={18} /> Back to salons
+        </button>
 
-      <div className="py-12 px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="max-w-7xl mx-auto">
-          {/* Back Button */}
-          <motion.button
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            whileHover={{ scale: 1.05 }}
-            onClick={() => navigate('/salons')}
-            className="mb-8 flex items-center gap-2 text-violet-400 hover:text-violet-300 transition text-lg font-semibold"
-          >
-            <ArrowLeft size={20} />
-            Back to Salons
-          </motion.button>
+        <div className="glass-effect rounded-3xl p-8">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <h1 className="text-4xl font-extrabold text-slate-900">{salon.name}</h1>
+              <p className="text-slate-600 mt-2 flex items-center gap-2"><MapPin size={16} /> {salon.address}, {salon.city}</p>
+              <p className="text-slate-600 mt-2 flex items-center gap-2"><Clock size={16} /> {salon.openTime || '09:00'} - {salon.closeTime || '18:00'}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-slate-500 text-sm">Average rating</p>
+              <p className="text-3xl font-extrabold text-slate-900">{averageRating.toFixed(1)}</p>
+              <p className="text-slate-500 text-sm">{reviews.length} review(s)</p>
+            </div>
+          </div>
+        </div>
 
-          {/* Hero Section */}
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="glass-effect rounded-3xl overflow-hidden mb-12 border border-white/10 backdrop-blur-xl"
-          >
-            {/* Header Image */}
-            <div className="h-80 bg-gradient-to-br from-violet-600/30 via-purple-600/30 to-pink-600/30 flex items-center justify-center relative overflow-hidden">
-              <motion.div
-                animate={{ scale: [1, 1.1, 1] }}
-                transition={{ duration: 3, repeat: Infinity }}
-                className="text-9xl"
-              >
-                💇‍♀️
-              </motion.div>
-
-              {/* Floating elements */}
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                className="absolute top-8 right-8 w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full flex items-center justify-center text-2xl shadow-lg"
-              >
-                ⭐
-              </motion.div>
-
-              {/* Favorite Button */}
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={() => setIsFavorite(!isFavorite)}
-                className="absolute top-8 right-8 p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full hover:bg-white/20 transition text-red-400 hover:text-red-300"
-              >
-                <Heart size={24} fill={isFavorite ? 'currentColor' : 'none'} />
-              </motion.button>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-6">
+            <div className="card-base p-6">
+              <h2 className="text-2xl font-bold text-slate-900 mb-5">Services</h2>
+              {services.length === 0 ? (
+                <p className="text-slate-600">No services available for this salon yet.</p>
+              ) : (
+                <div className="space-y-3">
+                  {services.map((service) => (
+                    <label key={service.id} className={`block p-4 rounded-xl border cursor-pointer ${selectedServiceIds.has(service.id) ? 'border-blue-300 bg-blue-50' : 'border-slate-200 bg-white'}`}>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-start gap-3">
+                          <input type="checkbox" checked={selectedServiceIds.has(service.id)} onChange={() => toggleService(service.id)} className="mt-1" />
+                          <div>
+                            <p className="text-slate-900 font-semibold">{service.name}</p>
+                            <p className="text-slate-600 text-sm">{service.description || 'No description'}</p>
+                          </div>
+                        </div>
+                        <div className="text-right text-slate-700">
+                          <p>${(service.price || 0).toFixed(2)}</p>
+                          <p className="text-xs text-slate-500">{service.duration || 0} min</p>
+                        </div>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              )}
             </div>
 
-            {/* Info */}
-            <div className="p-10">
-              <div className="flex items-start justify-between mb-8">
-                <div className="flex-grow">
-                  <motion.h1 
-                    variants={itemVariants}
-                    className="text-5xl font-bold text-white mb-6 bg-gradient-to-r from-violet-400 via-purple-400 to-pink-400 bg-clip-text text-transparent"
-                  >
-                    {salon.name}
-                  </motion.h1>
-
-                  {/* Meta Info */}
-                  <motion.div variants={itemVariants} className="space-y-4 text-slate-300">
-                    <div className="flex items-center gap-3">
-                      <MapPin size={22} className="text-violet-400 flex-shrink-0" />
-                      <span className="text-lg">{salon.address}, {salon.city}, {salon.state}</span>
+            <div className="card-base p-6">
+              <h2 className="text-2xl font-bold text-slate-900 mb-5">Reviews</h2>
+              <div className="space-y-4">
+                {reviews.length === 0 && <p className="text-slate-600">No reviews yet.</p>}
+                {reviews.map((review) => (
+                  <div key={review.id} className="rounded-xl p-4 border border-slate-200 bg-slate-50">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-slate-800 font-semibold">User #{review.userId}</p>
+                      <div className="text-amber-500 flex items-center gap-1"><Star size={16} fill="currentColor" /> {review.rating}</div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <Clock size={22} className="text-violet-400 flex-shrink-0" />
-                      <span className="text-lg">{salon.openingTime} - {salon.closingTime}</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Phone size={22} className="text-violet-400 flex-shrink-0" />
-                      <span className="text-lg">{salon.phone || '+1 (555) 000-0000'}</span>
-                    </div>
-                  </motion.div>
-                </div>
-
-                {/* Rating */}
-                <motion.div variants={itemVariants} className="text-right min-w-fit ml-8">
-                  <div className="flex gap-1 justify-end mb-3">
-                    {[...Array(5)].map((_, i) => (
-                      <motion.div
-                        key={i}
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ delay: i * 0.05 }}
-                      >
-                        <Star size={28} className="fill-yellow-400 text-yellow-400" />
-                      </motion.div>
-                    ))}
+                    <p className="text-slate-700">{review.text}</p>
                   </div>
-                  <p className="text-slate-300 font-semibold text-lg">{reviews.length} reviews</p>
-                </motion.div>
+                ))}
               </div>
 
-              {/* Description */}
-              <motion.p variants={itemVariants} className="text-slate-300 text-lg leading-relaxed">
-                {salon.description || 'Premium salon offering a wide range of beauty services including haircuts, styling, coloring, and treatments.'}
-              </motion.p>
-            </div>
-          </motion.div>
-
-          {/* Main Content */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left Column - Services */}
-            <div className="lg:col-span-2 space-y-8">
-              {/* Services Section */}
-              <motion.div
-                variants={itemVariants}
-                initial="hidden"
-                animate="visible"
-                className="glass-effect rounded-3xl p-10 border border-white/10 backdrop-blur-xl"
-              >
-                <div className="flex items-center gap-3 mb-8">
-                  <Sparkles className="text-violet-400" size={28} />
-                  <h2 className="text-3xl font-bold text-white">
-                    Our Services
-                  </h2>
-                </div>
-
-                {services.length > 0 ? (
-                  <div className="space-y-4">
-                    {services.map((service, index) => (
-                      <motion.div
-                        key={service.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        whileHover={{ scale: 1.02 }}
-                        onClick={() => handleServiceToggle(service.id)}
-                        className={`p-6 rounded-2xl cursor-pointer transition-all border-2 group ${
-                          selectedServices.has(service.id)
-                            ? 'bg-gradient-to-r from-violet-600/30 to-pink-600/30 border-violet-500'
-                            : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20'
-                        }`}
-                      >
-                        <div className="flex items-start gap-4">
-                          <motion.input
-                            type="checkbox"
-                            checked={selectedServices.has(service.id)}
-                            onChange={() => handleServiceToggle(service.id)}
-                            className="w-6 h-6 accent-violet-500 mt-1 cursor-pointer flex-shrink-0"
-                          />
-                          <div className="flex-1">
-                            <h3 className="text-xl font-bold text-white mb-2">
-                              {service.name}
-                            </h3>
-                            <p className="text-slate-300">
-                              {service.description}
-                            </p>
-                          </div>
-                          <div className="text-right min-w-fit">
-                            <p className="text-2xl font-bold bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">
-                              ${service.price}
-                            </p>
-                            <p className="text-slate-400 text-sm">
-                              {service.duration || '30'} mins
-                            </p>
-                          </div>
-                        </div>
-
-                        {selectedServices.has(service.id) && (
-                          <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="mt-4 flex items-center gap-2 text-emerald-400"
-                          >
-                            <CheckCircle size={18} />
-                            <span className="text-sm font-semibold">Selected</span>
-                          </motion.div>
-                        )}
-                      </motion.div>
-                    ))}
+              {user?.role === 'CUSTOMER' && (
+                <form onSubmit={submitReview} className="mt-6 space-y-3 border-t border-slate-200 pt-5">
+                  <h3 className="text-slate-900 font-semibold">Add your review</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                    <select value={reviewInput.rating} onChange={(e) => setReviewInput((prev) => ({ ...prev, rating: e.target.value }))} className="input-field">
+                      {[5, 4, 3, 2, 1].map((rating) => <option key={rating} value={rating}>{rating} Star</option>)}
+                    </select>
+                    <textarea value={reviewInput.text} onChange={(e) => setReviewInput((prev) => ({ ...prev, text: e.target.value }))} className="input-field sm:col-span-3" rows={3} placeholder="Share your experience (min 10 characters)" />
                   </div>
-                ) : (
-                  <p className="text-slate-300 text-center py-8">No services available</p>
-                )}
-              </motion.div>
-
-              {/* Reviews Section */}
-              <motion.div
-                variants={itemVariants}
-                initial="hidden"
-                animate="visible"
-                className="glass-effect rounded-3xl p-10 border border-white/10 backdrop-blur-xl"
-              >
-                <h2 className="text-3xl font-bold text-white mb-8">
-                  Customer Reviews
-                </h2>
-
-                {reviews.length > 0 ? (
-                  <div className="space-y-6">
-                    {reviews.map((review, index) => (
-                      <motion.div
-                        key={review.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        className="pb-6 border-b border-white/10 last:border-0"
-                      >
-                        <div className="flex items-start gap-4 mb-4">
-                          <span className="text-4xl">👤</span>
-                          <div className="flex-1">
-                            <h3 className="font-bold text-white text-lg">
-                              {review.userName || 'Anonymous'}
-                            </h3>
-                            <div className="flex gap-1 mt-1">
-                              {[...Array(review.rating)].map((_, i) => (
-                                <Star
-                                  key={i}
-                                  size={18}
-                                  className="fill-yellow-400 text-yellow-400"
-                                />
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                        <p className="text-slate-300 text-lg leading-relaxed">{review.comment}</p>
-                      </motion.div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-slate-300 text-center py-8">No reviews yet. Be the first to review!</p>
-                )}
-              </motion.div>
+                  {reviewError && <p className="text-red-600 text-sm">{reviewError}</p>}
+                  {reviewSuccess && <p className="text-emerald-700 text-sm">{reviewSuccess}</p>}
+                  <button type="submit" disabled={isSubmittingReview} className="btn-secondary">{isSubmittingReview ? 'Submitting...' : 'Submit Review'}</button>
+                </form>
+              )}
             </div>
+          </div>
 
-            {/* Right Column - Booking Panel */}
-            <div>
-              <motion.div
-                variants={itemVariants}
-                initial="hidden"
-                animate="visible"
-                className="glass-effect rounded-3xl p-8 border border-white/10 backdrop-blur-xl sticky top-24 h-fit"
-              >
-                <div className="flex items-center gap-3 mb-8">
-                  <Calendar className="text-violet-400" size={24} />
-                  <h2 className="text-2xl font-bold text-white">
-                    Book Now
-                  </h2>
-                </div>
+          <div>
+            <div className="card-base p-6 sticky top-24">
+              <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2 mb-5"><Calendar size={20} /> Book Appointment</h2>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Start Date & Time</label>
+              <input type="datetime-local" value={startTimeInput} onChange={(e) => setStartTimeInput(e.target.value)} className="input-field mb-5" />
 
-                {/* Date Selection */}
-                <motion.div whileHover={{ scale: 1.02 }} className="mb-6">
-                  <label className="block text-sm font-semibold text-slate-200 mb-3">
-                    Select Date
-                  </label>
-                  <input
-                    type="date"
-                    value={bookingDate}
-                    onChange={(e) => setBookingDate(e.target.value)}
-                    className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white focus:bg-white/15 focus:border-violet-500/50 focus:outline-none transition-all"
-                  />
-                </motion.div>
+              <div className="booking-summary-box rounded-xl p-4 mb-5 border border-blue-100 bg-blue-50">
+                <p className="booking-summary-meta text-slate-700">Selected services: {selectedServices.length}</p>
+                <p className="booking-summary-meta text-slate-700">Estimated duration: {Math.max(totalMinutes, 0)} min</p>
+                <p className="booking-summary-price text-slate-900 text-2xl font-extrabold mt-2">${totalPrice.toFixed(2)}</p>
+              </div>
 
-                {/* Time Selection */}
-                <motion.div whileHover={{ scale: 1.02 }} className="mb-6">
-                  <label className="block text-sm font-semibold text-slate-200 mb-3">
-                    Select Time
-                  </label>
-                  <select
-                    value={bookingTime}
-                    onChange={(e) => setBookingTime(e.target.value)}
-                    className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white focus:bg-white/15 focus:border-violet-500/50 focus:outline-none transition-all"
-                  >
-                    <option value="" className="bg-slate-900">Choose a time</option>
-                    {['09:00', '10:00', '11:00', '12:00', '14:00', '15:00', '16:00', '17:00'].map(
-                      (time) => (
-                        <option key={time} value={time} className="bg-slate-900">
-                          {time}
-                        </option>
-                      )
-                    )}
-                  </select>
-                </motion.div>
+              {bookingError && <p className="text-red-600 text-sm mb-3">{bookingError}</p>}
+              {bookingSuccess && <p className="text-emerald-700 text-sm mb-3">{bookingSuccess}</p>}
 
-                {/* Selected Services Summary */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="mb-8 p-6 bg-gradient-to-br from-violet-500/10 to-pink-500/10 border border-violet-500/30 rounded-2xl"
-                >
-                  <h3 className="font-bold text-white mb-4 flex items-center gap-2">
-                    <Sparkles size={18} className="text-violet-400" />
-                    Selected Services
-                  </h3>
-                  {selectedServices.size > 0 ? (
-                    <div className="space-y-3">
-                      {services
-                        .filter((s) => selectedServices.has(s.id))
-                        .map((service, idx) => (
-                          <motion.div
-                            key={service.id}
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: idx * 0.05 }}
-                            className="flex justify-between text-slate-300 text-sm"
-                          >
-                            <span>{service.name}</span>
-                            <span className="font-semibold text-violet-300">
-                              ${service.price}
-                            </span>
-                          </motion.div>
-                        ))}
-                      <div className="pt-3 border-t border-white/10 flex justify-between font-bold text-white">
-                        <span>Total:</span>
-                        <span className="bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent text-lg">
-                          ${totalPrice}
-                        </span>
-                      </div>
-                    </div>
-                  ) : (
-                    <p className="text-slate-400 text-sm">Select services to see total</p>
-                  )}
-                </motion.div>
-
-                {/* CTA Button */}
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={handleBooking}
-                  disabled={isBooking || selectedServices.size === 0}
-                  className="w-full py-4 bg-gradient-to-r from-violet-600 to-pink-600 text-white font-bold rounded-xl hover:shadow-2xl hover:shadow-violet-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
-                >
-                  {isBooking ? (
-                    <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      Book Now
-                      <ChevronRight size={20} />
-                    </>
-                  )}
-                </motion.button>
-
-                <motion.p className="text-xs text-slate-400 text-center mt-4">
-                  💳 Secure payment powered by Stripe
-                </motion.p>
-              </motion.div>
+              <button type="button" onClick={handleBooking} disabled={isBooking || selectedServiceIds.size === 0} className="btn-primary w-full disabled:opacity-60">
+                {isBooking ? 'Booking...' : 'Confirm Booking'}
+              </button>
             </div>
           </div>
         </div>

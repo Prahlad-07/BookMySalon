@@ -1,3 +1,8 @@
+/**
+ * @author Prahlad Yadav
+ * @version 1.0
+ * @since 2026-02-13
+ */
 import React from 'react';
 import { Mail, Phone, MapPin, Github, Linkedin } from 'lucide-react';
 import { SITE_PROFILE } from '../config/site';

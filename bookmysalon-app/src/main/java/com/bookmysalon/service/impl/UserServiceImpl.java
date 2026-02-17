@@ -1,3 +1,8 @@
+/**
+ * @author Prahlad Yadav
+ * @version 1.0
+ * @since 2026-02-13
+ */
 package com.bookmysalon.service.impl;
 
 import com.bookmysalon.dto.UserDto;
@@ -6,6 +11,7 @@ import com.bookmysalon.dto.LoginDto;
 import com.bookmysalon.dto.response.AuthResponse;
 import com.bookmysalon.dto.response.UserInfoResponse;
 import com.bookmysalon.entity.User;
+import com.bookmysalon.entity.UserRole;
 import com.bookmysalon.exception.UserNotFoundException;
 import com.bookmysalon.repository.UserRepository;
 import com.bookmysalon.service.UserService;
@@ -24,28 +30,37 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto createUser(SignupDto signupDto) {
-        // Validate input
-        if (signupDto.getEmail() == null || signupDto.getEmail().trim().isEmpty()) {
+        if (signupDto == null) {
+            throw new IllegalArgumentException("Signup data cannot be null");
+        }
+
+        String normalizedEmail = signupDto.getEmail() == null ? null : signupDto.getEmail().trim().toLowerCase();
+        String normalizedName = signupDto.getName() == null ? null : signupDto.getName().trim();
+        String normalizedPhone = signupDto.getPhone() == null ? null : signupDto.getPhone().trim();
+        String password = signupDto.getPassword();
+        UserRole role = signupDto.getRole() == null ? UserRole.CUSTOMER : signupDto.getRole();
+
+        if (normalizedEmail == null || normalizedEmail.isEmpty()) {
             throw new IllegalArgumentException("Email cannot be empty");
         }
-        if (signupDto.getPassword() == null || signupDto.getPassword().trim().isEmpty()) {
+        if (password == null || password.trim().isEmpty()) {
             throw new IllegalArgumentException("Password cannot be empty");
         }
-        if (signupDto.getName() == null || signupDto.getName().trim().isEmpty()) {
+        if (normalizedName == null || normalizedName.isEmpty()) {
             throw new IllegalArgumentException("Name cannot be empty");
         }
         
-        // Check if user already exists
-        if (userRepository.findByEmail(signupDto.getEmail()).isPresent()) {
+        if (userRepository.findByEmailIgnoreCase(normalizedEmail).isPresent()) {
             throw new IllegalArgumentException("User with this email already exists");
         }
 
         User user = new User();
-        user.setFullName(signupDto.getName());
-        user.setEmail(signupDto.getEmail());
-        user.setPhone(signupDto.getPhone());
-        user.setRole(signupDto.getRole());
-        user.setPassword(passwordEncoder.encode(signupDto.getPassword()));
+        user.setFullName(normalizedName);
+        user.setUsername(normalizedEmail.split("@")[0]);
+        user.setEmail(normalizedEmail);
+        user.setPhone(normalizedPhone);
+        user.setRole(role);
+        user.setPassword(passwordEncoder.encode(password));
 
         User savedUser = userRepository.save(user);
         return mapToDto(savedUser);
@@ -87,7 +102,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AuthResponse login(LoginDto loginDto) {
-        // Validate input
         if (loginDto == null) {
             throw new IllegalArgumentException("Login data cannot be null");
         }
@@ -98,7 +112,9 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("Password is required");
         }
 
-        User user = userRepository.findByEmail(loginDto.getEmail().trim())
+        String normalizedEmail = loginDto.getEmail().trim().toLowerCase();
+
+        User user = userRepository.findByEmailIgnoreCase(normalizedEmail)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
         
         if (!passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
@@ -109,7 +125,7 @@ public class UserServiceImpl implements UserService {
                 .id(user.getId())
                 .name(user.getFullName())
                 .email(user.getEmail())
-                .role(user.getRole().toString())
+                .role(user.getRole() == UserRole.USER ? UserRole.CUSTOMER.name() : user.getRole().toString())
                 .token("jwt-token-" + user.getId())
                 .message("Login successful")
                 .build();

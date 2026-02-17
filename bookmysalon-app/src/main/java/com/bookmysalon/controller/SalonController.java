@@ -1,13 +1,25 @@
+/**
+ * @author Prahlad Yadav
+ * @version 1.0
+ * @since 2026-02-14
+ */
 package com.bookmysalon.controller;
 
 import com.bookmysalon.dto.SalonDto;
 import com.bookmysalon.dto.response.ApiResponse;
+import com.bookmysalon.exception.UnauthorizedException;
+import com.bookmysalon.security.CustomUserPrincipal;
 import com.bookmysalon.service.SalonService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/salons")
@@ -15,6 +27,56 @@ import java.util.List;
 public class SalonController {
 
     private final SalonService salonService;
+
+    @PostMapping("/me")
+    public ResponseEntity<ApiResponse<SalonDto>> createSalonForCurrentOwner(@RequestBody SalonDto salonDto) {
+        try {
+            CustomUserPrincipal principal = getCurrentUserPrincipal();
+            ensureOwnerOrAdmin();
+
+            salonDto.setOwnerId(principal.getId());
+            SalonDto createdSalon = salonService.createSalon(salonDto);
+            return ResponseEntity.ok(ApiResponse.<SalonDto>builder()
+                    .success(true)
+                    .message("Salon created successfully")
+                    .data(createdSalon)
+                    .build());
+        } catch (UnauthorizedException e) {
+            return ResponseEntity.status(403).body(ApiResponse.<SalonDto>builder()
+                    .success(false)
+                    .error(e.getMessage())
+                    .build());
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(ApiResponse.<SalonDto>builder()
+                    .success(false)
+                    .error(e.getMessage())
+                    .build());
+        }
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<List<SalonDto>>> getCurrentOwnerSalons() {
+        try {
+            CustomUserPrincipal principal = getCurrentUserPrincipal();
+            ensureOwnerOrAdmin();
+
+            List<SalonDto> salons = salonService.getSalonsByOwnerId(principal.getId());
+            return ResponseEntity.ok(ApiResponse.<List<SalonDto>>builder()
+                    .success(true)
+                    .data(salons)
+                    .build());
+        } catch (UnauthorizedException e) {
+            return ResponseEntity.status(403).body(ApiResponse.<List<SalonDto>>builder()
+                    .success(false)
+                    .error(e.getMessage())
+                    .build());
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(ApiResponse.<List<SalonDto>>builder()
+                    .success(false)
+                    .error(e.getMessage())
+                    .build());
+        }
+    }
 
     @PostMapping
     public ResponseEntity<ApiResponse<SalonDto>> createSalon(@RequestBody SalonDto salonDto) {
@@ -127,6 +189,22 @@ public class SalonController {
                     .success(false)
                     .error(e.getMessage())
                     .build());
+        }
+    }
+
+    private CustomUserPrincipal getCurrentUserPrincipal() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return (CustomUserPrincipal) authentication.getPrincipal();
+    }
+
+    private void ensureOwnerOrAdmin() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Set<String> roles = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toSet());
+
+        if (!roles.contains("ROLE_SALON_OWNER") && !roles.contains("ROLE_ADMIN")) {
+            throw new UnauthorizedException("Only salon owners or admins can manage owner salons");
         }
     }
 }

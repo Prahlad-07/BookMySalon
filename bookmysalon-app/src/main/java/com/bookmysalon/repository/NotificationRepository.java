@@ -1,3 +1,8 @@
+/**
+ * @author Prahlad Yadav
+ * @version 1.0
+ * @since 2026-02-14
+ */
 package com.bookmysalon.repository;
 
 import com.bookmysalon.entity.Notification;

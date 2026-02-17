@@ -1,3 +1,8 @@
+/**
+ * @author Prahlad Yadav
+ * @version 1.0
+ * @since 2026-02-13
+ */
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
@@ -27,7 +32,6 @@ export function ChatProvider({ children }) {
         unreadNotifications: counts?.unreadNotifications || 0,
       });
     } catch (_) {
-      // no-op
     }
   };
 
@@ -37,7 +41,6 @@ export function ChatProvider({ children }) {
       const data = await api.get('/api/chat/notifications?limit=20');
       setNotifications(Array.isArray(data) ? data : []);
     } catch (_) {
-      // no-op
     }
   };
 

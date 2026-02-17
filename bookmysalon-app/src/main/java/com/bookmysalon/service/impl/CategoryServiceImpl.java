@@ -1,3 +1,8 @@
+/**
+ * @author Prahlad Yadav
+ * @version 1.0
+ * @since 2026-02-13
+ */
 package com.bookmysalon.service.impl;
 
 import com.bookmysalon.dto.CategoryDto;
@@ -21,7 +26,6 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto createCategory(CategoryDto categoryDto) {
-        // Validate input
         if (categoryDto == null) {
             throw new IllegalArgumentException("Category data cannot be null");
         }

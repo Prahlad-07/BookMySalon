@@ -1,3 +1,8 @@
+/**
+ * @author Prahlad Yadav
+ * @version 1.0
+ * @since 2026-02-13
+ */
 package com.bookmysalon.service.impl;
 
 import com.bookmysalon.dto.PaymentOrderDto;
@@ -33,7 +38,6 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public PaymentOrderDto createPayment(Long bookingId, Long userId) {
-        // Validate input
         if (bookingId == null || bookingId <= 0) {
             throw new IllegalArgumentException("Booking ID is required and must be valid");
         }

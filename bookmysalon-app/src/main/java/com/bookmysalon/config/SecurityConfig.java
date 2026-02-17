@@ -1,3 +1,8 @@
+/**
+ * @author Prahlad Yadav
+ * @version 1.0
+ * @since 2026-02-13
+ */
 package com.bookmysalon.config;
 
 import org.springframework.context.annotation.Bean;
@@ -30,7 +35,15 @@ public class SecurityConfig {
             .accessDeniedHandler(accessDeniedHandler)
         )
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/signup", "/api/auth/register", "/api/auth/refresh-token").permitAll()
+            .requestMatchers(HttpMethod.POST,
+                "/api/auth/login",
+                "/api/auth/refresh-token",
+                "/api/auth/forgot-password",
+                "/api/auth/reset-password",
+                "/api/auth/signup/initiate",
+                "/api/auth/signup/resend-otp",
+                "/api/auth/signup/verify-otp"
+            ).permitAll()
             .requestMatchers(HttpMethod.GET, "/api/auth/health", "/api/user/public/**").permitAll()
             .requestMatchers("/ws/**").permitAll()
             .requestMatchers("/actuator/**").permitAll()

@@ -1,3 +1,8 @@
+/**
+ * @author Prahlad Yadav
+ * @version 1.0
+ * @since 2026-02-14
+ */
 package com.bookmysalon.service.impl;
 
 import com.bookmysalon.dto.ServiceOfferingDto;
@@ -21,7 +26,6 @@ public class ServiceOfferingServiceImpl implements ServiceOfferingService {
 
     @Override
     public ServiceOfferingDto createServiceOffering(ServiceOfferingDto serviceOfferingDto) {
-        // Validate input
         if (serviceOfferingDto == null) {
             throw new IllegalArgumentException("Service offering data cannot be null");
         }

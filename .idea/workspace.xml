@@ -4,712 +4,221 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e7f2f231-d1e0-492a-a8bc-b12374d2d4c7" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/config/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/BookMySalon.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/.gitattributes" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/mvnw" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/mvnw.cmd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/booking-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/src/main/java/com/example/BookingServiceApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/src/main/java/com/example/config/RabbitMqConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/src/main/java/com/example/controller/BookingController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/src/main/java/com/example/domain/BookingStatus.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/src/main/java/com/example/domain/PaymentMethod.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/src/main/java/com/example/domain/PaymentStatus.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/src/main/java/com/example/mapper/BookingMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/src/main/java/com/example/message/BookingEventConsumer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/src/main/java/com/example/model/Booking.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/src/main/java/com/example/payload/dto/BookingDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/src/main/java/com/example/payload/dto/BookingRequestDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/src/main/java/com/example/payload/dto/BookingSlotDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/src/main/java/com/example/payload/dto/CategoryDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/src/main/java/com/example/payload/dto/PaymentOrder.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/src/main/java/com/example/payload/dto/SalonDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/src/main/java/com/example/payload/dto/SalonReportDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/src/main/java/com/example/payload/dto/ServiceOfferingDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/src/main/java/com/example/payload/dto/UserDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/src/main/java/com/example/payload/response/PaymentLinkResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/src/main/java/com/example/repository/BookingRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/src/main/java/com/example/service/BookingService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/src/main/java/com/example/service/client/CategoryFeignClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/src/main/java/com/example/service/client/PaymentFeignClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/src/main/java/com/example/service/client/SalonFeignClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/src/main/java/com/example/service/client/ServiceOfferingFeignClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/src/main/java/com/example/service/client/UserFeignClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/src/main/java/com/example/service/impl/BookingServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/src/main/resources/application.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/booking-service/src/test/java/com/example/BookingServiceApplicationTests.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/category-service/.gitattributes" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/category-service/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/category-service/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/category-service/mvnw" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/category-service/mvnw.cmd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/category-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/category-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/category-service/src/main/java/com/example/CategoryServiceApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/category-service/src/main/java/com/example/controller/CategoryController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/category-service/src/main/java/com/example/controller/SalonCategoryController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/category-service/src/main/java/com/example/exception/CategoryNotFoundException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/category-service/src/main/java/com/example/model/Category.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/category-service/src/main/java/com/example/payload/dto/SalonDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/category-service/src/main/java/com/example/payload/dto/UserDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/category-service/src/main/java/com/example/repository/CategoryRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/category-service/src/main/java/com/example/service/CategoryService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/category-service/src/main/java/com/example/service/client/SalonFeignClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/category-service/src/main/java/com/example/service/impl/CategoryServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/category-service/src/main/resources/application.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/category-service/src/test/java/com/example/CategoryServiceApplicationTests.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose/default/docker-compose.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/eureka-server/.gitattributes" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/eureka-server/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/eureka-server/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/eureka-server/mvnw" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/eureka-server/mvnw.cmd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/eureka-server/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/eureka-server/src/main/java/com/example/EurekaServerApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/eureka-server/src/main/resources/application.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/eureka-server/src/test/java/com/example/EurekaServerApplicationTests.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gateway-server/.gitattributes" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gateway-server/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gateway-server/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gateway-server/mvnw" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gateway-server/mvnw.cmd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gateway-server/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-server/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gateway-server/src/main/java/com/example/GatewayServerApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gateway-server/src/main/java/com/example/config/PrefixGrantedAuthoritiesConverter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gateway-server/src/main/java/com/example/config/SecurityConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gateway-server/src/main/java/com/example/config/StripBearerGlobalFilter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gateway-server/src/main/resources/application.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gateway-server/src/test/java/com/example/GatewayServerApplicationTests.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notification-service/.gitattributes" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notification-service/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notification-service/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notification-service/mvnw" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notification-service/mvnw.cmd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notification-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/notification-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notification-service/src/main/java/com/example/NotificationServiceApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notification-service/src/main/java/com/example/config/RabbitMqConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notification-service/src/main/java/com/example/controller/NotificationController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notification-service/src/main/java/com/example/controller/SalonNotificationController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notification-service/src/main/java/com/example/domain/BookingStatus.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notification-service/src/main/java/com/example/domain/PaymentMethod.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notification-service/src/main/java/com/example/mapper/NotificationMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notification-service/src/main/java/com/example/message/NotificationEventConsumer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notification-service/src/main/java/com/example/model/Notification.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notification-service/src/main/java/com/example/payload/dto/BookingDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notification-service/src/main/java/com/example/payload/dto/NotificationDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notification-service/src/main/java/com/example/payload/dto/SalonDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notification-service/src/main/java/com/example/payload/dto/UserDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notification-service/src/main/java/com/example/repository/NotificationRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notification-service/src/main/java/com/example/service/NotificationService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notification-service/src/main/java/com/example/service/client/BookingFeignClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notification-service/src/main/java/com/example/service/impl/NotificationServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notification-service/src/main/java/com/example/service/impl/RealTimeCommunicationService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notification-service/src/main/resources/application.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notification-service/src/test/java/com/example/NotificationServiceApplicationTests.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/.gitattributes" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/mvnw" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/mvnw.cmd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/payment-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/src/main/java/com/example/PaymentServiceApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/src/main/java/com/example/config/RabbitMqConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/src/main/java/com/example/controller/PaymentController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/src/main/java/com/example/domain/PaymentMethod.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/src/main/java/com/example/domain/PaymentStatus.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/src/main/java/com/example/message/BookingEventProducer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/src/main/java/com/example/message/NotificationEventProducer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/src/main/java/com/example/model/PaymentOrder.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/src/main/java/com/example/payload/dto/BookingDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/src/main/java/com/example/payload/dto/BookingRequestDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/src/main/java/com/example/payload/dto/BookingSlotDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/src/main/java/com/example/payload/dto/CategoryDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/src/main/java/com/example/payload/dto/NotificationDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/src/main/java/com/example/payload/dto/SalonDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/src/main/java/com/example/payload/dto/SalonReportDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/src/main/java/com/example/payload/dto/ServiceOfferingDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/src/main/java/com/example/payload/dto/UserDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/src/main/java/com/example/payload/response/PaymentLinkResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/src/main/java/com/example/repository/PaymentOrderRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/src/main/java/com/example/service/PaymentService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/src/main/java/com/example/service/client/CategoryFeignClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/src/main/java/com/example/service/client/SalonFeignClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/src/main/java/com/example/service/client/ServiceOfferingFeignClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/src/main/java/com/example/service/client/UserFeignClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/src/main/java/com/example/service/impl/PaymentServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/src/main/resources/application.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/src/test/java/com/example/PaymentServiceApplicationTests.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/review-service/.gitattributes" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/review-service/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/review-service/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/review-service/mvnw" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/review-service/mvnw.cmd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/review-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/review-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/review-service/src/main/java/com/example/ReviewServiceApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/review-service/src/main/java/com/example/controller/ReviewController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/review-service/src/main/java/com/example/domain/InternalCodeEnum.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/review-service/src/main/java/com/example/model/Review.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/review-service/src/main/java/com/example/payload/dto/SalonDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/review-service/src/main/java/com/example/payload/dto/UserDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/review-service/src/main/java/com/example/payload/request/ReviewRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/review-service/src/main/java/com/example/payload/response/ApiResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/review-service/src/main/java/com/example/payload/response/ApiResponseBody.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/review-service/src/main/java/com/example/payload/response/ReviewDeletedResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/review-service/src/main/java/com/example/repository/ReviewRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/review-service/src/main/java/com/example/service/ReviewService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/review-service/src/main/java/com/example/service/client/SalonFeignClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/review-service/src/main/java/com/example/service/client/UserFeignClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/review-service/src/main/java/com/example/service/impl/ReviewServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/review-service/src/main/resources/application.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/review-service/src/test/java/com/example/ReviewServiceApplicationTests.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/salon-service/HELP.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/salon-service/mvnw" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/salon-service/mvnw.cmd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/salon-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/salon-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/salon-service/src/main/java/com/example/SalonServiceApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/salon-service/src/main/java/com/example/controller/SalonController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/salon-service/src/main/java/com/example/exception/SalonNotFoundException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/salon-service/src/main/java/com/example/exception/UnauthorizedActionException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/salon-service/src/main/java/com/example/mapper/SalonMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/salon-service/src/main/java/com/example/model/Salon.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/salon-service/src/main/java/com/example/payload/dto/SalonDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/salon-service/src/main/java/com/example/payload/dto/UserDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/salon-service/src/main/java/com/example/repository/SalonRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/salon-service/src/main/java/com/example/service/SalonService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/salon-service/src/main/java/com/example/service/client/UserFeignClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/salon-service/src/main/java/com/example/service/impl/SalonServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/salon-service/src/main/resources/application.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/salon-service/src/test/java/com/example/SalonServiceApplicationTests.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/salon-service/target/classes/application.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/salon-service/target/maven-archiver/pom.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/salon-service/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/salon-service/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/salon-service/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/createdFiles.lst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/salon-service/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/salon-service/target/salon-service-0.0.1-SNAPSHOT.jar.original" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/salon-service/target/surefire-reports/TEST-com.example.SalonServiceApplicationTests.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/salon-service/target/surefire-reports/com.example.SalonServiceApplicationTests.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/service-offering-service/.gitattributes" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/service-offering-service/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/service-offering-service/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/service-offering-service/mvnw" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/service-offering-service/mvnw.cmd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/service-offering-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/service-offering-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service-offering-service/src/main/java/com/example/service/offering/service/ServiceOfferingServiceApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/service-offering-service/src/main/java/com/example/service/offering/service/controller/SalonServiceOfferingController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/service-offering-service/src/main/java/com/example/service/offering/service/controller/ServiceOfferingController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/service-offering-service/src/main/java/com/example/service/offering/service/model/ServiceOffering.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/service-offering-service/src/main/java/com/example/service/offering/service/payload/dto/CategoryDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/service-offering-service/src/main/java/com/example/service/offering/service/payload/dto/SalonDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/service-offering-service/src/main/java/com/example/service/offering/service/payload/dto/ServiceOfferingDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/service-offering-service/src/main/java/com/example/service/offering/service/payload/dto/UserDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/service-offering-service/src/main/java/com/example/service/offering/service/repository/ServiceOfferingRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/service-offering-service/src/main/java/com/example/service/offering/service/service/ServiceOfferingService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/service-offering-service/src/main/java/com/example/service/offering/service/service/client/CategoryFeignClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/service-offering-service/src/main/java/com/example/service/offering/service/service/client/SalonFeignClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/service-offering-service/src/main/java/com/example/service/offering/service/service/client/UserFeignClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/service-offering-service/src/main/java/com/example/service/offering/service/service/impl/ServiceOfferingServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/service-offering-service/src/main/resources/application.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/service-offering-service/src/test/java/com/example/service/offering/service/ServiceOfferingServiceApplicationTests.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/HELP.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/mvnw" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/mvnw.cmd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/example/UserServiceApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/example/config/AppConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/example/config/KeycloakProperties.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/example/controller/AuthController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/example/controller/UserController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/example/domain/InternalCodeEnum.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/example/domain/UserRole.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/example/exception/GlobalExceptionHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/example/exception/UserNotFoundException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/example/mapper/UserMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/example/model/User.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/example/payload/dto/KeycloakRoleDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/example/payload/dto/KeycloakUserDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/example/payload/dto/LoginDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/example/payload/dto/SignupDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/example/payload/request/CreateUserRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/example/payload/request/CredentialRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/example/payload/response/ApiResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/example/payload/response/ApiResponseBody.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/example/payload/response/AuthResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/example/payload/response/ExceptionResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/example/payload/response/TokenResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/example/payload/response/UserInfoResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/example/repository/UserRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/example/service/AuthService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/example/service/UserService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/example/service/impl/AuthServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/example/service/impl/KeycloakService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/example/service/impl/UserServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/resources/application.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/test/java/com/example/UserServiceApplicationTests.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/classes/META-INF/native-image/ch.qos.logback/logback-classic/1.5.18/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/classes/META-INF/native-image/ch.qos.logback/logback-classic/1.5.18/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/classes/META-INF/native-image/com.fasterxml.jackson.core/jackson-databind/2.19.1/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/classes/META-INF/native-image/com.zaxxer/HikariCP/6.3.0/jni-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/classes/META-INF/native-image/com.zaxxer/HikariCP/6.3.0/proxy-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/classes/META-INF/native-image/com.zaxxer/HikariCP/6.3.0/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/classes/META-INF/native-image/org.apache.httpcomponents/httpclient/4.5.3/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/classes/META-INF/native-image/org.apache.httpcomponents/httpclient/4.5.3/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/classes/META-INF/native-image/org.apache.httpcomponents/httpclient/4.5.3/serialization-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/classes/META-INF/native-image/org.apache.tomcat.embed/tomcat-embed-core/10.1.42/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/classes/META-INF/native-image/org.apache.tomcat.embed/tomcat-embed-core/10.1.42/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/classes/META-INF/native-image/org.glassfish.jaxb/jaxb-runtime/4.0.5/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/classes/META-INF/native-image/org.glassfish.jaxb/jaxb-runtime/4.0.5/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/classes/META-INF/native-image/org.hibernate.orm/hibernate-core/6.6.18.Final/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/classes/META-INF/native-image/org.hibernate.orm/hibernate-core/6.6.18.Final/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/classes/META-INF/native-image/org.hibernate.validator/hibernate-validator/8.0.2.Final/proxy-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/classes/META-INF/native-image/org.hibernate.validator/hibernate-validator/8.0.2.Final/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/classes/META-INF/native-image/org.hibernate.validator/hibernate-validator/8.0.2.Final/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/classes/META-INF/native-image/org.jboss.logging/jboss-logging/3.6.1.Final/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/classes/META-INF/native-image/org.postgresql/postgresql/42.7.7/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/classes/application.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/ch.qos.logback.contrib/logback-jackson/0.1.5/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/ch.qos.logback.contrib/logback-jackson/0.1.5/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/ch.qos.logback.contrib/logback-jackson/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/ch.qos.logback.contrib/logback-json-classic/0.1.5/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/ch.qos.logback.contrib/logback-json-classic/0.1.5/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/ch.qos.logback.contrib/logback-json-classic/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/ch.qos.logback/logback-classic/1.2.11/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/ch.qos.logback/logback-classic/1.2.11/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/ch.qos.logback/logback-classic/1.4.1/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/ch.qos.logback/logback-classic/1.4.1/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/ch.qos.logback/logback-classic/1.4.1/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/ch.qos.logback/logback-classic/1.4.9/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/ch.qos.logback/logback-classic/1.4.9/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/ch.qos.logback/logback-classic/1.4.9/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/ch.qos.logback/logback-classic/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.ecwid.consul/consul-api/1.4.5/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.ecwid.consul/consul-api/1.4.5/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.ecwid.consul/consul-api/1.4.5/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.ecwid.consul/consul-api/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.fasterxml.jackson.core/jackson-databind/2.15.2/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.fasterxml.jackson.core/jackson-databind/2.15.2/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.fasterxml.jackson.core/jackson-databind/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.github.ben-manes.caffeine/caffeine/2.9.3/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.github.ben-manes.caffeine/caffeine/2.9.3/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.github.ben-manes.caffeine/caffeine/3.1.2/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.github.ben-manes.caffeine/caffeine/3.1.2/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.github.ben-manes.caffeine/caffeine/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.github.luben/zstd-jni/1.5.2-5/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.github.luben/zstd-jni/1.5.2-5/jni-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.github.luben/zstd-jni/1.5.2-5/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.github.luben/zstd-jni/1.5.2-5/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.github.luben/zstd-jni/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.google.protobuf/protobuf-java-util/3.21.12/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.google.protobuf/protobuf-java-util/3.21.12/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.google.protobuf/protobuf-java-util/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.graphql-java/graphql-java-extended-validation/19.1/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.graphql-java/graphql-java-extended-validation/19.1/proxy-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.graphql-java/graphql-java-extended-validation/19.1/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.graphql-java/graphql-java-extended-validation/19.1/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.graphql-java/graphql-java-extended-validation/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.graphql-java/graphql-java/19.2/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.graphql-java/graphql-java/19.2/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.graphql-java/graphql-java/19.2/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.graphql-java/graphql-java/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.h2database/h2/2.1.210/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.h2database/h2/2.1.210/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.h2database/h2/2.1.210/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.h2database/h2/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.hazelcast/hazelcast/5.2.1/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.hazelcast/hazelcast/5.2.1/jni-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.hazelcast/hazelcast/5.2.1/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.hazelcast/hazelcast/5.2.1/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.hazelcast/hazelcast/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.itextpdf/forms/8.0.3/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.itextpdf/forms/8.0.3/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.itextpdf/forms/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.itextpdf/io/8.0.3/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.itextpdf/io/8.0.3/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.itextpdf/io/8.0.3/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.itextpdf/io/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.itextpdf/kernel/8.0.3/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.itextpdf/kernel/8.0.3/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.itextpdf/kernel/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.itextpdf/layout/8.0.3/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.itextpdf/layout/8.0.3/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.itextpdf/layout/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.itextpdf/svg/8.0.3/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.itextpdf/svg/8.0.3/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.itextpdf/svg/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.microsoft.sqlserver/mssql-jdbc/12.2.0.jre11/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.microsoft.sqlserver/mssql-jdbc/12.2.0.jre11/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.microsoft.sqlserver/mssql-jdbc/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.mysql/mysql-connector-j/8.0.31/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.mysql/mysql-connector-j/8.0.31/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.mysql/mysql-connector-j/8.0.31/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.mysql/mysql-connector-j/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.sun.mail/jakarta.mail/2.0.1/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.sun.mail/jakarta.mail/2.0.1/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.sun.mail/jakarta.mail/2.0.1/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.sun.mail/jakarta.mail/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.zaxxer/HikariCP/5.0.1/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.zaxxer/HikariCP/5.0.1/jni-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.zaxxer/HikariCP/5.0.1/proxy-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.zaxxer/HikariCP/5.0.1/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/com.zaxxer/HikariCP/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/commons-logging/commons-logging/1.2/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/commons-logging/commons-logging/1.2/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/commons-logging/commons-logging/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.grpc/grpc-core/1.69.0/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.grpc/grpc-core/1.69.0/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.grpc/grpc-core/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.grpc/grpc-netty/1.51.0/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.grpc/grpc-netty/1.51.0/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.grpc/grpc-netty/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.jsonwebtoken/jjwt-gson/0.11.5/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.jsonwebtoken/jjwt-gson/0.11.5/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.jsonwebtoken/jjwt-gson/0.11.5/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.jsonwebtoken/jjwt-gson/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.jsonwebtoken/jjwt-jackson/0.11.5/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.jsonwebtoken/jjwt-jackson/0.11.5/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.jsonwebtoken/jjwt-jackson/0.11.5/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.jsonwebtoken/jjwt-jackson/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.jsonwebtoken/jjwt-orgjson/0.11.5/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.jsonwebtoken/jjwt-orgjson/0.11.5/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.jsonwebtoken/jjwt-orgjson/0.11.5/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.jsonwebtoken/jjwt-orgjson/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.nats/jnats/2.16.11/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.nats/jnats/2.16.11/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.nats/jnats/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.netty/netty-buffer/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.netty/netty-codec-http/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.netty/netty-codec-http2/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.netty/netty-common/4.1.115.Final/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.netty/netty-common/4.1.115.Final/jni-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.netty/netty-common/4.1.115.Final/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.netty/netty-common/4.1.115.Final/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.netty/netty-common/4.1.115.Final/serialization-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.netty/netty-common/4.1.80.Final/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.netty/netty-common/4.1.80.Final/jni-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.netty/netty-common/4.1.80.Final/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.netty/netty-common/4.1.80.Final/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.netty/netty-common/4.1.80.Final/serialization-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.netty/netty-common/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.netty/netty-handler/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.netty/netty-resolver-dns/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.netty/netty-transport/4.1.115.Final/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.netty/netty-transport/4.1.115.Final/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.netty/netty-transport/4.1.80.Final/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.netty/netty-transport/4.1.80.Final/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.netty/netty-transport/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.opentelemetry/opentelemetry-exporter-jaeger/1.19.0/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.opentelemetry/opentelemetry-exporter-jaeger/1.19.0/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.opentelemetry/opentelemetry-exporter-jaeger/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.opentelemetry/opentelemetry-exporter-logging/1.19.0/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.opentelemetry/opentelemetry-exporter-logging/1.19.0/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.opentelemetry/opentelemetry-exporter-logging/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.opentelemetry/opentelemetry-exporter-otlp/1.19.0/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.opentelemetry/opentelemetry-exporter-otlp/1.19.0/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.opentelemetry/opentelemetry-exporter-otlp/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.opentelemetry/opentelemetry-exporter-zipkin/1.19.0/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.opentelemetry/opentelemetry-exporter-zipkin/1.19.0/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.opentelemetry/opentelemetry-exporter-zipkin/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.opentelemetry/opentelemetry-sdk-metrics/1.19.0/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.opentelemetry/opentelemetry-sdk-metrics/1.19.0/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.opentelemetry/opentelemetry-sdk-metrics/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.opentelemetry/opentelemetry-sdk-trace/1.19.0/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.opentelemetry/opentelemetry-sdk-trace/1.19.0/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.opentelemetry/opentelemetry-sdk-trace/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.undertow/undertow-core/2.2.19.Final/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.undertow/undertow-core/2.2.19.Final/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.undertow/undertow-core/2.2.19.Final/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.undertow/undertow-core/2.3.0.Final/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.undertow/undertow-core/2.3.0.Final/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.undertow/undertow-core/2.3.0.Final/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/io.undertow/undertow-core/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/jakarta.servlet/jakarta.servlet-api/5.0.0/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/jakarta.servlet/jakarta.servlet-api/5.0.0/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/jakarta.servlet/jakarta.servlet-api/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/javax.cache/cache-api/1.1.1/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/javax.cache/cache-api/1.1.1/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/javax.cache/cache-api/1.1.1/serialization-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/javax.cache/cache-api/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/log4j/log4j/1.2.17/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/log4j/log4j/1.2.17/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/log4j/log4j/1.2.17/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/log4j/log4j/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/mysql/mysql-connector-java/8.0.29/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/mysql/mysql-connector-java/8.0.29/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/mysql/mysql-connector-java/8.0.29/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/mysql/mysql-connector-java/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/net.java.dev.jna/jna/5.8.0/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/net.java.dev.jna/jna/5.8.0/jni-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/net.java.dev.jna/jna/5.8.0/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/net.java.dev.jna/jna/5.8.0/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/net.java.dev.jna/jna/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.activemq/activemq-broker/5.18.1/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.activemq/activemq-broker/5.18.1/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.activemq/activemq-broker/5.18.1/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.activemq/activemq-broker/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.activemq/activemq-client/5.18.1/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.activemq/activemq-client/5.18.1/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.activemq/activemq-client/5.18.1/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.activemq/activemq-client/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.activemq/artemis-jms-client/2.28.0/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.activemq/artemis-jms-client/2.28.0/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.activemq/artemis-jms-client/2.28.0/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.activemq/artemis-jms-client/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.commons/commons-compress/1.23.0/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.commons/commons-compress/1.23.0/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.commons/commons-compress/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.commons/commons-dbcp2/2.12.0/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.commons/commons-dbcp2/2.12.0/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.commons/commons-dbcp2/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.commons/commons-pool2/2.11.1/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.commons/commons-pool2/2.11.1/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.commons/commons-pool2/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.httpcomponents/httpclient/4.5.14/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.httpcomponents/httpclient/4.5.14/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.httpcomponents/httpclient/4.5.14/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.httpcomponents/httpclient/4.5.14/serialization-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.httpcomponents/httpclient/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.kafka/kafka-clients/3.5.1/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.kafka/kafka-clients/3.5.1/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.kafka/kafka-clients/3.5.1/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.kafka/kafka-clients/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.kafka/kafka-streams/3.5.1/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.kafka/kafka-streams/3.5.1/jni-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.kafka/kafka-streams/3.5.1/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.kafka/kafka-streams/3.5.1/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.kafka/kafka-streams/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.tomcat.embed/tomcat-embed-core/10.0.20/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.tomcat.embed/tomcat-embed-core/10.0.20/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.tomcat.embed/tomcat-embed-core/10.0.20/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.tomcat.embed/tomcat-embed-core/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.tomcat/tomcat-jdbc/10.1.7/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.tomcat/tomcat-jdbc/10.1.7/proxy-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.apache.tomcat/tomcat-jdbc/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.bouncycastle/bcpkix-jdk15on/1.70/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.bouncycastle/bcpkix-jdk15on/1.70/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.bouncycastle/bcpkix-jdk15on/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.bouncycastle/bcpkix-jdk15to18/1.77/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.bouncycastle/bcpkix-jdk15to18/1.77/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.bouncycastle/bcpkix-jdk15to18/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.bouncycastle/bcpkix-jdk18on/1.77/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.bouncycastle/bcpkix-jdk18on/1.77/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.bouncycastle/bcpkix-jdk18on/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.eclipse.angus/jakarta.mail/1.0.0/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.eclipse.angus/jakarta.mail/1.0.0/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.eclipse.angus/jakarta.mail/1.0.0/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.eclipse.angus/jakarta.mail/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.eclipse.jetty/jetty-client/11.0.12/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.eclipse.jetty/jetty-client/11.0.12/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.eclipse.jetty/jetty-client/11.0.12/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.eclipse.jetty/jetty-client/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.eclipse.jetty/jetty-server/11.0.12/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.eclipse.jetty/jetty-server/11.0.12/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.eclipse.jetty/jetty-server/11.0.12/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.eclipse.jetty/jetty-server/12.0.1/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.eclipse.jetty/jetty-server/12.0.1/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.eclipse.jetty/jetty-server/12.0.1/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.eclipse.jetty/jetty-server/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.eclipse.jetty/jetty-util/12.0.9/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.eclipse.jetty/jetty-util/12.0.9/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.eclipse.jetty/jetty-util/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.eclipse.jgit/org.eclipse.jgit/6.5.0.202303070854-r/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.eclipse.jgit/org.eclipse.jgit/6.5.0.202303070854-r/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.eclipse.jgit/org.eclipse.jgit/6.5.0.202303070854-r/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.eclipse.jgit/org.eclipse.jgit/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.eclipse.paho/org.eclipse.paho.client.mqttv3/1.2.5/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.eclipse.paho/org.eclipse.paho.client.mqttv3/1.2.5/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.eclipse.paho/org.eclipse.paho.client.mqttv3/1.2.5/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.eclipse.paho/org.eclipse.paho.client.mqttv3/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.eclipse.paho/org.eclipse.paho.mqttv5.client/1.2.5/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.eclipse.paho/org.eclipse.paho.mqttv5.client/1.2.5/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.eclipse.paho/org.eclipse.paho.mqttv5.client/1.2.5/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.eclipse.paho/org.eclipse.paho.mqttv5.client/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.ehcache/ehcache/3.10.8-jakarta/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.ehcache/ehcache/3.10.8-jakarta/jni-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.ehcache/ehcache/3.10.8-jakarta/proxy-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.ehcache/ehcache/3.10.8-jakarta/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.ehcache/ehcache/3.10.8-jakarta/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.ehcache/ehcache/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.example/library/0.0.1/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.example/library/0.0.1/jni-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.example/library/0.0.1/proxy-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.example/library/0.0.1/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.example/library/0.0.1/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.example/library/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.flywaydb/flyway-core/10.10.0/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.flywaydb/flyway-core/10.10.0/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.flywaydb/flyway-core/10.10.0/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.flywaydb/flyway-core/10.15.0/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.flywaydb/flyway-core/10.15.0/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.flywaydb/flyway-core/10.15.0/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.flywaydb/flyway-core/10.20.0/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.flywaydb/flyway-core/10.20.0/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.flywaydb/flyway-core/10.20.0/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.flywaydb/flyway-core/10.20.1/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.flywaydb/flyway-core/10.20.1/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.flywaydb/flyway-core/10.20.1/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.flywaydb/flyway-core/9.0.1/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.flywaydb/flyway-core/9.0.1/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.flywaydb/flyway-core/9.0.1/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.flywaydb/flyway-core/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.flywaydb/flyway-database-postgresql/10.10.0/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.flywaydb/flyway-database-postgresql/10.10.0/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.flywaydb/flyway-database-postgresql/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.flywaydb/flyway-sqlserver/10.10.0/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.flywaydb/flyway-sqlserver/10.10.0/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.flywaydb/flyway-sqlserver/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.freemarker/freemarker/2.3.31/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.freemarker/freemarker/2.3.31/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.freemarker/freemarker/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.glassfish.jaxb/jaxb-runtime/3.0.2/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.glassfish.jaxb/jaxb-runtime/3.0.2/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.glassfish.jaxb/jaxb-runtime/3.0.2/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.glassfish.jaxb/jaxb-runtime/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hdrhistogram/HdrHistogram/2.1.12/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hdrhistogram/HdrHistogram/2.1.12/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hdrhistogram/HdrHistogram/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate.orm/hibernate-core/6.1.1.Final/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate.orm/hibernate-core/6.1.1.Final/proxy-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate.orm/hibernate-core/6.1.1.Final/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate.orm/hibernate-core/6.1.1.Final/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate.orm/hibernate-core/6.2.0.Final/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate.orm/hibernate-core/6.2.0.Final/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate.orm/hibernate-core/6.2.0.Final/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate.orm/hibernate-core/6.5.0.Final/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate.orm/hibernate-core/6.5.0.Final/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate.orm/hibernate-core/6.5.0.Final/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate.orm/hibernate-core/6.6.0.Final/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate.orm/hibernate-core/6.6.0.Final/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate.orm/hibernate-core/6.6.0.Final/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate.orm/hibernate-core/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate.orm/hibernate-envers/6.1.1.Final/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate.orm/hibernate-envers/6.1.1.Final/proxy-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate.orm/hibernate-envers/6.1.1.Final/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate.orm/hibernate-envers/6.1.1.Final/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate.orm/hibernate-envers/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate.reactive/hibernate-reactive-core/2.0.0.Final/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate.reactive/hibernate-reactive-core/2.0.0.Final/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate.reactive/hibernate-reactive-core/2.0.0.Final/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate.reactive/hibernate-reactive-core/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate.validator/hibernate-validator/7.0.4.Final/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate.validator/hibernate-validator/7.0.4.Final/proxy-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate.validator/hibernate-validator/7.0.4.Final/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate.validator/hibernate-validator/7.0.4.Final/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate.validator/hibernate-validator/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate/hibernate-core/5.6.14.Final/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate/hibernate-core/5.6.14.Final/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate/hibernate-core/5.6.14.Final/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate/hibernate-core/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate/hibernate-spatial/6.5.0.Final/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate/hibernate-spatial/6.5.0.Final/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.hibernate/hibernate-spatial/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.jboss.logging/jboss-logging/3.5.0.Final/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.jboss.logging/jboss-logging/3.5.0.Final/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.jboss.logging/jboss-logging/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.jboss.spec.javax.servlet/jboss-servlet-api_4.0_spec/2.0.0.Final/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.jboss.spec.javax.servlet/jboss-servlet-api_4.0_spec/2.0.0.Final/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.jboss.spec.javax.servlet/jboss-servlet-api_4.0_spec/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.jctools/jctools-core/2.1.2/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.jctools/jctools-core/2.1.2/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.jctools/jctools-core/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.jetbrains.kotlin/kotlin-reflect/1.7.10/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.jetbrains.kotlin/kotlin-reflect/1.7.10/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.jetbrains.kotlin/kotlin-reflect/1.7.10/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.jetbrains.kotlin/kotlin-reflect/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.jetbrains.kotlin/kotlin-stdlib/1.7.10/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.jetbrains.kotlin/kotlin-stdlib/1.7.10/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.jetbrains.kotlin/kotlin-stdlib/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.jline/jline/3.21.0/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.jline/jline/3.21.0/jni-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.jline/jline/3.21.0/proxy-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.jline/jline/3.21.0/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.jline/jline/3.21.0/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.jline/jline/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.jooq/jooq/3.17.7/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.jooq/jooq/3.17.7/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.jooq/jooq/3.18.2/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.jooq/jooq/3.18.2/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.jooq/jooq/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.liquibase/liquibase-core/4.17.0/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.liquibase/liquibase-core/4.17.0/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.liquibase/liquibase-core/4.17.0/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.liquibase/liquibase-core/4.20.0/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.liquibase/liquibase-core/4.20.0/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.liquibase/liquibase-core/4.20.0/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.liquibase/liquibase-core/4.23.0/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.liquibase/liquibase-core/4.23.0/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.liquibase/liquibase-core/4.23.0/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.liquibase/liquibase-core/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.mariadb.jdbc/mariadb-java-client/3.0.6/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.mariadb.jdbc/mariadb-java-client/3.0.6/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.mariadb.jdbc/mariadb-java-client/3.0.6/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.mariadb.jdbc/mariadb-java-client/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.mariadb/r2dbc-mariadb/1.1.3/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.mariadb/r2dbc-mariadb/1.1.3/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.mariadb/r2dbc-mariadb/1.1.3/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.mariadb/r2dbc-mariadb/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.mockito/mockito-core/4.8.1/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.mockito/mockito-core/4.8.1/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.mockito/mockito-core/4.8.1/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.mockito/mockito-core/5.0.0/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.mockito/mockito-core/5.0.0/proxy-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.mockito/mockito-core/5.0.0/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.mockito/mockito-core/5.0.0/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.mockito/mockito-core/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.opengauss/opengauss-jdbc/3.1.0-og/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.opengauss/opengauss-jdbc/3.1.0-og/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.opengauss/opengauss-jdbc/3.1.0-og/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.opengauss/opengauss-jdbc/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.postgresql/postgresql/42.3.4/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.postgresql/postgresql/42.3.4/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.postgresql/postgresql/42.7.3/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.postgresql/postgresql/42.7.3/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.postgresql/postgresql/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.quartz-scheduler/quartz/2.3.2/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.quartz-scheduler/quartz/2.3.2/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.quartz-scheduler/quartz/2.3.2/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.quartz-scheduler/quartz/2.3.2/serialization-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.quartz-scheduler/quartz/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.testcontainers/testcontainers/1.17.6/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.testcontainers/testcontainers/1.17.6/proxy-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.testcontainers/testcontainers/1.17.6/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.testcontainers/testcontainers/1.17.6/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.testcontainers/testcontainers/1.19.8/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.testcontainers/testcontainers/1.19.8/proxy-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.testcontainers/testcontainers/1.19.8/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.testcontainers/testcontainers/1.19.8/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.testcontainers/testcontainers/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.thymeleaf.extras/thymeleaf-extras-springsecurity6/3.1.0.M1/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.thymeleaf.extras/thymeleaf-extras-springsecurity6/3.1.0.M1/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.thymeleaf.extras/thymeleaf-extras-springsecurity6/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.thymeleaf/thymeleaf-spring6/3.1.0.M2/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.thymeleaf/thymeleaf-spring6/3.1.0.M2/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.thymeleaf/thymeleaf-spring6/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.thymeleaf/thymeleaf/3.1.0.M2/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.thymeleaf/thymeleaf/3.1.0.M2/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.thymeleaf/thymeleaf/3.1.0.M2/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.thymeleaf/thymeleaf/3.1.0.RC1/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.thymeleaf/thymeleaf/3.1.0.RC1/reflect-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.thymeleaf/thymeleaf/3.1.0.RC1/resource-config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/org.thymeleaf/thymeleaf/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/samples/docker/image-pull/.gitkeep" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/graalvm-reachability-metadata/922933094647332d8994cc971950c20aefd4b0d/samples/docker/index.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/maven-archiver/pom.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/createdFiles.lst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/surefire-reports/TEST-com.example.UserServiceApplicationTests.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/surefire-reports/com.example.UserServiceApplicationTests.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/test-ids/junit-platform-unique-ids-502127057246110438.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/target/user-service-0.0.1-SNAPSHOT.jar.original" beforeDir="false" />
+    <list default="true" id="e7f2f231-d1e0-492a-a8bc-b12374d2d4c7" name="Changes" comment="frontend-added">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/BookMySalonApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/BookMySalonApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/controller/ChatRestController.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/controller/ChatRestController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/controller/MessageController.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/controller/MessageController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/dto/ConversationDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/dto/ConversationDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/dto/MessageDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/dto/MessageDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/dto/SendMessageRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/dto/SendMessageRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/dto/UnreadCountDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/dto/UnreadCountDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/entity/Conversation.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/entity/Conversation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/entity/Message.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/entity/Message.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/entity/MessageStatus.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/entity/MessageStatus.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/repository/ConversationRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/repository/ConversationRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/repository/MessageRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/repository/MessageRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/service/MessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/service/MessageService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/service/PresenceService.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/service/PresenceService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/service/impl/MessageServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/service/impl/MessageServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/service/impl/PresenceServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/service/impl/PresenceServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/websocket/ChatHandshakeHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/websocket/ChatHandshakeHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/websocket/JwtChannelInterceptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/websocket/JwtChannelInterceptor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/websocket/JwtHandshakeInterceptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/websocket/JwtHandshakeInterceptor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/websocket/WebSocketPresenceListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/websocket/WebSocketPresenceListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/websocket/WsUserPrincipal.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/websocket/WsUserPrincipal.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/config/AppConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/config/AppConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/config/CorsConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/config/CorsConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/config/RabbitMqConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/config/RabbitMqConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/config/WebConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/config/WebConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/config/WebSocketConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/config/WebSocketConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/AuthController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/BookingController.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/BookingController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/CategoryController.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/CategoryController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/NotificationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/NotificationController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/PaymentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/PaymentController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/ReviewController.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/ReviewController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/SalonController.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/SalonController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/ServiceOfferingController.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/ServiceOfferingController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/BookingDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/BookingDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/BookingRequestDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/BookingRequestDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/CategoryDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/CategoryDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/LoginDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/LoginDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/NotificationDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/NotificationDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/PaymentOrderDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/PaymentOrderDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/ReviewDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/ReviewDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/ReviewRequestDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/ReviewRequestDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/SalonDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/SalonDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/ServiceOfferingDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/ServiceOfferingDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/SignupDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/SignupDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/UserDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/UserDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/response/ApiResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/response/ApiResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/response/AuthResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/response/AuthResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/response/PaymentLinkResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/response/PaymentLinkResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/response/UserInfoResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/response/UserInfoResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/entity/Booking.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/entity/Booking.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/entity/BookingStatus.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/entity/BookingStatus.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/entity/Category.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/entity/Category.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/entity/Notification.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/entity/Notification.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/entity/NotificationType.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/entity/NotificationType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/entity/PaymentMethod.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/entity/PaymentMethod.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/entity/PaymentOrder.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/entity/PaymentOrder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/entity/PaymentStatus.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/entity/PaymentStatus.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/entity/Review.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/entity/Review.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/entity/Salon.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/entity/Salon.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/entity/ServiceOffering.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/entity/ServiceOffering.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/entity/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/entity/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/entity/UserRole.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/entity/UserRole.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/exception/BookingNotFoundException.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/exception/BookingNotFoundException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/exception/CategoryNotFoundException.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/exception/CategoryNotFoundException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/exception/InvalidRequestException.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/exception/InvalidRequestException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/exception/ReviewNotFoundException.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/exception/ReviewNotFoundException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/exception/SalonNotFoundException.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/exception/SalonNotFoundException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/exception/UnauthorizedException.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/exception/UnauthorizedException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/exception/UserNotFoundException.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/exception/UserNotFoundException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/repository/BookingRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/repository/BookingRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/repository/CategoryRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/repository/CategoryRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/repository/NotificationRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/repository/NotificationRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/repository/PaymentOrderRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/repository/PaymentOrderRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/repository/ReviewRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/repository/ReviewRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/repository/SalonRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/repository/SalonRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/repository/ServiceOfferingRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/repository/ServiceOfferingRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/repository/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/BookingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/BookingService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/CategoryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/CategoryService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/NotificationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/NotificationService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/PaymentService.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/PaymentService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/ReviewService.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/ReviewService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/SalonService.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/SalonService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/ServiceOfferingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/ServiceOfferingService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/BookingServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/BookingServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/CategoryServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/CategoryServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/NotificationServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/NotificationServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/PaymentServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/PaymentServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/ReviewServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/ReviewServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/SalonServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/SalonServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/ServiceOfferingServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/ServiceOfferingServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/UserServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/bookmysalon-app-1.0.0.jar" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/bookmysalon-app-1.0.0.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/bookmysalon-app-1.0.0.jar.original" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/bookmysalon-app-1.0.0.jar.original" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/BookMySalonApplication.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/BookMySalonApplication.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/config/AppConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/config/AppConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/config/CorsConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/config/CorsConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/config/RabbitMqConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/config/RabbitMqConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/config/SecurityConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/config/SecurityConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/config/WebConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/config/WebConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/AuthController.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/AuthController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/BookingController.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/BookingController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/CategoryController.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/CategoryController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/NotificationController.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/NotificationController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/PaymentController.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/PaymentController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/ReviewController.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/ReviewController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/SalonController.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/SalonController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/ServiceOfferingController.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/ServiceOfferingController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/BookingDto$BookingDtoBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/BookingDto$BookingDtoBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/BookingDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/BookingDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/BookingRequestDto$BookingRequestDtoBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/BookingRequestDto$BookingRequestDtoBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/BookingRequestDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/BookingRequestDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/CategoryDto$CategoryDtoBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/CategoryDto$CategoryDtoBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/CategoryDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/CategoryDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/LoginDto$LoginDtoBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/LoginDto$LoginDtoBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/LoginDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/LoginDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/NotificationDto$NotificationDtoBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/NotificationDto$NotificationDtoBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/NotificationDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/NotificationDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/PaymentOrderDto$PaymentOrderDtoBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/PaymentOrderDto$PaymentOrderDtoBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/PaymentOrderDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/PaymentOrderDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/ReviewDto$ReviewDtoBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/ReviewDto$ReviewDtoBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/ReviewDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/ReviewDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/ReviewRequestDto$ReviewRequestDtoBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/ReviewRequestDto$ReviewRequestDtoBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/ReviewRequestDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/ReviewRequestDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/SalonDto$SalonDtoBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/SalonDto$SalonDtoBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/SalonDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/SalonDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/ServiceOfferingDto$ServiceOfferingDtoBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/ServiceOfferingDto$ServiceOfferingDtoBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/ServiceOfferingDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/ServiceOfferingDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/SignupDto$SignupDtoBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/SignupDto$SignupDtoBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/SignupDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/SignupDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/UserDto$UserDtoBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/UserDto$UserDtoBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/UserDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/UserDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/response/ApiResponse$ApiResponseBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/response/ApiResponse$ApiResponseBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/response/ApiResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/response/ApiResponse.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/response/AuthResponse$AuthResponseBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/response/AuthResponse$AuthResponseBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/response/AuthResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/response/AuthResponse.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/response/PaymentLinkResponse$PaymentLinkResponseBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/response/PaymentLinkResponse$PaymentLinkResponseBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/response/PaymentLinkResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/response/PaymentLinkResponse.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/response/UserInfoResponse$UserInfoResponseBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/response/UserInfoResponse$UserInfoResponseBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/response/UserInfoResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/response/UserInfoResponse.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/entity/Booking.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/entity/Booking.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/entity/BookingStatus.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/entity/BookingStatus.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/entity/Category.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/entity/Category.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/entity/Notification.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/entity/Notification.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/entity/PaymentMethod.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/entity/PaymentMethod.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/entity/PaymentOrder.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/entity/PaymentOrder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/entity/PaymentStatus.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/entity/PaymentStatus.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/entity/Review.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/entity/Review.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/entity/Salon.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/entity/Salon.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/entity/ServiceOffering.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/entity/ServiceOffering.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/entity/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/entity/User.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/entity/UserRole.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/entity/UserRole.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/exception/BookingNotFoundException.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/exception/BookingNotFoundException.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/exception/CategoryNotFoundException.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/exception/CategoryNotFoundException.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/exception/InvalidRequestException.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/exception/InvalidRequestException.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/exception/ReviewNotFoundException.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/exception/ReviewNotFoundException.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/exception/SalonNotFoundException.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/exception/SalonNotFoundException.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/exception/UnauthorizedException.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/exception/UnauthorizedException.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/exception/UserNotFoundException.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/exception/UserNotFoundException.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/repository/BookingRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/repository/BookingRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/repository/CategoryRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/repository/CategoryRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/repository/NotificationRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/repository/NotificationRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/repository/PaymentOrderRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/repository/PaymentOrderRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/repository/ReviewRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/repository/ReviewRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/repository/SalonRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/repository/SalonRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/repository/ServiceOfferingRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/repository/ServiceOfferingRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/repository/UserRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/repository/UserRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/BookingService.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/BookingService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/CategoryService.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/CategoryService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/NotificationService.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/NotificationService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/PaymentService.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/PaymentService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/ReviewService.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/ReviewService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/SalonService.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/SalonService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/ServiceOfferingService.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/ServiceOfferingService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/UserService.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/UserService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/impl/BookingServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/impl/BookingServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/impl/CategoryServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/impl/CategoryServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/impl/NotificationServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/impl/NotificationServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/impl/PaymentServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/impl/PaymentServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/impl/ReviewServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/impl/ReviewServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/impl/SalonServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/impl/SalonServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/impl/ServiceOfferingServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/impl/ServiceOfferingServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/impl/UserServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/impl/UserServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/test-classes/com/bookmysalon/BookMySalonApplicationTests.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/test-classes/com/bookmysalon/BookMySalonApplicationTests.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/AppErrorBoundary.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/AppErrorBoundary.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Footer.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Footer.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Navbar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Navbar.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/config/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/config/api.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/config/site.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/config/site.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/context/AuthContext.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/context/AuthContext.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/context/ChatContext.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/context/ChatContext.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/main.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/main.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/ChatPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/ChatPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/ChatRoute.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/ChatRoute.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Login.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Login.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/MyBookings.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/MyBookings.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Profile.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Profile.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/SalonDetail.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/SalonDetail.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/SalonList.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/SalonList.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/SalonOwnerDashboard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/SalonOwnerDashboard.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Signup.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Signup.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/tailwind.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/tailwind.config.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -762,6 +271,7 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editing.templates&quot;,
     &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
@@ -786,17 +296,6 @@
       <framework value="gotest" />
       <method v="2" />
     </configuration>
-    <configuration default="true" type="JetRunConfigurationType">
-      <module name="BookMySalon" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
-      <module name="BookMySalon" />
-      <option name="filePath" />
-      <method v="2" />
-    </configuration>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -819,11 +318,36 @@
       <workItem from="1770831413077" duration="1448000" />
       <workItem from="1770832893368" duration="1088000" />
       <workItem from="1770834020955" duration="827000" />
-      <workItem from="1770834860010" duration="549000" />
+      <workItem from="1770834860010" duration="1413000" />
+      <workItem from="1770869872077" duration="2933000" />
+      <workItem from="1770884708673" duration="3006000" />
+      <workItem from="1770951194549" duration="5128000" />
+      <workItem from="1771031157752" duration="7671000" />
+      <workItem from="1771062156447" duration="1190000" />
+      <workItem from="1771219634192" duration="6108000" />
+      <workItem from="1771243426927" duration="16202000" />
+      <workItem from="1771349960370" duration="783000" />
     </task>
+    <task id="LOCAL-00001" summary="frontend-added">
+      <option name="closed" value="true" />
+      <created>1770835427943</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1770835427943</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="frontend-added" />
+    <option name="LAST_COMMIT_MESSAGE" value="frontend-added" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

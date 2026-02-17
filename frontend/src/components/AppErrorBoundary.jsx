@@ -1,3 +1,8 @@
+/**
+ * @author Prahlad Yadav
+ * @version 1.0
+ * @since 2026-02-13
+ */
 import React from 'react';
 
 export default class AppErrorBoundary extends React.Component {
@@ -11,7 +16,6 @@ export default class AppErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    // eslint-disable-next-line no-console
     console.error('App crashed:', error, errorInfo);
   }
 

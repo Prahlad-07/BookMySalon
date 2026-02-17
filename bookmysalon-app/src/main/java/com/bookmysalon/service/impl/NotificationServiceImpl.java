@@ -1,3 +1,8 @@
+/**
+ * @author Prahlad Yadav
+ * @version 1.0
+ * @since 2026-02-14
+ */
 package com.bookmysalon.service.impl;
 
 import com.bookmysalon.dto.NotificationDto;
@@ -25,7 +30,6 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public NotificationDto createNotification(NotificationDto notificationDto) {
-        // Validate input
         if (notificationDto == null) {
             throw new IllegalArgumentException("Notification data cannot be null");
         }

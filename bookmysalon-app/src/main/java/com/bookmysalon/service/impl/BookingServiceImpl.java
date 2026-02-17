@@ -1,3 +1,8 @@
+/**
+ * @author Prahlad Yadav
+ * @version 1.0
+ * @since 2026-02-14
+ */
 package com.bookmysalon.service.impl;
 
 import com.bookmysalon.dto.BookingDto;
@@ -17,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -25,6 +31,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 public class BookingServiceImpl implements BookingService {
+    private static final List<BookingStatus> ACTIVE_STATUSES = List.of(BookingStatus.PENDING, BookingStatus.CONFIRMED);
 
     private final BookingRepository bookingRepository;
     private final ServiceOfferingRepository serviceOfferingRepository;
@@ -33,7 +40,6 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto createBooking(BookingRequestDto bookingRequestDto, Long customerId) {
-        // Validate input
         if (bookingRequestDto == null) {
             throw new IllegalArgumentException("Booking request cannot be null");
         }
@@ -52,9 +58,13 @@ public class BookingServiceImpl implements BookingService {
         if (bookingRequestDto.getEndTime().isBefore(bookingRequestDto.getStartTime())) {
             throw new IllegalArgumentException("End time must be after start time");
         }
+        if (!bookingRequestDto.getStartTime().isAfter(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Start time must be in the future");
+        }
         if (bookingRequestDto.getServiceOfferingIds() == null || bookingRequestDto.getServiceOfferingIds().isEmpty()) {
             throw new IllegalArgumentException("At least one service offering must be selected");
         }
+        validateNoOverlap(bookingRequestDto.getSalonId(), bookingRequestDto.getStartTime(), bookingRequestDto.getEndTime(), null);
 
         Booking booking = new Booking();
         booking.setSalonId(bookingRequestDto.getSalonId());
@@ -103,8 +113,16 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new BookingNotFoundException("Booking not found with id: " + id));
         BookingStatus previousStatus = booking.getStatus();
 
-        if (bookingDto.getStartTime() != null) booking.setStartTime(bookingDto.getStartTime());
-        if (bookingDto.getEndTime() != null) booking.setEndTime(bookingDto.getEndTime());
+        LocalDateTime updatedStart = bookingDto.getStartTime() != null ? bookingDto.getStartTime() : booking.getStartTime();
+        LocalDateTime updatedEnd = bookingDto.getEndTime() != null ? bookingDto.getEndTime() : booking.getEndTime();
+
+        if (!updatedEnd.isAfter(updatedStart)) {
+            throw new IllegalArgumentException("End time must be after start time");
+        }
+        validateNoOverlap(booking.getSalonId(), updatedStart, updatedEnd, booking.getId());
+
+        if (bookingDto.getStartTime() != null) booking.setStartTime(updatedStart);
+        if (bookingDto.getEndTime() != null) booking.setEndTime(updatedEnd);
         if (bookingDto.getStatus() != null) booking.setStatus(bookingDto.getStatus());
 
         Booking updatedBooking = bookingRepository.save(booking);
@@ -182,6 +200,20 @@ public class BookingServiceImpl implements BookingService {
                     null,
                     null
             );
+        }
+    }
+
+    private void validateNoOverlap(Long salonId, LocalDateTime startTime, LocalDateTime endTime, Long excludeBookingId) {
+        boolean hasOverlap = excludeBookingId == null
+                ? bookingRepository.existsBySalonIdAndStatusInAndStartTimeLessThanAndEndTimeGreaterThan(
+                salonId, ACTIVE_STATUSES, endTime, startTime
+        )
+                : bookingRepository.existsBySalonIdAndIdNotAndStatusInAndStartTimeLessThanAndEndTimeGreaterThan(
+                salonId, excludeBookingId, ACTIVE_STATUSES, endTime, startTime
+        );
+
+        if (hasOverlap) {
+            throw new IllegalArgumentException("Selected slot is already booked for this salon");
         }
     }
 }

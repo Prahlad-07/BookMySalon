@@ -1,3 +1,8 @@
+/**
+ * @author Prahlad Yadav
+ * @version 1.0
+ * @since 2026-02-13
+ */
 export const SITE_PROFILE = {
   founderName: 'Prahlad Yadav',
   locationLabel: 'Delhi - Noida',

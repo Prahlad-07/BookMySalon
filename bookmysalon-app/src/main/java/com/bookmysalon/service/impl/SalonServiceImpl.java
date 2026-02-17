@@ -1,3 +1,8 @@
+/**
+ * @author Prahlad Yadav
+ * @version 1.0
+ * @since 2026-02-14
+ */
 package com.bookmysalon.service.impl;
 
 import com.bookmysalon.dto.SalonDto;
@@ -9,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,7 +27,6 @@ public class SalonServiceImpl implements SalonService {
 
     @Override
     public SalonDto createSalon(SalonDto salonDto) {
-        // Validate input
         if (salonDto == null) {
             throw new IllegalArgumentException("Salon data cannot be null");
         }
@@ -114,10 +119,14 @@ public class SalonServiceImpl implements SalonService {
     }
 
     private SalonDto mapToDto(Salon salon) {
+        List<String> safeImages = salon.getImages() == null
+                ? new ArrayList<>()
+                : new ArrayList<>(salon.getImages());
+
         return SalonDto.builder()
                 .id(salon.getId())
                 .name(salon.getName())
-                .images(salon.getImages())
+                .images(safeImages)
                 .address(salon.getAddress())
                 .phoneNumber(salon.getPhoneNumber())
                 .email(salon.getEmail())

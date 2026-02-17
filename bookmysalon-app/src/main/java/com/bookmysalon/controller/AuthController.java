@@ -1,12 +1,23 @@
+/**
+ * @author Prahlad Yadav
+ * @version 1.0
+ * @since 2026-02-13
+ */
 package com.bookmysalon.controller;
 
-import com.bookmysalon.dto.SignupDto;
-import com.bookmysalon.dto.LoginDto;
-import com.bookmysalon.dto.UserDto;
+import com.bookmysalon.dto.auth.LoginRequest;
+import com.bookmysalon.dto.auth.ForgotPasswordRequest;
+import com.bookmysalon.dto.auth.RefreshTokenRequest;
+import com.bookmysalon.dto.auth.ResendSignupOtpRequest;
+import com.bookmysalon.dto.auth.RegisterRequest;
+import com.bookmysalon.dto.auth.ResetPasswordRequest;
+import com.bookmysalon.dto.auth.SignupInitiateRequest;
+import com.bookmysalon.dto.auth.SignupInitiateResponse;
+import com.bookmysalon.dto.auth.VerifySignupOtpRequest;
 import com.bookmysalon.dto.response.ApiResponse;
 import com.bookmysalon.dto.response.AuthResponse;
-import com.bookmysalon.dto.response.UserInfoResponse;
-import com.bookmysalon.service.UserService;
+import com.bookmysalon.service.auth.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final UserService userService;
+    private final AuthService authService;
 
     @GetMapping("/health")
     public ResponseEntity<ApiResponse<String>> health() {
@@ -27,85 +38,83 @@ public class AuthController {
                 .build());
     }
 
-    @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<UserDto>> signup(@RequestBody SignupDto signupDto) {
-        try {
-            // Validate input
-            if (signupDto == null) {
-                return ResponseEntity.status(400).body(ApiResponse.<UserDto>builder()
-                        .success(false)
-                        .message("Signup data is required")
-                        .build());
-            }
+    @PostMapping("/register")
+    public ResponseEntity<ApiResponse<AuthResponse>> register(@Valid @RequestBody RegisterRequest request) {
+        AuthResponse response = authService.register(request);
+        return ResponseEntity.ok(ApiResponse.<AuthResponse>builder()
+                .success(true)
+                .message("User registered successfully")
+                .data(response)
+                .build());
+    }
 
-            UserDto userDto = userService.createUser(signupDto);
-            return ResponseEntity.ok(ApiResponse.<UserDto>builder()
-                    .success(true)
-                    .message("User registered successfully")
-                    .data(userDto)
-                    .build());
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(400).body(ApiResponse.<UserDto>builder()
-                    .success(false)
-                    .message("Validation failed")
-                    .error(e.getMessage())
-                    .build());
-        } catch (Exception e) {
-            return ResponseEntity.status(400).body(ApiResponse.<UserDto>builder()
-                    .success(false)
-                    .message("Registration failed")
-                    .error(e.getMessage())
-                    .build());
-        }
+    @PostMapping("/signup/initiate")
+    public ResponseEntity<ApiResponse<SignupInitiateResponse>> initiateSignup(@Valid @RequestBody SignupInitiateRequest request) {
+        SignupInitiateResponse response = authService.initiateSignup(request);
+        return ResponseEntity.ok(ApiResponse.<SignupInitiateResponse>builder()
+                .success(true)
+                .message("OTP sent to email and phone")
+                .data(response)
+                .build());
+    }
+
+    @PostMapping("/signup/resend-otp")
+    public ResponseEntity<ApiResponse<SignupInitiateResponse>> resendSignupOtp(@Valid @RequestBody ResendSignupOtpRequest request) {
+        SignupInitiateResponse response = authService.resendSignupOtp(request);
+        return ResponseEntity.ok(ApiResponse.<SignupInitiateResponse>builder()
+                .success(true)
+                .message("OTP resent to email and phone")
+                .data(response)
+                .build());
+    }
+
+    @PostMapping("/signup/verify-otp")
+    public ResponseEntity<ApiResponse<AuthResponse>> verifySignupOtp(@Valid @RequestBody VerifySignupOtpRequest request) {
+        AuthResponse response = authService.verifySignupOtp(request);
+        return ResponseEntity.ok(ApiResponse.<AuthResponse>builder()
+                .success(true)
+                .message("Signup verified successfully")
+                .data(response)
+                .build());
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<AuthResponse>> login(@RequestBody LoginDto loginDto) {
-        try {
-            // Validate input
-            if (loginDto == null || loginDto.getEmail() == null || loginDto.getPassword() == null) {
-                return ResponseEntity.status(400).body(ApiResponse.<AuthResponse>builder()
-                        .success(false)
-                        .message("Email and password are required")
-                        .build());
-            }
-
-            AuthResponse authResponse = userService.login(loginDto);
-            return ResponseEntity.ok(ApiResponse.<AuthResponse>builder()
-                    .success(true)
-                    .message("Login successful")
-                    .data(authResponse)
-                    .build());
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(401).body(ApiResponse.<AuthResponse>builder()
-                    .success(false)
-                    .message("Invalid credentials")
-                    .error(e.getMessage())
-                    .build());
-        } catch (Exception e) {
-            return ResponseEntity.status(401).body(ApiResponse.<AuthResponse>builder()
-                    .success(false)
-                    .message("Login failed")
-                    .error(e.getMessage())
-                    .build());
-        }
+    public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest request) {
+        AuthResponse response = authService.login(request);
+        return ResponseEntity.ok(ApiResponse.<AuthResponse>builder()
+                .success(true)
+                .message("Login successful")
+                .data(response)
+                .build());
     }
 
-    @GetMapping("/user/{id}")
-    public ResponseEntity<ApiResponse<UserInfoResponse>> getUserInfo(@PathVariable Long id) {
-        try {
-            UserInfoResponse userInfo = userService.getUserInfo(id);
-            return ResponseEntity.ok(ApiResponse.<UserInfoResponse>builder()
-                    .success(true)
-                    .message("User info retrieved successfully")
-                    .data(userInfo)
-                    .build());
-        } catch (Exception e) {
-            return ResponseEntity.status(404).body(ApiResponse.<UserInfoResponse>builder()
-                    .success(false)
-                    .message("User not found")
-                    .error(e.getMessage())
-                    .build());
-        }
+    @PostMapping("/refresh-token")
+    public ResponseEntity<ApiResponse<AuthResponse>> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
+        AuthResponse response = authService.refreshToken(request);
+        return ResponseEntity.ok(ApiResponse.<AuthResponse>builder()
+                .success(true)
+                .message("Token refreshed")
+                .data(response)
+                .build());
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ApiResponse<String>> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        authService.forgotPassword(request);
+        return ResponseEntity.ok(ApiResponse.<String>builder()
+                .success(true)
+                .message("If that email exists, a password reset link has been sent")
+                .data("If that email exists, a password reset link has been sent")
+                .build());
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponse<String>> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        authService.resetPassword(request);
+        return ResponseEntity.ok(ApiResponse.<String>builder()
+                .success(true)
+                .message("Password reset successful")
+                .data("Password reset successful")
+                .build());
     }
 }

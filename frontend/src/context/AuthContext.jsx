@@ -1,3 +1,8 @@
+/**
+ * @author Prahlad Yadav
+ * @version 1.0
+ * @since 2026-02-13
+ */
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import api from '../config/api';
 
@@ -140,6 +145,66 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const initiateSignupOtp = async (data) => {
+    try {
+      setError(null);
+      if (!data || !data.email || !data.password || !data.name || !data.phone) {
+        setError('Name, email, phone and password are required');
+        return null;
+      }
+
+      const payload = {
+        fullName: data.name.trim(),
+        name: data.name.trim(),
+        email: data.email.trim().toLowerCase(),
+        phone: data.phone.trim(),
+        password: data.password,
+        role: data.role,
+        username: data.email.trim().toLowerCase().split('@')[0],
+      };
+
+      const response = await api.post('/api/auth/signup/initiate', payload);
+      return response;
+    } catch (err) {
+      const errorMessage = extractErrorMessage(err, 'Unable to send OTP. Please try again.');
+      setError(errorMessage);
+      return null;
+    }
+  };
+
+  const resendSignupOtp = async (sessionToken) => {
+    try {
+      setError(null);
+      return await api.post('/api/auth/signup/resend-otp', { sessionToken });
+    } catch (err) {
+      const errorMessage = extractErrorMessage(err, 'Unable to resend OTP. Please try again.');
+      setError(errorMessage);
+      return null;
+    }
+  };
+
+  const verifySignupOtp = async (sessionToken, emailOtp, phoneOtp) => {
+    try {
+      setError(null);
+      const response = await api.post('/api/auth/signup/verify-otp', {
+        sessionToken,
+        emailOtp,
+        phoneOtp,
+      });
+
+      const { token, refreshToken, id } = response || {};
+      if (token) localStorage.setItem('accessToken', token);
+      if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
+      if (id) localStorage.setItem('userId', id);
+      setUser(normalizeUser(response));
+      return true;
+    } catch (err) {
+      const errorMessage = extractErrorMessage(err, 'OTP verification failed.');
+      setError(errorMessage);
+      return false;
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
@@ -148,7 +213,20 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, login, signup, logout, setUser }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        error,
+        login,
+        signup,
+        initiateSignupOtp,
+        resendSignupOtp,
+        verifySignupOtp,
+        logout,
+        setUser,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

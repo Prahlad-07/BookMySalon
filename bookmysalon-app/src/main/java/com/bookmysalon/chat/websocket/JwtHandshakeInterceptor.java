@@ -1,3 +1,8 @@
+/**
+ * @author Prahlad Yadav
+ * @version 1.0
+ * @since 2026-02-15
+ */
 package com.bookmysalon.chat.websocket;
 
 import com.bookmysalon.security.CustomUserPrincipal;
@@ -42,7 +47,6 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
                 attributes.put("wsUsername", user.getUsername());
             }
         } catch (Exception ignored) {
-            // CONNECT frame interceptor handles auth failure and blocks connection.
         }
 
         return true;
@@ -53,7 +57,6 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
                                ServerHttpResponse response,
                                WebSocketHandler wsHandler,
                                Exception exception) {
-        // no-op
     }
 
     private String extractToken(ServerHttpRequest request) {

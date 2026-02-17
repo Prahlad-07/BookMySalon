@@ -1,3 +1,8 @@
+/**
+ * @author Prahlad Yadav
+ * @version 1.0
+ * @since 2026-02-13
+ */
 package com.bookmysalon.entity;
 
 import jakarta.persistence.*;
@@ -10,6 +15,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -24,6 +31,10 @@ public class User {
     @Column(nullable = false)
     private String fullName;
 
+    @NotBlank
+    @Column(nullable = false, unique = true)
+    private String username;
+
     @Email
     @Column(nullable = false, unique = true)
     private String email;
@@ -37,6 +48,14 @@ public class User {
     @NotBlank
     @Column(nullable = false)
     private String password;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles = new HashSet<>();
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
