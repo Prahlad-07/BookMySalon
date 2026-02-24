@@ -183,13 +183,14 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const verifySignupOtp = async (sessionToken, emailOtp, phoneOtp) => {
+  const verifySignupOtp = async (sessionToken, emailOtp, phoneOtp, msg91AccessToken) => {
     try {
       setError(null);
       const response = await api.post('/api/auth/signup/verify-otp', {
         sessionToken,
         emailOtp,
         phoneOtp,
+        msg91AccessToken,
       });
 
       const { token, refreshToken, id } = response || {};

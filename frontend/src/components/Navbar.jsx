@@ -85,7 +85,7 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav className="sticky top-0 z-50 backdrop-blur bg-white/85 border-b border-blue-100">
+    <nav className="sticky top-0 z-50 nav-surface">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="flex items-center gap-2">
@@ -96,7 +96,7 @@ export default function Navbar() {
           </Link>
 
           <div className="hidden md:flex items-center gap-7 text-sm font-semibold text-slate-700">
-            <Link to="/" className="hover:text-blue-700">Home</Link>
+            <Link to="/" className="hover:text-primary-700">Home</Link>
             <button
               type="button"
               onClick={toggleTheme}
@@ -109,18 +109,18 @@ export default function Navbar() {
             {user ? (
               <>
                 {roleLinks.map((item) => (
-                  <Link key={item.to} to={item.to} className="hover:text-blue-700">
+                  <Link key={item.to} to={item.to} className="hover:text-primary-700">
                     {item.label}
                   </Link>
                 ))}
-                <Link to="/chat" className="hover:text-blue-700 flex items-center gap-1">
+                <Link to="/chat" className="hover:text-primary-700 flex items-center gap-1">
                   <MessageCircle size={16} />
                   Chat
                 </Link>
                 <div className="relative" ref={notificationRef}>
                   <button
                     type="button"
-                    className="hover:text-blue-700 flex items-center gap-1"
+                    className="hover:text-primary-700 flex items-center gap-1"
                     onClick={() => {
                       setShowNotifications((prev) => !prev);
                       loadNotifications();
@@ -135,7 +135,7 @@ export default function Navbar() {
                     )}
                   </button>
                   {showNotifications && (
-                    <div className="absolute right-0 mt-2 w-80 bg-white border border-slate-200 rounded-xl shadow-lg p-2 z-50">
+                    <div className="absolute right-0 mt-2 w-80 surface-card rounded-xl p-2 z-50">
                       <p className="px-2 py-1 text-xs font-semibold text-slate-500">Notifications</p>
                       <div className="max-h-72 overflow-auto space-y-1">
                         {notifications.length === 0 && (
@@ -150,7 +150,7 @@ export default function Navbar() {
                               if (item.conversationId) navigate('/chat');
                             }}
                             className={`w-full text-left px-2 py-2 rounded-lg border ${
-                              item.wasRead ? 'bg-white border-slate-100' : 'bg-blue-50 border-blue-100'
+                              item.wasRead ? 'surface-muted border-slate-200' : 'bg-primary-50 border-primary-200'
                             }`}
                           >
                             <p className="text-xs font-semibold text-slate-700">{item.type?.replaceAll('_', ' ') || 'NOTIFICATION'}</p>
@@ -161,14 +161,14 @@ export default function Navbar() {
                     </div>
                   )}
                 </div>
-                <Link to="/profile" className="hover:text-blue-700">Profile</Link>
+                <Link to="/profile" className="hover:text-primary-700">Profile</Link>
                 <button onClick={handleLogout} className="btn-primary flex items-center gap-2 !py-2">
                   <LogOut size={16} /> Logout
                 </button>
               </>
             ) : (
               <>
-                <Link to="/login" className="hover:text-blue-700">Login</Link>
+                <Link to="/login" className="hover:text-primary-700">Login</Link>
                 <Link to="/signup" className="btn-primary !py-2">Sign Up</Link>
               </>
             )}
@@ -194,7 +194,7 @@ export default function Navbar() {
         </div>
 
         {isOpen && (
-          <div className="md:hidden py-3 border-t border-blue-100 space-y-1 text-sm font-medium">
+          <div className="md:hidden py-3 border-t border-slate-200 space-y-1 text-sm font-medium">
             <Link to="/" className="block px-2 py-2 text-slate-700" onClick={() => setIsOpen(false)}>Home</Link>
             {user ? (
               <>

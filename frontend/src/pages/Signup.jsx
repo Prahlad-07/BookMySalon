@@ -3,10 +3,31 @@
  * @version 1.0
  * @since 2026-02-13
  */
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, User, AlertCircle, Phone, Sparkles, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+
+const MSG91_WIDGET_ID = import.meta.env.VITE_MSG91_WIDGET_ID || '';
+const MSG91_TOKEN_AUTH = import.meta.env.VITE_MSG91_TOKEN_AUTH || '';
+
+const MSG91_SCRIPT_URLS = [
+  'https://verify.msg91.com/otp-provider.js',
+  'https://verify.phone91.com/otp-provider.js',
+];
+
+const extractMsg91AccessToken = (payload) => {
+  if (!payload || typeof payload !== 'object') return '';
+  return (
+    payload.accessToken ||
+    payload.token ||
+    payload.access_token ||
+    payload['access-token'] ||
+    payload?.data?.accessToken ||
+    payload?.data?.token ||
+    ''
+  );
+};
 
 export default function Signup() {
   const [formData, setFormData] = useState({
@@ -21,12 +42,12 @@ export default function Signup() {
   const [otpData, setOtpData] = useState({
     sessionToken: '',
     emailOtp: '',
-    phoneOtp: '',
+    msg91AccessToken: '',
+    msg91Verified: false,
     expiresAtEpochMs: 0,
     maskedEmail: '',
     maskedPhone: '',
     devEmailOtp: '',
-    devPhoneOtp: '',
   });
 
   const [stage, setStage] = useState('FORM');
@@ -45,6 +66,40 @@ export default function Signup() {
     const msLeft = otpData.expiresAtEpochMs - Date.now();
     return Math.max(0, Math.ceil(msLeft / 60000));
   }, [otpData.expiresAtEpochMs]);
+
+  const loadMsg91Script = useCallback(() => {
+    if (typeof window === 'undefined') return Promise.reject(new Error('Window not available'));
+    if (typeof window.initSendOTP === 'function') return Promise.resolve();
+
+    return new Promise((resolve, reject) => {
+      let index = 0;
+      const attemptLoad = () => {
+        if (index >= MSG91_SCRIPT_URLS.length) {
+          reject(new Error('Unable to load MSG91 widget script.'));
+          return;
+        }
+
+        const script = document.createElement('script');
+        script.src = MSG91_SCRIPT_URLS[index];
+        script.async = true;
+        script.onload = () => {
+          if (typeof window.initSendOTP === 'function') {
+            resolve();
+            return;
+          }
+          index += 1;
+          attemptLoad();
+        };
+        script.onerror = () => {
+          index += 1;
+          attemptLoad();
+        };
+        document.head.appendChild(script);
+      };
+
+      attemptLoad();
+    });
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -71,28 +126,89 @@ export default function Signup() {
     setOtpData({
       sessionToken: response.sessionToken || '',
       emailOtp: '',
-      phoneOtp: '',
+      msg91AccessToken: '',
+      msg91Verified: false,
       expiresAtEpochMs: response.expiresAtEpochMs || 0,
       maskedEmail: response.maskedEmail || formData.email,
       maskedPhone: response.maskedPhone || formData.phone,
       devEmailOtp: response.devEmailOtp || '',
-      devPhoneOtp: response.devPhoneOtp || '',
     });
     setStage('OTP');
-    setSuccess('OTP sent to your email and phone. Please verify to complete signup.');
+    setSuccess('Email OTP sent. Please verify email and mobile to complete signup.');
+  };
+
+  const handleVerifyMobile = async () => {
+    setLocalError('');
+    setSuccess('');
+
+    if (!MSG91_WIDGET_ID || !MSG91_TOKEN_AUTH) {
+      setLocalError('MSG91 is not configured. Set VITE_MSG91_WIDGET_ID and VITE_MSG91_TOKEN_AUTH.');
+      return;
+    }
+
+    if (!formData.phone?.trim()) {
+      setLocalError('Phone number is required for mobile verification.');
+      return;
+    }
+
+    try {
+      await loadMsg91Script();
+    } catch (err) {
+      setLocalError('Unable to load mobile verification widget.');
+      return;
+    }
+
+    if (typeof window.initSendOTP !== 'function') {
+      setLocalError('Mobile verification widget is unavailable right now.');
+      return;
+    }
+
+    window.initSendOTP({
+      widgetId: MSG91_WIDGET_ID,
+      tokenAuth: MSG91_TOKEN_AUTH,
+      identifier: formData.phone.trim(),
+      success: (data) => {
+        const accessToken = extractMsg91AccessToken(data);
+        if (!accessToken) {
+          setLocalError('Mobile verified, but token was not returned by MSG91.');
+          return;
+        }
+
+        setOtpData((prev) => ({
+          ...prev,
+          msg91AccessToken: accessToken,
+          msg91Verified: true,
+        }));
+        setSuccess('Mobile number verified successfully.');
+      },
+      failure: (errorObj) => {
+        const failureReason = errorObj?.message || errorObj?.error || 'Mobile verification failed.';
+        setLocalError(failureReason);
+      },
+    });
   };
 
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
     setLocalError('');
 
-    if (!otpData.emailOtp || !otpData.phoneOtp) {
-      setLocalError('Both OTPs are required.');
+    if (!otpData.emailOtp) {
+      setLocalError('Email OTP is required.');
+      return;
+    }
+
+    if (!otpData.msg91AccessToken) {
+      setLocalError('Please verify your mobile number.');
       return;
     }
 
     setIsLoading(true);
-    const ok = await verifySignupOtp(otpData.sessionToken, otpData.emailOtp.trim(), otpData.phoneOtp.trim());
+    const ok = await verifySignupOtp(
+      otpData.sessionToken,
+      otpData.emailOtp.trim(),
+      '',
+      otpData.msg91AccessToken
+    );
     setIsLoading(false);
 
     if (ok) {
@@ -112,10 +228,10 @@ export default function Signup() {
     setOtpData((prev) => ({
       ...prev,
       emailOtp: '',
-      phoneOtp: '',
+      msg91AccessToken: '',
+      msg91Verified: false,
       expiresAtEpochMs: response.expiresAtEpochMs || prev.expiresAtEpochMs,
       devEmailOtp: response.devEmailOtp || '',
-      devPhoneOtp: response.devPhoneOtp || '',
     }));
     setSuccess('OTP resent successfully.');
   };
@@ -218,10 +334,11 @@ export default function Signup() {
         ) : (
           <form onSubmit={handleVerifyOtp} className="space-y-4">
             <div className="rounded-xl border border-blue-100 bg-blue-50 p-3 text-sm text-slate-700">
-              <p>OTP sent to: <strong>{otpData.maskedEmail}</strong> and <strong>{otpData.maskedPhone}</strong></p>
+              <p>OTP sent to: <strong>{otpData.maskedEmail}</strong></p>
+              <p className="mt-1">Verify mobile via widget for: <strong>{otpData.maskedPhone}</strong></p>
               <p className="mt-1">Expires in approximately {otpMinutesRemaining} minute(s).</p>
-              {(otpData.devEmailOtp || otpData.devPhoneOtp) && (
-                <p className="mt-2 text-xs text-blue-700">Dev OTPs: Email {otpData.devEmailOtp}, Phone {otpData.devPhoneOtp}</p>
+              {otpData.devEmailOtp && (
+                <p className="mt-2 text-xs text-blue-700">Dev OTP: Email {otpData.devEmailOtp}</p>
               )}
             </div>
 
@@ -230,9 +347,20 @@ export default function Signup() {
               <input className="input-field mt-1.5" value={otpData.emailOtp} onChange={(e) => setOtpData((prev) => ({ ...prev, emailOtp: e.target.value }))} required />
             </div>
 
-            <div>
-              <label className="text-sm font-semibold text-slate-700">Phone OTP</label>
-              <input className="input-field mt-1.5" value={otpData.phoneOtp} onChange={(e) => setOtpData((prev) => ({ ...prev, phoneOtp: e.target.value }))} required />
+            <div className="rounded-xl border border-slate-200 p-3">
+              <p className="text-sm font-semibold text-slate-700">Mobile Verification</p>
+              <p className="text-xs text-slate-500 mt-1">Use MSG91 widget to verify your phone number before final signup.</p>
+              <button
+                type="button"
+                className="btn-outline mt-3"
+                onClick={handleVerifyMobile}
+                disabled={isLoading}
+              >
+                {otpData.msg91Verified ? 'Re-verify Mobile' : 'Verify Mobile'}
+              </button>
+              <p className={`text-xs mt-2 ${otpData.msg91Verified ? 'text-emerald-700' : 'text-slate-500'}`}>
+                {otpData.msg91Verified ? 'Mobile verified successfully.' : 'Mobile not verified yet.'}
+              </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

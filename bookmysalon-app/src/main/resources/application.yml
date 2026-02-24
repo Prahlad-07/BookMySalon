@@ -29,6 +29,16 @@ stripe:
 app:
   otp:
     dev-mode: true
+    msg91:
+      enabled: ${MSG91_ENABLED:false}
+      authkey: ${MSG91_AUTHKEY:}
+    sms:
+      enabled: ${OTP_SMS_ENABLED:false}
+      default-country-code: ${OTP_SMS_DEFAULT_COUNTRY_CODE:+91}
+      twilio:
+        account-sid: ${TWILIO_ACCOUNT_SID:}
+        auth-token: ${TWILIO_AUTH_TOKEN:}
+        from-number: ${TWILIO_FROM_NUMBER:}
 
 logging:
   level:

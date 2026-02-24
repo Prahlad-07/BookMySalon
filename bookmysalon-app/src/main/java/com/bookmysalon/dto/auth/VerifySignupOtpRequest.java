@@ -20,6 +20,7 @@ public class VerifySignupOtpRequest {
     @NotBlank
     private String emailOtp;
 
-    @NotBlank
     private String phoneOtp;
+
+    private String msg91AccessToken;
 }
