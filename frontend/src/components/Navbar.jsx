@@ -9,6 +9,7 @@ import { Bell, Menu, X, LogOut, MessageCircle, Moon, Sun } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
+import appLogo from '../assets/app-logo.png';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -88,15 +89,12 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 nav-surface">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 text-white font-bold flex items-center justify-center shadow-md">
-              B
-            </div>
-            <span className="gradient-text text-xl font-extrabold hidden sm:inline">BookMySalon</span>
+          <Link to="/" className="flex items-center gap-2.5">
+            <img src={appLogo} alt="BookMySalon logo" className="brand-logo-full" />
           </Link>
 
-          <div className="hidden md:flex items-center gap-7 text-sm font-semibold text-slate-700">
-            <Link to="/" className="hover:text-primary-700">Home</Link>
+          <div className="hidden md:flex items-center gap-5 text-sm font-semibold text-slate-700">
+            <Link to="/" className="hover:text-primary-700 px-2 py-1 rounded-lg hover:bg-slate-100/60">Home</Link>
             <button
               type="button"
               onClick={toggleTheme}
@@ -109,11 +107,11 @@ export default function Navbar() {
             {user ? (
               <>
                 {roleLinks.map((item) => (
-                  <Link key={item.to} to={item.to} className="hover:text-primary-700">
+                  <Link key={item.to} to={item.to} className="hover:text-primary-700 px-2 py-1 rounded-lg hover:bg-slate-100/60">
                     {item.label}
                   </Link>
                 ))}
-                <Link to="/chat" className="hover:text-primary-700 flex items-center gap-1">
+                <Link to="/chat" className="hover:text-primary-700 flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-slate-100/60">
                   <MessageCircle size={16} />
                   Chat
                 </Link>
@@ -161,14 +159,14 @@ export default function Navbar() {
                     </div>
                   )}
                 </div>
-                <Link to="/profile" className="hover:text-primary-700">Profile</Link>
+                <Link to="/profile" className="hover:text-primary-700 px-2 py-1 rounded-lg hover:bg-slate-100/60">Profile</Link>
                 <button onClick={handleLogout} className="btn-primary flex items-center gap-2 !py-2">
                   <LogOut size={16} /> Logout
                 </button>
               </>
             ) : (
               <>
-                <Link to="/login" className="hover:text-primary-700">Login</Link>
+                <Link to="/login" className="hover:text-primary-700 px-2 py-1 rounded-lg hover:bg-slate-100/60">Login</Link>
                 <Link to="/signup" className="btn-primary !py-2">Sign Up</Link>
               </>
             )}
@@ -195,18 +193,18 @@ export default function Navbar() {
 
         {isOpen && (
           <div className="md:hidden py-3 border-t border-slate-200 space-y-1 text-sm font-medium">
-            <Link to="/" className="block px-2 py-2 text-slate-700" onClick={() => setIsOpen(false)}>Home</Link>
+            <Link to="/" className="block px-3 py-2.5 text-slate-700 rounded-lg hover:bg-slate-100/60" onClick={() => setIsOpen(false)}>Home</Link>
             {user ? (
               <>
                 {roleLinks.map((item) => (
-                  <Link key={item.to} to={item.to} className="block px-2 py-2 text-slate-700" onClick={() => setIsOpen(false)}>
+                  <Link key={item.to} to={item.to} className="block px-3 py-2.5 text-slate-700 rounded-lg hover:bg-slate-100/60" onClick={() => setIsOpen(false)}>
                     {item.label}
                   </Link>
                 ))}
-                <Link to="/chat" className="block px-2 py-2 text-slate-700" onClick={() => setIsOpen(false)}>
+                <Link to="/chat" className="block px-3 py-2.5 text-slate-700 rounded-lg hover:bg-slate-100/60" onClick={() => setIsOpen(false)}>
                   Chat
                 </Link>
-                <Link to="/profile" className="block px-2 py-2 text-slate-700" onClick={() => setIsOpen(false)}>Profile</Link>
+                <Link to="/profile" className="block px-3 py-2.5 text-slate-700 rounded-lg hover:bg-slate-100/60" onClick={() => setIsOpen(false)}>Profile</Link>
                 <div className="pt-2">
                   <button
                     onClick={() => {
@@ -221,7 +219,7 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <Link to="/login" className="block px-2 py-2 text-slate-700" onClick={() => setIsOpen(false)}>Login</Link>
+                <Link to="/login" className="block px-3 py-2.5 text-slate-700 rounded-lg hover:bg-slate-100/60" onClick={() => setIsOpen(false)}>Login</Link>
                 <Link to="/signup" className="btn-primary w-full text-center block mt-2" onClick={() => setIsOpen(false)}>Sign Up</Link>
               </>
             )}

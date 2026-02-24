@@ -3,16 +3,14 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
   Sparkles,
-  Heart,
   Calendar,
   Users,
   Star,
   ArrowRight,
-  CheckCircle,
-  Zap,
   Shield,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import appLogo from '../assets/app-logo.png';
 
 export default function Home() {
   const { user } = useAuth();
@@ -138,6 +136,12 @@ export default function Home() {
                 Discover, connect, and book appointments with the best salons in your area. Verified reviews, expert stylists, and instant confirmation.
               </p>
 
+              <div className="flex flex-wrap gap-3 mb-10">
+                <span className="badge-secondary">Real-time confirmation</span>
+                <span className="badge-secondary">Verified professionals</span>
+                <span className="badge-secondary">Secure checkout</span>
+              </div>
+
               <div className="flex flex-col sm:flex-row gap-4 mb-12">
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Link 
@@ -187,22 +191,24 @@ export default function Home() {
                 transition={{ duration: 4, repeat: Infinity }}
                 className="relative"
               >
-                <div className="w-96 h-96 glass-effect rounded-3xl overflow-hidden flex items-center justify-center text-9xl glow-effect">
-                  💇‍♀️
+                <div className="w-[28rem] h-[28rem] glass-effect rounded-[2rem] overflow-hidden flex items-center justify-center glow-effect p-8">
+                  <div className="w-full h-full rounded-3xl bg-gradient-to-br from-sky-50 via-white to-teal-50 border border-slate-200/70 flex items-center justify-center">
+                    <img src={appLogo} alt="BookMySalon" className="w-64 h-64 object-contain drop-shadow-xl" />
+                  </div>
                 </div>
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                  className="absolute top-8 -right-8 w-24 h-24 bg-gradient-to-br from-primary-500 to-accent-500 rounded-full flex items-center justify-center text-5xl shadow-lg glow-effect"
+                  className="absolute top-8 -right-8 w-24 h-24 bg-gradient-to-br from-primary-500 to-accent-500 rounded-full flex items-center justify-center shadow-lg glow-effect"
                 >
-                  ⭐
+                  <Sparkles className="text-white" size={34} />
                 </motion.div>
                 <motion.div
                   animate={{ rotate: -360 }}
                   transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                  className="absolute -bottom-8 left-8 w-20 h-20 bg-gradient-to-br from-secondary-500 to-primary-500 rounded-full flex items-center justify-center text-3xl shadow-lg glow-effect"
+                  className="absolute -bottom-8 left-8 w-20 h-20 bg-gradient-to-br from-secondary-500 to-primary-500 rounded-full flex items-center justify-center shadow-lg glow-effect"
                 >
-                  💕
+                  <Shield className="text-white" size={28} />
                 </motion.div>
               </motion.div>
             </motion.div>

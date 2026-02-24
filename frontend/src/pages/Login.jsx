@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import appLogo from '../assets/app-logo.png';
 
 export default function Login() {
   const [identifier, setIdentifier] = useState('');
@@ -39,12 +40,15 @@ export default function Login() {
               Sign in to access your personalized dashboard and workflow.
             </p>
           </div>
-          <div className="h-48 rounded-2xl bg-gradient-to-br from-blue-100 via-cyan-100 to-indigo-100 flex items-center justify-center text-7xl">
-            ✨
+          <div className="h-48 rounded-2xl bg-gradient-to-br from-blue-100 via-cyan-100 to-indigo-100 flex items-center justify-center p-4">
+            <img src={appLogo} alt="BookMySalon" className="h-full w-full object-contain" />
           </div>
         </div>
 
         <div className="card-base p-8 sm:p-10">
+          <div className="login-brand-wrap mb-5">
+            <img src={appLogo} alt="BookMySalon logo" className="login-brand-logo" />
+          </div>
           <h1 className="text-3xl font-extrabold text-slate-900">Sign In</h1>
           <p className="text-slate-600 mt-2">Access your BookMySalon account.</p>
 

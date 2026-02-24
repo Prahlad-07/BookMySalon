@@ -14,21 +14,23 @@
   --font-display: 'Playfair Display', 'Times New Roman', serif;
   --font-body: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
-  --color-bg: #f4f7fb;
-  --color-surface: #ffffff;
-  --color-surface-muted: #edf2f8;
-  --color-border: #ced8e4;
-  --color-text: #102131;
-  --color-muted: #58697b;
-  --color-primary: #0b5cab;
-  --color-primary-700: #08437f;
-  --color-secondary: #1f4b7a;
-  --color-accent: #0f766e;
+  --color-bg: #dce8ee;
+  --color-surface: #ecf3f6;
+  --color-surface-muted: #e2edf2;
+  --color-border: #b9cad3;
+  --color-text: #0f2534;
+  --color-muted: #4f6777;
+  --color-primary: #0e6178;
+  --color-primary-700: #0a4a5e;
+  --color-secondary: #1e748c;
+  --color-accent: #e17a2f;
   --color-success: #1d8f5a;
-  --color-warning: #b96a16;
+  --color-warning: #b46518;
   --color-danger: #b42318;
   --color-footer: #0b1a2b;
   --color-footer-text: #e8eef5;
+  --logo-plate-start: #3d6271;
+  --logo-plate-end: #507887;
   --shadow-soft: 0 20px 60px rgba(13, 35, 58, 0.12);
   --shadow-card: 0 16px 40px rgba(13, 35, 58, 0.1);
 }
@@ -49,6 +51,8 @@
   --color-danger: #ff8b7f;
   --color-footer: #040d16;
   --color-footer-text: #e7eff8;
+  --logo-plate-start: #183848;
+  --logo-plate-end: #245266;
   --shadow-soft: 0 20px 60px rgba(0, 0, 0, 0.4);
   --shadow-card: 0 16px 36px rgba(0, 0, 0, 0.35);
 }
@@ -59,8 +63,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
   color: var(--color-text);
   background:
-    radial-gradient(50rem 25rem at 20% -10%, color-mix(in srgb, var(--color-primary), transparent 82%), transparent 60%),
-    radial-gradient(40rem 25rem at 85% 0%, color-mix(in srgb, var(--color-accent), transparent 85%), transparent 60%),
+    radial-gradient(58rem 28rem at 18% -8%, color-mix(in srgb, var(--color-primary), transparent 84%), transparent 60%),
+    radial-gradient(42rem 25rem at 88% -2%, color-mix(in srgb, var(--color-accent), transparent 88%), transparent 60%),
     linear-gradient(180deg, var(--color-bg), var(--color-bg));
   min-height: 100%;
 }
@@ -127,8 +131,67 @@ button, a, input, select, textarea {
   color: transparent;
 }
 
+.brand-logo-shell {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.9rem;
+  background: linear-gradient(135deg, #f2f8fb, #eff5f7);
+  border: 1px solid color-mix(in srgb, var(--color-border), white 20%);
+  box-shadow: 0 10px 22px rgba(19, 60, 80, 0.18);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.brand-logo-icon {
+  width: 125%;
+  height: 125%;
+  object-fit: cover;
+  object-position: center 28%;
+  transform: translateY(-6%);
+}
+
+.brand-logo-full {
+  height: 3.15rem;
+  width: auto;
+  object-fit: contain;
+  padding: 0.3rem 0.55rem;
+  border-radius: 0.9rem;
+  background: linear-gradient(135deg, var(--logo-plate-start), var(--logo-plate-end));
+  border: 1px solid color-mix(in srgb, var(--logo-plate-start), white 26%);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--logo-plate-start), transparent 70%);
+}
+
+.footer-brand-logo {
+  height: 3.5rem;
+}
+
+.login-brand-wrap {
+  border: 1px solid var(--color-border);
+  border-radius: 0.9rem;
+  padding: 0.65rem 0.85rem;
+  background: linear-gradient(135deg, var(--logo-plate-start), var(--logo-plate-end));
+  box-shadow: 0 12px 24px color-mix(in srgb, var(--logo-plate-start), transparent 68%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-brand-logo {
+  height: 4.2rem;
+  width: auto;
+  object-fit: contain;
+}
+
+.signup-brand-logo {
+  height: 4rem;
+  width: auto;
+  object-fit: contain;
+}
+
 .nav-surface {
-  background: color-mix(in srgb, var(--color-surface) 86%, transparent);
+  background: color-mix(in srgb, var(--color-surface) 90%, transparent);
   border-bottom: 1px solid var(--color-border);
   backdrop-filter: blur(16px);
 }

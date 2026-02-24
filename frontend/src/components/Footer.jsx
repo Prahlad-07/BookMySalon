@@ -6,6 +6,7 @@
 import React from 'react';
 import { Mail, Phone, MapPin, Github, Linkedin } from 'lucide-react';
 import { SITE_PROFILE } from '../config/site';
+import appLogo from '../assets/app-logo.png';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -16,10 +17,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold">B</span>
-              </div>
-              <span className="font-bold text-xl text-white">BookMySalon</span>
+              <img src={appLogo} alt="BookMySalon logo" className="brand-logo-full footer-brand-logo" />
             </div>
             <p className="footer-link text-sm leading-6">
               Book appointments, manage salons, and track bookings in one place.

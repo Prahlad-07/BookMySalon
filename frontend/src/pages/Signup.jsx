@@ -7,6 +7,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, User, AlertCircle, Phone, Sparkles, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import appLogo from '../assets/app-logo.png';
 
 const MSG91_WIDGET_ID = import.meta.env.VITE_MSG91_WIDGET_ID || '';
 const MSG91_TOKEN_AUTH = import.meta.env.VITE_MSG91_TOKEN_AUTH || '';
@@ -241,11 +242,14 @@ export default function Signup() {
       <div className="w-full max-w-2xl card-base p-8 sm:p-10">
         <div className="flex items-center justify-between mb-6">
           <div>
+            <div className="login-brand-wrap mb-4">
+              <img src={appLogo} alt="BookMySalon logo" className="signup-brand-logo" />
+            </div>
             <h1 className="text-3xl font-extrabold text-slate-900">Create Account</h1>
             <p className="text-slate-600 mt-2">
               {stage === 'FORM' ? 'Get started as customer or salon owner.' : 'Verify email + mobile OTP to activate account.'}
             </p>
-          </div>
+            </div>
           <div className="hidden sm:flex w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 items-center justify-center text-blue-700">
             {stage === 'FORM' ? <Sparkles size={20} /> : <ShieldCheck size={20} />}
           </div>
