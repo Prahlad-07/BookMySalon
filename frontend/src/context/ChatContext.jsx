@@ -11,7 +11,7 @@ import { useAuth } from './AuthContext';
 
 const ChatContext = createContext(null);
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://bookmysalon-5.onrender.com';
 const SockJsCtor = SockJS?.default || SockJS;
 
 export function ChatProvider({ children }) {
