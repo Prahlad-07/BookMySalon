@@ -1,34 +1,36 @@
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/bookmysalon?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-    username: root
-    password: "@anuram1008"
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/bookmysalon?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
     properties:
       hibernate:
         format_sql: true
     open-in-view: false
   flyway:
-    enabled: false
+    enabled: ${SPRING_FLYWAY_ENABLED:false}
 
 security:
   jwt:
-    secret: "c3VjdXJlLWJvb2tteXNhbG9uLWp3dC1zZWNyZXQtYmFzZTY0LQ=="
-    access-token-expiration-ms: 7200000
-    refresh-token-expiration-ms: 604800000
+    secret: ${SECURITY_JWT_SECRET:c3VjdXJlLWJvb2tteXNhbG9uLWp3dC1zZWNyZXQtYmFzZTY0LQ==}
+    access-token-expiration-ms: ${SECURITY_JWT_ACCESS_TOKEN_EXPIRATION_MS:7200000}
+    refresh-token-expiration-ms: ${SECURITY_JWT_REFRESH_TOKEN_EXPIRATION_MS:604800000}
 
 stripe:
   api:
-    key: "sk_test_change_me"
+    key: ${STRIPE_API_KEY:sk_test_change_me}
 
 app:
+  cors:
+    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173}
   otp:
-    dev-mode: true
+    dev-mode: ${APP_OTP_DEV_MODE:true}
     msg91:
       enabled: ${MSG91_ENABLED:false}
       authkey: ${MSG91_AUTHKEY:}

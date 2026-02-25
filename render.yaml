@@ -1,0 +1,38 @@
+services:
+  - type: web
+    name: bookmysalon-backend
+    runtime: docker
+    plan: free
+    branch: main
+    dockerContext: ./bookmysalon-app
+    dockerfilePath: ./bookmysalon-app/Dockerfile
+    healthCheckPath: /api/auth/health
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+      - key: SECURITY_JWT_SECRET
+        sync: false
+      - key: STRIPE_API_KEY
+        sync: false
+      - key: APP_CORS_ALLOWED_ORIGINS
+        value: http://localhost:3000,http://localhost:5173
+      - key: APP_OTP_DEV_MODE
+        value: "true"
+      - key: MSG91_ENABLED
+        value: "false"
+      - key: MSG91_AUTHKEY
+        sync: false
+      - key: OTP_SMS_ENABLED
+        value: "false"
+      - key: OTP_SMS_DEFAULT_COUNTRY_CODE
+        value: "+91"
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_FROM_NUMBER
+        sync: false
