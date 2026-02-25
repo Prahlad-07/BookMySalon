@@ -15,4 +15,4 @@ COPY --from=build /app/target/bookmysalon-app-1.0.0.jar app.jar
 ENV PORT=10000
 EXPOSE 10000
 
-ENTRYPOINT ["sh", "-c", "java -Dserver.port=${PORT} -jar app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
