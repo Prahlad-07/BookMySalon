@@ -4,8 +4,8 @@ services:
     runtime: docker
     plan: free
     branch: main
-    dockerContext: ./bookmysalon-app
-    dockerfilePath: ./bookmysalon-app/Dockerfile
+    dockerContext: .
+    dockerfilePath: ./Dockerfile
     healthCheckPath: /api/auth/health
     envVars:
       - key: SPRING_DATASOURCE_URL
