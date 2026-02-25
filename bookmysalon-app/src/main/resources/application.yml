@@ -30,7 +30,7 @@ stripe:
 
 app:
   cors:
-    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173}
+    allowed-origin-patterns: ${APP_CORS_ALLOWED_ORIGIN_PATTERNS:http://localhost:3000,http://localhost:5173,https://*.vercel.app}
   otp:
     dev-mode: ${APP_OTP_DEV_MODE:true}
     msg91:
