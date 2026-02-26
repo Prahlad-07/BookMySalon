@@ -8,11 +8,7 @@ Modern salon booking platform with real-time chat, payments, and analytics.
 BookMySalon is a full-stack application that lets customers discover salons, book services, pay securely, and chat with salon owners. It includes role-based authentication, reviews, service catalogs, and real-time notifications.
 
 ## Architecture
-![General Architecture](architecture-images/general-architecture.png)
 
-![Owner and User Flows](architecture-images/owner-and-user-flows.png)
-
-![Security Flows](architecture-images/security-flows.png)
 
 ![System Diagram](Architecture/img.png)
 
