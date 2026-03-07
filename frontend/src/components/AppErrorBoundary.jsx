@@ -23,10 +23,10 @@ export default class AppErrorBoundary extends React.Component {
     if (this.state.hasError) {
       return (
         <div className="min-h-screen flex items-center justify-center p-6">
-          <div className="max-w-xl w-full rounded-xl border border-red-300 bg-red-50 p-5 text-red-800">
-            <h1 className="text-xl font-bold mb-2">Something went wrong</h1>
-            <p className="text-sm">The app encountered a runtime error. Open browser console for details.</p>
-            {this.state.error?.message && <p className="text-xs mt-3">{this.state.error.message}</p>}
+          <div className="card-base max-w-xl w-full rounded-2xl p-5">
+            <h1 className="text-xl font-bold mb-2 text-slate-900">Something went wrong</h1>
+            <p className="text-sm text-slate-600">The app encountered a runtime error. Open browser console for details.</p>
+            {this.state.error?.message && <p className="text-xs mt-3 text-red-700">{this.state.error.message}</p>}
           </div>
         </div>
       );

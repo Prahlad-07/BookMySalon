@@ -23,8 +23,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 @Service
@@ -151,13 +153,17 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private BookingDto mapToDto(Booking booking) {
+        Set<Long> safeServiceOfferingIds = booking.getServiceOfferingIds() == null
+                ? Collections.emptySet()
+                : new LinkedHashSet<>(booking.getServiceOfferingIds());
+
         return BookingDto.builder()
                 .id(booking.getId())
                 .salonId(booking.getSalonId())
                 .customerId(booking.getCustomerId())
                 .startTime(booking.getStartTime())
                 .endTime(booking.getEndTime())
-                .serviceOfferingIds(booking.getServiceOfferingIds())
+                .serviceOfferingIds(safeServiceOfferingIds)
                 .status(booking.getStatus())
                 .totalPrice(booking.getTotalPrice())
                 .build();

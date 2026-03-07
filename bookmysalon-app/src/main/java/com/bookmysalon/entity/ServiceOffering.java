@@ -11,7 +11,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "service_offerings")
+@Table(
+        name = "service_offerings",
+        indexes = {
+                @Index(name = "idx_service_offerings_salon_id", columnList = "salon_id"),
+                @Index(name = "idx_service_offerings_category_id", columnList = "category_id"),
+                @Index(name = "idx_service_offerings_salon_category", columnList = "salon_id, category_id")
+        }
+)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -32,17 +39,17 @@ public class ServiceOffering {
     @Column(nullable = false)
     private Integer duration;
 
-    @Column(nullable = false)
+    @Column(name = "salon_id", nullable = false)
     private Long salonId;
 
-    @Column(nullable = false)
+    @Column(name = "category_id", nullable = false)
     private Long categoryId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "salonId", insertable = false, updatable = false)
+    @JoinColumn(name = "salon_id", insertable = false, updatable = false)
     private Salon salon;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "categoryId", insertable = false, updatable = false)
+    @JoinColumn(name = "category_id", insertable = false, updatable = false)
     private Category category;
 }

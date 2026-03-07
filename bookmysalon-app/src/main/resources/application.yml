@@ -4,35 +4,72 @@ server:
 
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:h2:mem:bookmysalon;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}
-    username: ${SPRING_DATASOURCE_USERNAME:sa}
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/bookmysalon?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
     password: ${SPRING_DATASOURCE_PASSWORD:}
-    driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME:org.h2.Driver}
+    driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME:com.mysql.cj.jdbc.Driver}
+    hikari:
+      minimum-idle: ${SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE:2}
+      maximum-pool-size: ${SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE:12}
+      idle-timeout: ${SPRING_DATASOURCE_HIKARI_IDLE_TIMEOUT:300000}
+      max-lifetime: ${SPRING_DATASOURCE_HIKARI_MAX_LIFETIME:1800000}
+      connection-timeout: ${SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT:30000}
   jpa:
     hibernate:
       ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
     properties:
       hibernate:
         format_sql: true
+        jdbc:
+          time_zone: UTC
     open-in-view: false
   flyway:
     enabled: ${SPRING_FLYWAY_ENABLED:false}
+  mail:
+    host: ${SPRING_MAIL_HOST:smtp.gmail.com}
+    port: ${SPRING_MAIL_PORT:587}
+    username: ${SPRING_MAIL_USERNAME:}
+    password: ${SPRING_MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: ${SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH:true}
+          starttls:
+            enable: ${SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE:true}
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:google-client-id-not-set}
+            client-secret: ${GOOGLE_CLIENT_SECRET:google-client-secret-not-set}
+            scope:
+              - openid
+              - profile
+              - email
 
 security:
   jwt:
-    secret: ${SECURITY_JWT_SECRET:c3VjdXJlLWJvb2tteXNhbG9uLWp3dC1zZWNyZXQtYmFzZTY0LQ==}
+    secret: ${SECURITY_JWT_SECRET:change-me-in-env}
     access-token-expiration-ms: ${SECURITY_JWT_ACCESS_TOKEN_EXPIRATION_MS:7200000}
     refresh-token-expiration-ms: ${SECURITY_JWT_REFRESH_TOKEN_EXPIRATION_MS:604800000}
 
 stripe:
   api:
-    key: ${STRIPE_API_KEY:sk_test_change_me}
+    key: ${STRIPE_API_KEY:}
 
 app:
+  oauth2:
+    enabled: ${APP_OAUTH2_ENABLED:false}
+    redirect-uri: ${APP_OAUTH2_REDIRECT_URI:http://localhost:5173/oauth/callback}
+    failure-uri: ${APP_OAUTH2_FAILURE_URI:http://localhost:5173/login}
   cors:
     allowed-origin-patterns: ${APP_CORS_ALLOWED_ORIGIN_PATTERNS:http://localhost:3000,http://localhost:5173,https://*.vercel.app}
   otp:
-    dev-mode: ${APP_OTP_DEV_MODE:true}
+    dev-mode: ${APP_OTP_DEV_MODE:false}
+    email:
+      enabled: ${OTP_EMAIL_ENABLED:true}
+      from: ${OTP_EMAIL_FROM:${SPRING_MAIL_USERNAME:}}
     msg91:
       enabled: ${MSG91_ENABLED:false}
       authkey: ${MSG91_AUTHKEY:}

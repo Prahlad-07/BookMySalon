@@ -12,22 +12,52 @@ const extractErrorMessage = (err, fallbackMessage) => {
   return err?.response?.data?.error || err?.response?.data?.message || err?.message || fallbackMessage;
 };
 
-const parseRole = (rawUser = {}) => {
-  const directRole = rawUser.role || '';
-  const roleList = String(directRole)
-    .split(',')
-    .map((item) => item.trim())
-    .filter(Boolean);
+const normalizeRoleToken = (value) => {
+  return String(value || '')
+    .trim()
+    .toUpperCase()
+    .replace(/^ROLE_/, '');
+};
 
-  if (roleList.includes('ADMIN')) return 'ADMIN';
-  if (roleList.includes('SALON_OWNER')) return 'SALON_OWNER';
-  if (roleList.includes('CUSTOMER')) return 'CUSTOMER';
+const parseRole = (rawUser = {}) => {
+  const roleSet = new Set();
+
+  const addRoleValue = (roleValue) => {
+    const normalized = normalizeRoleToken(roleValue);
+    if (!normalized) return;
+    if (normalized === 'USER') {
+      roleSet.add('CUSTOMER');
+      return;
+    }
+    roleSet.add(normalized);
+  };
+
+  String(rawUser.role || '')
+    .split(/[,\s;|]+/)
+    .filter(Boolean)
+    .forEach(addRoleValue);
 
   if (Array.isArray(rawUser.roles)) {
-    if (rawUser.roles.includes('ROLE_ADMIN')) return 'ADMIN';
-    if (rawUser.roles.includes('ROLE_SALON_OWNER')) return 'SALON_OWNER';
+    rawUser.roles.forEach((roleItem) => {
+      if (typeof roleItem === 'string') {
+        addRoleValue(roleItem);
+        return;
+      }
+      if (roleItem && typeof roleItem === 'object') {
+        addRoleValue(roleItem.name);
+        addRoleValue(roleItem.role);
+        addRoleValue(roleItem.authority);
+      }
+    });
   }
 
+  if (Array.isArray(rawUser.authorities)) {
+    rawUser.authorities.forEach((authority) => addRoleValue(authority?.authority || authority));
+  }
+
+  if (roleSet.has('ADMIN')) return 'ADMIN';
+  if (roleSet.has('SALON_OWNER')) return 'SALON_OWNER';
+  if (roleSet.has('CUSTOMER')) return 'CUSTOMER';
   return 'CUSTOMER';
 };
 
@@ -53,6 +83,25 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const hydrateAuthenticatedUser = async (fallbackUser = {}) => {
+    try {
+      const profile = await api.get('/api/user/me');
+      const normalizedProfile = normalizeUser(profile);
+      setUser(normalizedProfile);
+      if (normalizedProfile.id) {
+        localStorage.setItem('userId', String(normalizedProfile.id));
+      }
+      return normalizedProfile;
+    } catch (_) {
+      const normalizedFallback = normalizeUser(fallbackUser);
+      setUser(normalizedFallback);
+      if (normalizedFallback.id) {
+        localStorage.setItem('userId', String(normalizedFallback.id));
+      }
+      return normalizedFallback;
+    }
+  };
 
   useEffect(() => {
     const safetyTimeout = setTimeout(() => {
@@ -89,7 +138,7 @@ export const AuthProvider = ({ children }) => {
 
       if (!identifier || !password) {
         setError('Email/username and password are required');
-        return false;
+        return null;
       }
 
       const normalizedIdentifier = identifier.trim();
@@ -103,13 +152,11 @@ export const AuthProvider = ({ children }) => {
       if (token) localStorage.setItem('accessToken', token);
       if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
       if (id) localStorage.setItem('userId', id);
-
-      setUser(normalizeUser(response));
-      return true;
+      return await hydrateAuthenticatedUser(response);
     } catch (err) {
       const errorMessage = extractErrorMessage(err, 'Login failed. Please try again.');
       setError(errorMessage);
-      return false;
+      return null;
     }
   };
 
@@ -119,7 +166,7 @@ export const AuthProvider = ({ children }) => {
 
       if (!data || !data.email || !data.password || !data.name) {
         setError('All required fields must be filled');
-        return false;
+        return { ok: false, code: 'VALIDATION_ERROR', error: 'All required fields must be filled' };
       }
 
       const name = data.name?.trim();
@@ -136,20 +183,31 @@ export const AuthProvider = ({ children }) => {
         role: data.role,
       };
 
-      await api.post('/api/auth/signup', signupPayload);
-      return true;
+      const response = await api.post('/api/auth/register', signupPayload);
+
+      const { token, refreshToken, id } = response || {};
+      if (token) localStorage.setItem('accessToken', token);
+      if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
+      if (id) localStorage.setItem('userId', id);
+      const normalized = await hydrateAuthenticatedUser(response);
+      return { ok: true, user: normalized };
     } catch (err) {
       const errorMessage = extractErrorMessage(err, 'Signup failed. Please try again.');
       setError(errorMessage);
-      return false;
+      const emailExists = errorMessage.toLowerCase().includes('email already exists');
+      return {
+        ok: false,
+        code: emailExists ? 'EMAIL_EXISTS' : 'SIGNUP_FAILED',
+        error: errorMessage,
+      };
     }
   };
 
   const initiateSignupOtp = async (data) => {
     try {
       setError(null);
-      if (!data || !data.email || !data.password || !data.name || !data.phone) {
-        setError('Name, email, phone and password are required');
+      if (!data || !data.email || !data.password || !data.name) {
+        setError('Name, email and password are required');
         return null;
       }
 
@@ -157,7 +215,7 @@ export const AuthProvider = ({ children }) => {
         fullName: data.name.trim(),
         name: data.name.trim(),
         email: data.email.trim().toLowerCase(),
-        phone: data.phone.trim(),
+        phone: data.phone?.trim() || '',
         password: data.password,
         role: data.role,
         username: data.email.trim().toLowerCase().split('@')[0],
@@ -197,7 +255,7 @@ export const AuthProvider = ({ children }) => {
       if (token) localStorage.setItem('accessToken', token);
       if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
       if (id) localStorage.setItem('userId', id);
-      setUser(normalizeUser(response));
+      await hydrateAuthenticatedUser(response);
       return true;
     } catch (err) {
       const errorMessage = extractErrorMessage(err, 'OTP verification failed.');

@@ -75,7 +75,6 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse register(RegisterRequest request) {
-        String username = request.getUsername() == null ? null : request.getUsername().trim();
         String email = request.getEmail() == null ? null : request.getEmail().trim().toLowerCase();
         String fullName = request.getFullName() == null ? null : request.getFullName().trim();
         String phone = request.getPhone() == null ? null : request.getPhone().trim();
@@ -86,12 +85,7 @@ public class AuthServiceImpl implements AuthService {
         if (request.getPassword() == null || request.getPassword().isBlank()) {
             throw new AuthException("Password is required");
         }
-        if (username == null || username.isBlank()) {
-            username = email.split("@")[0];
-        }
-        if (userRepository.existsByUsernameIgnoreCase(username)) {
-            throw new AuthException("Username already exists");
-        }
+        String username = resolveAvailableUsername(request.getUsername(), email);
         if (userRepository.existsByEmailIgnoreCase(email)) {
             throw new AuthException("Email already exists");
         }
@@ -118,33 +112,25 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public SignupInitiateResponse initiateSignup(SignupInitiateRequest request) {
-        String username = request.getUsername() == null ? null : request.getUsername().trim();
         String email = request.getEmail() == null ? null : request.getEmail().trim().toLowerCase();
         String fullName = request.getFullName() == null ? null : request.getFullName().trim();
-        String phone = request.getPhone() == null ? null : request.getPhone().trim();
+        String providedPhone = request.getPhone() == null ? null : request.getPhone().trim();
 
         if (email == null || email.isBlank()) {
             throw new AuthException("Email is required");
         }
-        if (phone == null || phone.isBlank()) {
-            throw new AuthException("Phone is required");
-        }
         if (request.getPassword() == null || request.getPassword().trim().length() < 8) {
             throw new AuthException("Password must be at least 8 characters");
         }
-        if (username == null || username.isBlank()) {
-            username = email.split("@")[0];
-        }
-
-        if (userRepository.existsByUsernameIgnoreCase(username)) {
-            throw new AuthException("Username already exists");
-        }
+        String username = resolveAvailableUsername(request.getUsername(), email);
         if (userRepository.existsByEmailIgnoreCase(email)) {
             throw new AuthException("Email already exists");
         }
 
         signupVerificationSessionRepository.deleteByEmailIgnoreCase(email);
-        signupVerificationSessionRepository.deleteByPhone(phone);
+        if (providedPhone != null && !providedPhone.isBlank()) {
+            signupVerificationSessionRepository.deleteByPhone(providedPhone);
+        }
         signupVerificationSessionRepository.deleteByExpiresAtBefore(LocalDateTime.now());
 
         SignupVerificationSession session = new SignupVerificationSession();
@@ -152,7 +138,10 @@ public class AuthServiceImpl implements AuthService {
         session.setUsername(username);
         session.setFullName(fullName == null || fullName.isBlank() ? username : fullName);
         session.setEmail(email);
-        session.setPhone(phone);
+        String sessionPhone = (providedPhone == null || providedPhone.isBlank())
+                ? "EMAIL_ONLY_" + Math.abs(email.hashCode())
+                : providedPhone;
+        session.setPhone(sessionPhone);
         session.setPasswordHash(passwordEncoder.encode(request.getPassword().trim()));
         session.setRequestedRole(request.getRole() == null || request.getRole().isBlank() ? "CUSTOMER" : request.getRole().trim().toUpperCase());
 
@@ -190,32 +179,27 @@ public class AuthServiceImpl implements AuthService {
         }
 
         boolean emailOtpValid = passwordEncoder.matches(request.getEmailOtp().trim(), session.getEmailOtpHash());
-        boolean phoneOtpValid = isPhoneVerificationValid(request, session);
-
-        if (!emailOtpValid || !phoneOtpValid) {
+        if (!emailOtpValid) {
             session.setAttemptCount(session.getAttemptCount() + 1);
             if (session.getAttemptCount() >= MAX_OTP_ATTEMPTS) {
                 signupVerificationSessionRepository.delete(session);
                 throw new AuthException("Too many invalid attempts. Please signup again.");
             }
             signupVerificationSessionRepository.save(session);
-            throw new AuthException("Invalid verification. Please verify both email and phone.");
+            throw new AuthException("Invalid email OTP.");
         }
 
         if (userRepository.existsByEmailIgnoreCase(session.getEmail())) {
             signupVerificationSessionRepository.delete(session);
             throw new AuthException("Email already exists");
         }
-        if (userRepository.existsByUsernameIgnoreCase(session.getUsername())) {
-            signupVerificationSessionRepository.delete(session);
-            throw new AuthException("Username already exists");
-        }
+        String username = resolveAvailableUsername(session.getUsername(), session.getEmail());
 
         Set<UserRole> roleNames = resolveRequestedRoles(session.getRequestedRole());
         Set<Role> roles = roleNames.stream().map(this::getOrCreateRole).collect(Collectors.toSet());
 
         User user = new User();
-        user.setUsername(session.getUsername());
+        user.setUsername(username);
         user.setEmail(session.getEmail());
         user.setPhone(session.getPhone());
         user.setFullName(session.getFullName());
@@ -324,31 +308,23 @@ public class AuthServiceImpl implements AuthService {
 
     private SignupInitiateResponse issueAndSendOtp(SignupVerificationSession session) {
         String emailOtp = generateSixDigitOtp();
-        String phoneOtp = generateSixDigitOtp();
 
         session.setEmailOtpHash(passwordEncoder.encode(emailOtp));
-        session.setPhoneOtpHash(passwordEncoder.encode(phoneOtp));
+        session.setPhoneOtpHash(passwordEncoder.encode(generateToken()));
         session.setAttemptCount(0);
         session.setExpiresAt(LocalDateTime.now().plusMinutes(SIGNUP_OTP_EXPIRY_MINUTES));
 
         SignupVerificationSession saved = signupVerificationSessionRepository.save(session);
 
         verificationDeliveryService.sendEmailOtp(saved.getEmail(), emailOtp);
-        if (!msg91Enabled) {
-            verificationDeliveryService.sendPhoneOtp(saved.getPhone(), phoneOtp);
-        }
 
         SignupInitiateResponse.SignupInitiateResponseBuilder builder = SignupInitiateResponse.builder()
                 .sessionToken(saved.getSessionToken())
                 .expiresAtEpochMs(saved.getExpiresAt().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli())
-                .maskedEmail(maskEmail(saved.getEmail()))
-                .maskedPhone(maskPhone(saved.getPhone()));
+                .maskedEmail(maskEmail(saved.getEmail()));
 
         if (otpDevMode) {
             builder.devEmailOtp(emailOtp);
-            if (!msg91Enabled) {
-                builder.devPhoneOtp(phoneOtp);
-            }
         }
 
         return builder.build();
@@ -356,12 +332,22 @@ public class AuthServiceImpl implements AuthService {
 
     private Set<UserRole> resolveRequestedRoles(RegisterRequest request) {
         if (request.getRoles() != null && !request.getRoles().isEmpty()) {
-            Set<UserRole> requested = new HashSet<>(request.getRoles());
-            if (requested.contains(UserRole.USER) && !requested.contains(UserRole.CUSTOMER)) {
-                requested.remove(UserRole.USER);
-                requested.add(UserRole.CUSTOMER);
+            Set<UserRole> requested = request.getRoles().stream()
+                    .filter(java.util.Objects::nonNull)
+                    .map(role -> role == UserRole.USER ? UserRole.CUSTOMER : role)
+                    .collect(Collectors.toSet());
+
+            if (requested.contains(UserRole.ADMIN)) {
+                throw new AuthException("Invalid role selected. Choose CUSTOMER or SALON_OWNER.");
             }
-            return requested;
+
+            if (requested.contains(UserRole.SALON_OWNER)) {
+                return Set.of(UserRole.SALON_OWNER);
+            }
+            if (requested.contains(UserRole.CUSTOMER)) {
+                return Set.of(UserRole.CUSTOMER);
+            }
+            throw new AuthException("Invalid role selected. Choose CUSTOMER or SALON_OWNER.");
         }
         return resolveRequestedRoles(request.getRole());
     }
@@ -372,16 +358,13 @@ public class AuthServiceImpl implements AuthService {
         }
 
         String normalized = roleValue.trim().toUpperCase();
-        if ("ADMIN".equals(normalized)) {
-            return Set.of(UserRole.ADMIN);
-        }
         if ("SALON_OWNER".equals(normalized)) {
             return Set.of(UserRole.SALON_OWNER);
         }
         if ("USER".equals(normalized) || "CUSTOMER".equals(normalized)) {
             return Set.of(UserRole.CUSTOMER);
         }
-        return Set.of(UserRole.CUSTOMER);
+        throw new AuthException("Invalid role selected. Choose CUSTOMER or SALON_OWNER.");
     }
 
     private Role getOrCreateRole(UserRole roleName) {
@@ -404,12 +387,9 @@ public class AuthServiceImpl implements AuthService {
 
     private CustomUserPrincipal buildPrincipal(User user) {
         Set<SimpleGrantedAuthority> authorities = new HashSet<>();
+        Set<String> roleNames = resolveRoleNames(user);
 
-        if (user.getRoles() != null && !user.getRoles().isEmpty()) {
-            user.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName().name())));
-        } else if (user.getRole() != null) {
-            authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
-        }
+        roleNames.forEach(roleName -> authorities.add(new SimpleGrantedAuthority("ROLE_" + roleName)));
 
         return new CustomUserPrincipal(
                 user.getId(),
@@ -421,10 +401,8 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private AuthResponse buildAuthResponse(User user, String accessToken, RefreshToken refreshToken, String message) {
-        String roleSummary = user.getRoles() == null || user.getRoles().isEmpty()
-                ? normalizeRole(user.getRole())
-                : user.getRoles().stream()
-                .map(role -> normalizeRole(role.getName()))
+        String roleSummary = resolveRoleNames(user).stream()
+                .map(this::normalizeRole)
                 .sorted()
                 .collect(Collectors.joining(","));
 
@@ -442,6 +420,64 @@ public class AuthServiceImpl implements AuthService {
                 .role(roleSummary)
                 .message(message)
                 .build();
+    }
+
+    private Set<String> resolveRoleNames(User user) {
+        Set<String> roleNames = new HashSet<>();
+
+        if (user.getRoles() != null) {
+            user.getRoles().stream()
+                    .map(Role::getName)
+                    .filter(java.util.Objects::nonNull)
+                    .map(Enum::name)
+                    .forEach(roleNames::add);
+        }
+
+        if (user.getRole() != null) {
+            roleNames.add(user.getRole().name());
+        }
+
+        if (roleNames.isEmpty() || roleNames.contains(UserRole.USER.name())) {
+            roleNames.remove(UserRole.USER.name());
+            roleNames.add(UserRole.CUSTOMER.name());
+        }
+
+        return roleNames;
+    }
+
+    private String resolveAvailableUsername(String requestedUsername, String email) {
+        String base = sanitizeUsername(requestedUsername);
+        if (base.isBlank()) {
+            base = deriveUsernameFromEmail(email);
+        }
+
+        String candidate = base;
+        while (userRepository.existsByUsernameIgnoreCase(candidate)) {
+            candidate = base + "_" + (1000 + SECURE_RANDOM.nextInt(9000));
+        }
+        return candidate;
+    }
+
+    private String deriveUsernameFromEmail(String email) {
+        if (email == null || email.isBlank()) {
+            return "user";
+        }
+
+        String localPart = email.trim().toLowerCase();
+        int atIndex = localPart.indexOf('@');
+        if (atIndex > 0) {
+            localPart = localPart.substring(0, atIndex);
+        }
+
+        String sanitized = sanitizeUsername(localPart);
+        return sanitized.isBlank() ? "user" : sanitized;
+    }
+
+    private String sanitizeUsername(String rawUsername) {
+        if (rawUsername == null) {
+            return "";
+        }
+        return rawUsername.trim().replaceAll("[^a-zA-Z0-9._-]", "");
     }
 
     private String generateToken() {
@@ -470,6 +506,13 @@ public class AuthServiceImpl implements AuthService {
             return UserRole.CUSTOMER.name();
         }
         return role.name();
+    }
+
+    private String normalizeRole(String roleName) {
+        if (roleName == null || roleName.isBlank() || UserRole.USER.name().equals(roleName)) {
+            return UserRole.CUSTOMER.name();
+        }
+        return roleName;
     }
 
     private boolean isPhoneVerificationValid(VerifySignupOtpRequest request, SignupVerificationSession session) {

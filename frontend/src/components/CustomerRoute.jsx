@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { canAccessCustomerRoute, getDashboardPathByRole } from '../utils/roleRouting';
 
 export default function CustomerRoute({ children }) {
   const { user, loading } = useAuth();
@@ -13,8 +14,12 @@ export default function CustomerRoute({ children }) {
     );
   }
 
-  if (!user || user.role !== 'CUSTOMER') {
-    return <Navigate to="/" replace />;
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!canAccessCustomerRoute(user.role)) {
+    return <Navigate to={getDashboardPathByRole(user.role)} replace />;
   }
 
   return children;

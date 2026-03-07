@@ -14,7 +14,14 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "reviews")
+@Table(
+        name = "reviews",
+        indexes = {
+                @Index(name = "idx_reviews_salon_id", columnList = "salon_id"),
+                @Index(name = "idx_reviews_user_id", columnList = "user_id"),
+                @Index(name = "idx_reviews_created_at", columnList = "created_at")
+        }
+)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -29,21 +36,21 @@ public class Review {
     @Column(nullable = false)
     private Double rating;
 
-    @Column(nullable = false)
+    @Column(name = "salon_id", nullable = false)
     private Long salonId;
 
-    @Column(nullable = false)
+    @Column(name = "user_id", nullable = false)
     private Long userId;
 
     @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "salonId", insertable = false, updatable = false)
+    @JoinColumn(name = "salon_id", insertable = false, updatable = false)
     private Salon salon;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId", insertable = false, updatable = false)
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user;
 }

@@ -11,7 +11,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "categories")
+@Table(
+        name = "categories",
+        indexes = {
+                @Index(name = "idx_categories_salon_id", columnList = "salon_id"),
+                @Index(name = "idx_categories_salon_name", columnList = "salon_id, name")
+        }
+)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -25,10 +31,10 @@ public class Category {
 
     private String image;
 
-    @Column(nullable = false)
+    @Column(name = "salon_id", nullable = false)
     private Long salonId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "salonId", insertable = false, updatable = false)
+    @JoinColumn(name = "salon_id", insertable = false, updatable = false)
     private Salon salon;
 }

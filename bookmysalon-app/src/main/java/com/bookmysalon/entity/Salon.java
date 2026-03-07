@@ -14,7 +14,14 @@ import java.time.LocalTime;
 import java.util.List;
 
 @Entity
-@Table(name = "salons")
+@Table(
+        name = "salons",
+        indexes = {
+                @Index(name = "idx_salons_owner_id", columnList = "owner_id"),
+                @Index(name = "idx_salons_city", columnList = "city"),
+                @Index(name = "idx_salons_lat_lng", columnList = "latitude, longitude")
+        }
+)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -34,6 +41,12 @@ public class Salon {
     @Column(nullable = false)
     private String address;
 
+    @Column
+    private Double latitude;
+
+    @Column
+    private Double longitude;
+
     @Column(nullable = false)
     private String phoneNumber;
 
@@ -43,7 +56,7 @@ public class Salon {
     @Column(nullable = false)
     private String city;
 
-    @Column(nullable = false)
+    @Column(name = "owner_id", nullable = false)
     private Long ownerId;
 
     @Column(nullable = false)
@@ -51,4 +64,8 @@ public class Salon {
 
     @Column(nullable = false)
     private LocalTime closeTime;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", insertable = false, updatable = false)
+    private User owner;
 }

@@ -3,6 +3,8 @@
  * @version 1.0
  * @since 2026-02-13
  */
+
+
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://bookmysalon-5.onrender.com';
@@ -19,7 +21,9 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('accessToken');
-    if (token) {
+    const requestUrl = config.url || '';
+    const isAuthEndpoint = requestUrl.includes('/api/auth/');
+    if (token && !isAuthEndpoint) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
@@ -41,6 +45,7 @@ api.interceptors.response.use(
       requestUrl.includes('/api/auth/login') ||
       requestUrl.includes('/api/auth/signup') ||
       requestUrl.includes('/api/auth/register') ||
+      requestUrl.includes('/api/auth/oauth/exchange') ||
       requestUrl.includes('/api/auth/refresh-token') ||
       requestUrl.includes('/api/auth/forgot-password') ||
       requestUrl.includes('/api/auth/reset-password') ||
@@ -53,7 +58,10 @@ api.interceptors.response.use(
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('userId');
-      window.location.href = '/login';
+      if (!window.location.pathname.startsWith('/login')) {
+        const message = encodeURIComponent('Session expired. Please sign in again.');
+        window.location.href = `/login?error=${message}`;
+      }
     }
 
     return Promise.reject(error);

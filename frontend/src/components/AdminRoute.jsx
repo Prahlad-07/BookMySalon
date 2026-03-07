@@ -7,6 +7,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { getDashboardPathByRole } from '../utils/roleRouting';
 
 export default function AdminRoute({ children }) {
   const { user, loading } = useAuth();
@@ -19,8 +20,12 @@ export default function AdminRoute({ children }) {
     );
   }
 
-  if (!user || user.role !== 'ADMIN') {
-    return <Navigate to="/" replace />;
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (user.role !== 'ADMIN') {
+    return <Navigate to={getDashboardPathByRole(user.role)} replace />;
   }
 
   return children;

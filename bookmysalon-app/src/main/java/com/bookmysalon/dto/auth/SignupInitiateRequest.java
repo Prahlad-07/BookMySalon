@@ -28,7 +28,6 @@ public class SignupInitiateRequest {
     @NotBlank
     private String email;
 
-    @NotBlank
     private String phone;
 
     @NotBlank

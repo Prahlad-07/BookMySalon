@@ -50,8 +50,13 @@ public class CustomUserDetailsService implements UserDetailsService {
                     .collect(Collectors.toSet()));
         }
 
-        if (roleNames.isEmpty() && user.getRole() != null) {
+        if (user.getRole() != null) {
             roleNames.add(user.getRole().name());
+        }
+
+        if (roleNames.contains("USER")) {
+            roleNames.remove("USER");
+            roleNames.add("CUSTOMER");
         }
 
         return roleNames.stream()

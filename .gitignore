@@ -1,0 +1,26 @@
+# OS
+.DS_Store
+
+# IDE
+.idea/
+*.iml
+
+# Environment files (keep only templates)
+.env
+.env.*
+!.env.example
+!.env.render.example
+frontend/.env.local
+bookmysalon-app/.env.local
+
+# Frontend build artifacts
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Java build artifacts
+**/target/
+*.class
+
+# Logs
+*.log

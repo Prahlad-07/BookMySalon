@@ -8,13 +8,26 @@ package com.bookmysalon.service.auth.verification;
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class VerificationDeliveryServiceImpl implements VerificationDeliveryService {
+
+    private final ObjectProvider<JavaMailSender> mailSenderProvider;
+
+    @Value("${app.otp.email.enabled:false}")
+    private boolean emailEnabled;
+
+    @Value("${app.otp.email.from:}")
+    private String emailFrom;
 
     @Value("${app.otp.sms.enabled:false}")
     private boolean smsEnabled;
@@ -33,7 +46,29 @@ public class VerificationDeliveryServiceImpl implements VerificationDeliveryServ
 
     @Override
     public void sendEmailOtp(String email, String otp) {
-        log.info("Email OTP for {}: {}", email, otp);
+        if (!emailEnabled) {
+            log.info("Email delivery disabled. Email OTP for {}: {}", email, otp);
+            return;
+        }
+
+        JavaMailSender mailSender = mailSenderProvider.getIfAvailable();
+        if (mailSender == null || isBlank(emailFrom)) {
+            log.error("Email is enabled but SMTP/from config is missing.");
+            throw new IllegalStateException("Email provider is not configured");
+        }
+
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(emailFrom.trim());
+            message.setTo(email);
+            message.setSubject("BookMySalon OTP Verification");
+            message.setText("Your BookMySalon OTP is " + otp + ". It is valid for 10 minutes.");
+            mailSender.send(message);
+            log.info("Email OTP sent successfully to {}", email);
+        } catch (Exception ex) {
+            log.error("Failed to send OTP email to {}", email, ex);
+            throw new IllegalStateException("Failed to send OTP email");
+        }
     }
 
     @Override

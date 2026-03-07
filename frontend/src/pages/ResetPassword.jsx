@@ -22,8 +22,8 @@ export default function ResetPassword() {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
-  const submit = async (e) => {
-    e.preventDefault();
+  const submit = async (event) => {
+    event.preventDefault();
 
     if (!token.trim()) {
       setError('Reset token is required.');
@@ -42,11 +42,13 @@ export default function ResetPassword() {
       setLoading(true);
       setError('');
       setMessage('');
+
       const response = await api.post('/api/auth/reset-password', {
         token: token.trim(),
         newPassword,
       });
-      setMessage(response || 'Password reset successful.');
+
+      setMessage(response || 'Password reset successful. Redirecting to login...');
       setTimeout(() => navigate('/login'), 1200);
     } catch (err) {
       setError(err?.response?.data?.error || 'Unable to reset password.');
@@ -57,17 +59,23 @@ export default function ResetPassword() {
 
   return (
     <div className="min-h-screen px-4 py-12 flex items-center justify-center">
-      <div className="w-full max-w-md card-base p-8">
-        <h1 className="text-3xl font-extrabold text-slate-900">Reset Password</h1>
-        <p className="text-slate-600 mt-2">Enter your token and set a new password.</p>
+      <div className="w-full max-w-md card-base rounded-3xl p-8">
+        <h1 className="text-3xl font-bold text-slate-900">Reset Password</h1>
+        <p className="text-slate-600 mt-2">Set your new password and sign in again.</p>
 
-        {message && <div className="mt-4 p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm">{message}</div>}
-        {error && <div className="mt-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">{error}</div>}
+        {message && <div className="notice-box notice-success mt-5">{message}</div>}
+        {error && <div className="notice-box notice-error mt-5">{error}</div>}
 
         <form onSubmit={submit} className="space-y-4 mt-6">
           <div>
             <label className="text-sm font-semibold text-slate-700">Reset Token</label>
-            <input className="input-field mt-1.5" value={token} onChange={(e) => setToken(e.target.value)} required />
+            <input
+              className="input-field mt-1.5"
+              value={token}
+              onChange={(event) => setToken(event.target.value)}
+              placeholder="Paste reset token"
+              required
+            />
           </div>
 
           <div>
@@ -78,10 +86,15 @@ export default function ResetPassword() {
                 type={showPassword ? 'text' : 'password'}
                 className="input-field input-with-icon pr-11"
                 value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
+                onChange={(event) => setNewPassword(event.target.value)}
                 required
               />
-              <button type="button" onClick={() => setShowPassword((v) => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700">
+              <button
+                type="button"
+                onClick={() => setShowPassword((previous) => !previous)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
@@ -93,16 +106,21 @@ export default function ResetPassword() {
               type={showPassword ? 'text' : 'password'}
               className="input-field mt-1.5"
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              onChange={(event) => setConfirmPassword(event.target.value)}
               required
             />
           </div>
 
-          <button className="btn-primary w-full" disabled={loading}>{loading ? 'Resetting...' : 'Reset Password'}</button>
+          <button className="btn-primary w-full" disabled={loading}>
+            {loading ? 'Resetting...' : 'Reset Password'}
+          </button>
         </form>
 
         <p className="text-slate-600 text-sm mt-6 text-center">
-          Back to <Link to="/login" className="text-blue-700 hover:text-blue-800 font-semibold">Sign In</Link>
+          Back to{' '}
+          <Link to="/login" className="text-blue-700 hover:text-blue-800 font-semibold">
+            Sign In
+          </Link>
         </p>
       </div>
     </div>

@@ -7,6 +7,7 @@ package com.bookmysalon.controller;
 
 import com.bookmysalon.dto.auth.LoginRequest;
 import com.bookmysalon.dto.auth.ForgotPasswordRequest;
+import com.bookmysalon.dto.auth.OAuthExchangeRequest;
 import com.bookmysalon.dto.auth.RefreshTokenRequest;
 import com.bookmysalon.dto.auth.ResendSignupOtpRequest;
 import com.bookmysalon.dto.auth.RegisterRequest;
@@ -17,6 +18,7 @@ import com.bookmysalon.dto.auth.VerifySignupOtpRequest;
 import com.bookmysalon.dto.response.ApiResponse;
 import com.bookmysalon.dto.response.AuthResponse;
 import com.bookmysalon.service.auth.AuthService;
+import com.bookmysalon.service.auth.OAuthLoginCodeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final OAuthLoginCodeService oAuthLoginCodeService;
 
     @GetMapping("/health")
     public ResponseEntity<ApiResponse<String>> health() {
@@ -94,6 +97,16 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.<AuthResponse>builder()
                 .success(true)
                 .message("Token refreshed")
+                .data(response)
+                .build());
+    }
+
+    @PostMapping("/oauth/exchange")
+    public ResponseEntity<ApiResponse<AuthResponse>> exchangeOAuthCode(@Valid @RequestBody OAuthExchangeRequest request) {
+        AuthResponse response = oAuthLoginCodeService.consume(request.getCode());
+        return ResponseEntity.ok(ApiResponse.<AuthResponse>builder()
+                .success(true)
+                .message("OAuth login successful")
                 .data(response)
                 .build());
     }

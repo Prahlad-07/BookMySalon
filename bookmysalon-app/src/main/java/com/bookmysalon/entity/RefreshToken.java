@@ -13,7 +13,13 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "refresh_tokens")
+@Table(
+        name = "refresh_tokens",
+        indexes = {
+                @Index(name = "idx_refresh_tokens_user_id", columnList = "user_id"),
+                @Index(name = "idx_refresh_tokens_user_revoked", columnList = "user_id, revoked")
+        }
+)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -14,7 +14,14 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "payment_orders")
+@Table(
+        name = "payment_orders",
+        indexes = {
+                @Index(name = "idx_payment_orders_user_id", columnList = "user_id"),
+                @Index(name = "idx_payment_orders_booking_id", columnList = "booking_id"),
+                @Index(name = "idx_payment_orders_status", columnList = "status")
+        }
+)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -34,23 +41,24 @@ public class PaymentOrder {
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
 
+    @Column(name = "payment_link_id")
     private String paymentLinkId;
 
-    @Column(nullable = false)
+    @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Column(nullable = false)
+    @Column(name = "booking_id", nullable = false)
     private Long bookingId;
 
     @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId", insertable = false, updatable = false)
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bookingId", insertable = false, updatable = false)
+    @JoinColumn(name = "booking_id", insertable = false, updatable = false)
     private Booking booking;
 }

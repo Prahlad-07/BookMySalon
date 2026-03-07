@@ -29,14 +29,33 @@ public class BookingController {
     private final BookingService bookingService;
     private final SalonRepository salonRepository;
 
+    @PostMapping("/me")
+    public ResponseEntity<ApiResponse<BookingDto>> createMyBooking(@RequestBody BookingRequestDto bookingRequestDto) {
+        try {
+            Long currentUserId = currentUserId();
+            BookingDto booking = bookingService.createBooking(bookingRequestDto, currentUserId);
+            return ResponseEntity.ok(ApiResponse.<BookingDto>builder()
+                    .success(true)
+                    .message("Booking created successfully")
+                    .data(booking)
+                    .build());
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(ApiResponse.<BookingDto>builder()
+                    .success(false)
+                    .error(e.getMessage())
+                    .build());
+        }
+    }
+
     @PostMapping("/{userId}")
     public ResponseEntity<ApiResponse<BookingDto>> createBooking(@PathVariable Long userId, @RequestBody BookingRequestDto bookingRequestDto) {
         try {
             Long currentUserId = currentUserId();
-            if (!currentUserId.equals(userId) && !isAdmin()) {
-                return forbidden("You are not allowed to create booking for another user");
+            Long targetUserId = currentUserId;
+            if (isAdmin() && userId != null && userId > 0) {
+                targetUserId = userId;
             }
-            BookingDto booking = bookingService.createBooking(bookingRequestDto, currentUserId);
+            BookingDto booking = bookingService.createBooking(bookingRequestDto, targetUserId);
             return ResponseEntity.ok(ApiResponse.<BookingDto>builder()
                     .success(true)
                     .message("Booking created successfully")

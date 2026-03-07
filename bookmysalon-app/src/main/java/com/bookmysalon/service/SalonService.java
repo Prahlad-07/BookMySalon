@@ -14,6 +14,7 @@ public interface SalonService {
     List<SalonDto> getAllSalons();
     List<SalonDto> getSalonsByOwnerId(Long ownerId);
     List<SalonDto> getSalonsByCity(String city);
+    List<SalonDto> getSalonsNearLocation(double latitude, double longitude, double radiusKm);
     SalonDto updateSalon(Long id, SalonDto salonDto);
     void deleteSalon(Long id);
 }

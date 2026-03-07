@@ -8,9 +8,13 @@ import {
   Star,
   ArrowRight,
   Shield,
+  Search,
+  ListChecks,
+  CalendarCheck2,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import appLogo from '../assets/app-logo.png';
+import brandLogo from '../assets/brand-logo.png';
+import { getDashboardPathByRole } from '../utils/roleRouting';
 
 export default function Home() {
   const { user } = useAuth();
@@ -63,31 +67,31 @@ export default function Home() {
     {
       name: 'Sarah Johnson',
       role: 'Customer',
-      image: '👩‍🦰',
+      initials: 'SJ',
       text: 'BookMySalon made finding and booking my favorite salon incredible. The interface is stunning!',
       rating: 5,
     },
     {
       name: 'Mike Chen',
       role: 'Salon Owner',
-      image: '👨‍💼',
+      initials: 'MC',
       text: 'This platform completely transformed how I manage bookings. Highly recommended for all salon owners!',
       rating: 5,
     },
     {
       name: 'Emma Davis',
       role: 'Customer',
-      image: '👩‍🦱',
+      initials: 'ED',
       text: 'The booking process is seamless and the design is absolutely beautiful. Best salon app I\'ve used!',
       rating: 5,
     },
   ];
 
   const steps = [
-    { step: '1', title: 'Search', description: 'Find salons near you', icon: '🔍' },
-    { step: '2', title: 'Browse', description: 'Check services & reviews', icon: '📋' },
-    { step: '3', title: 'Book', description: 'Select date and time', icon: '📅' },
-    { step: '4', title: 'Enjoy', description: 'Get professional services', icon: '✨' },
+    { step: '1', title: 'Search', description: 'Find top salons in your city', icon: Search },
+    { step: '2', title: 'Compare', description: 'Review services and trusted ratings', icon: ListChecks },
+    { step: '3', title: 'Book', description: 'Pick slot and confirm in seconds', icon: CalendarCheck2 },
+    { step: '4', title: 'Enjoy', description: 'Experience premium salon care', icon: Sparkles },
   ];
 
   return (
@@ -145,10 +149,10 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row gap-4 mb-12">
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Link 
-                    to={user ? (user.role === 'CUSTOMER' ? '/salons' : '/salon/dashboard') : '/signup'} 
+                    to={user ? getDashboardPathByRole(user.role) : '/signup'}
                     className="btn-primary inline-flex items-center gap-2 px-8 py-4"
                   >
-                    {user ? (user.role === 'CUSTOMER' ? 'Find Salons' : 'Go to Dashboard') : 'Get Started'}
+                    {user ? 'Go to Dashboard' : 'Get Started'}
                     <ArrowRight size={20} />
                   </Link>
                 </motion.div>
@@ -193,7 +197,7 @@ export default function Home() {
               >
                 <div className="w-[28rem] h-[28rem] glass-effect rounded-[2rem] overflow-hidden flex items-center justify-center glow-effect p-8">
                   <div className="w-full h-full rounded-3xl bg-gradient-to-br from-sky-50 via-white to-teal-50 border border-slate-200/70 flex items-center justify-center">
-                    <img src={appLogo} alt="BookMySalon" className="w-64 h-64 object-contain drop-shadow-xl" />
+                    <img src={brandLogo} alt="BookMySalon" className="w-64 h-64 object-contain rounded-2xl drop-shadow-xl" />
                   </div>
                 </div>
                 <motion.div
@@ -282,37 +286,42 @@ export default function Home() {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {steps.map((item, index) => (
-              <motion.div
-                key={index}
-                custom={index}
-                variants={itemVariants}
-                whileHover={{ scale: 1.05 }}
-                className="relative group"
-              >
-                {/* Connector line */}
-                {index < steps.length - 1 && (
-                  <div className="hidden lg:block absolute top-8 -right-[2rem] w-[calc(100%+2rem)] h-1 bg-gradient-to-r from-primary-500 to-transparent" />
-                )}
+            {steps.map((item, index) => {
+              const StepIcon = item.icon;
+              return (
+                <motion.div
+                  key={index}
+                  custom={index}
+                  variants={itemVariants}
+                  whileHover={{ scale: 1.05 }}
+                  className="relative group"
+                >
+                  {/* Connector line */}
+                  {index < steps.length - 1 && (
+                    <div className="hidden lg:block absolute top-8 -right-[2rem] w-[calc(100%+2rem)] h-1 bg-gradient-to-r from-primary-500 to-transparent" />
+                  )}
 
-                <div className="text-center">
-                  <motion.div 
-                    animate={{ y: [0, -10, 0] }}
-                    transition={{ duration: 3, repeat: Infinity, delay: index * 0.2 }}
-                    className="w-20 h-20 bg-gradient-to-br from-primary-600 to-secondary-500 text-white rounded-2xl flex items-center justify-center text-2xl font-bold mx-auto mb-6 shadow-xl shadow-primary-500/30 group-hover:shadow-2xl transition-all"
-                  >
-                    {item.step}
-                  </motion.div>
-                  <p className="text-4xl mb-4">{item.icon}</p>
-                  <h3 className="text-2xl font-bold text-slate-900 mb-3">
-                    {item.title}
-                  </h3>
-                  <p className="text-slate-600">
-                    {item.description}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
+                  <div className="text-center">
+                    <motion.div 
+                      animate={{ y: [0, -10, 0] }}
+                      transition={{ duration: 3, repeat: Infinity, delay: index * 0.2 }}
+                      className="w-20 h-20 bg-gradient-to-br from-primary-600 to-secondary-500 text-white rounded-2xl flex items-center justify-center text-2xl font-bold mx-auto mb-6 shadow-xl shadow-primary-500/30 group-hover:shadow-2xl transition-all"
+                    >
+                      {item.step}
+                    </motion.div>
+                    <div className="w-14 h-14 rounded-xl bg-primary-50 text-primary-700 border border-primary-100 inline-flex items-center justify-center mb-4">
+                      <StepIcon size={26} />
+                    </div>
+                    <h3 className="text-2xl font-bold text-slate-900 mb-3">
+                      {item.title}
+                    </h3>
+                    <p className="text-slate-600">
+                      {item.description}
+                    </p>
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </motion.section>
@@ -345,7 +354,9 @@ export default function Home() {
                 className="card-base card-hover p-8 transition-all"
               >
                 <div className="flex items-center gap-4 mb-6">
-                  <span className="text-5xl">{testimonial.image}</span>
+                  <span className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 text-white text-sm font-bold inline-flex items-center justify-center shadow-lg">
+                    {testimonial.initials}
+                  </span>
                   <div>
                     <h3 className="font-bold text-slate-900 text-lg">{testimonial.name}</h3>
                     <p className="text-slate-600 text-sm">{testimonial.role}</p>
@@ -358,9 +369,9 @@ export default function Home() {
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ delay: i * 0.1 }}
-                      className="text-2xl"
+                      className="text-amber-500"
                     >
-                      ⭐
+                      <Star size={18} fill="currentColor" />
                     </motion.span>
                   ))}
                 </div>
@@ -399,7 +410,7 @@ export default function Home() {
             >
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Link
-                  to={user ? (user.role === 'CUSTOMER' ? '/salons' : '/salon/dashboard') : '/signup'}
+                  to={user ? getDashboardPathByRole(user.role) : '/signup'}
                   className="btn-primary inline-flex items-center gap-2 py-4 px-10"
                 >
                   Get Started Today

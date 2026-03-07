@@ -18,9 +18,15 @@ const getMessageKey = (message) => {
   return `tmp-${message.createdAt}-${message.senderId}`;
 };
 
+const toNumericId = (value) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
 export default function ChatPage() {
   const { participantId } = useParams();
   const navigate = useNavigate();
+
   const { user } = useAuth();
   const { connected, subscribeToConversation, sendMessage, markConversationRead, unread } = useChat();
 
@@ -43,8 +49,20 @@ export default function ChatPage() {
     setConversations(Array.isArray(data) ? data : []);
   };
 
+  const isSelfParticipant = (targetParticipantId) => {
+    const targetId = toNumericId(targetParticipantId);
+    const currentUserId = toNumericId(user?.id);
+    return targetId != null && currentUserId != null && targetId === currentUserId;
+  };
+
   const openConversation = async (targetParticipantId) => {
     if (!targetParticipantId) return;
+    if (isSelfParticipant(targetParticipantId)) {
+      setConversation(null);
+      setMessages([]);
+      setError('Open a chat with another user from bookings or owner console.');
+      return;
+    }
 
     const convo = await api.post(`/api/chat/conversations/with/${targetParticipantId}`);
     setConversation(convo);
@@ -64,12 +82,24 @@ export default function ChatPage() {
       try {
         setLoading(true);
         await loadConversations();
-
+        if (participantId && isSelfParticipant(participantId)) {
+          setError('You cannot start a conversation with yourself.');
+          navigate('/chat', { replace: true });
+          return;
+        }
         if (participantId) {
           await openConversation(participantId);
+        } else {
+          setError('');
         }
       } catch (err) {
-        setError(err?.response?.data?.error || 'Failed to load chat data');
+        const errorMessage = err?.response?.data?.error || 'Failed to load chat data';
+        if (String(errorMessage).toLowerCase().includes('yourself')) {
+          setError('You cannot start a conversation with yourself.');
+          navigate('/chat', { replace: true });
+        } else {
+          setError(errorMessage);
+        }
       } finally {
         setLoading(false);
       }
@@ -82,25 +112,25 @@ export default function ChatPage() {
     if (!conversation?.id || !connected) return;
 
     const unsubscribe = subscribeToConversation(conversation.id, async (incoming) => {
-      setMessages((prev) => {
-        const idxById = incoming.id ? prev.findIndex((item) => item.id === incoming.id) : -1;
-        if (idxById >= 0) {
-          const next = [...prev];
-          next[idxById] = { ...next[idxById], ...incoming };
+      setMessages((previous) => {
+        const indexById = incoming.id ? previous.findIndex((item) => item.id === incoming.id) : -1;
+        if (indexById >= 0) {
+          const next = [...previous];
+          next[indexById] = { ...next[indexById], ...incoming };
           return next.sort(byCreatedAt);
         }
 
-        const idxByClientId = incoming.clientMessageId
-          ? prev.findIndex((item) => item.clientMessageId && item.clientMessageId === incoming.clientMessageId)
+        const indexByClientId = incoming.clientMessageId
+          ? previous.findIndex((item) => item.clientMessageId && item.clientMessageId === incoming.clientMessageId)
           : -1;
 
-        if (idxByClientId >= 0) {
-          const next = [...prev];
-          next[idxByClientId] = { ...next[idxByClientId], ...incoming };
+        if (indexByClientId >= 0) {
+          const next = [...previous];
+          next[indexByClientId] = { ...next[indexByClientId], ...incoming };
           return next.sort(byCreatedAt);
         }
 
-        return [...prev, incoming].sort(byCreatedAt);
+        return [...previous, incoming].sort(byCreatedAt);
       });
 
       if (incoming.receiverId === user?.id) {
@@ -115,8 +145,8 @@ export default function ChatPage() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const onSend = async (e) => {
-    e.preventDefault();
+  const onSend = async (event) => {
+    event.preventDefault();
     if (!conversation?.id || !activeOtherUserId || !text.trim()) return;
 
     const content = text.trim();
@@ -133,7 +163,7 @@ export default function ChatPage() {
       createdAt: new Date().toISOString(),
     };
 
-    setMessages((prev) => [...prev, optimistic].sort(byCreatedAt));
+    setMessages((previous) => [...previous, optimistic].sort(byCreatedAt));
     setText('');
 
     try {
@@ -144,7 +174,7 @@ export default function ChatPage() {
         clientMessageId,
       });
     } catch (err) {
-      setMessages((prev) => prev.filter((msg) => getMessageKey(msg) !== getMessageKey(optimistic)));
+      setMessages((previous) => previous.filter((message) => getMessageKey(message) !== getMessageKey(optimistic)));
       setText(content);
       setError(err?.message || 'Failed to send message');
     }
@@ -161,26 +191,30 @@ export default function ChatPage() {
   return (
     <div className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="card-base rounded-2xl p-4 lg:col-span-1">
+        <aside className="card-base rounded-2xl p-4 lg:col-span-1">
           <div className="flex items-center justify-between mb-3">
             <h1 className="text-2xl font-bold text-slate-900">Chats</h1>
-            <span className="text-xs text-slate-600">Unread: {unread.unreadMessages}</span>
+            <span className="status-pill status-pending">Unread {unread.unreadMessages}</span>
           </div>
 
-          <div className="space-y-2 max-h-[70vh] overflow-auto">
+          <div className="space-y-2 max-h-[70vh] overflow-auto pr-1">
             {conversations.length === 0 && <p className="text-slate-600">No conversations yet.</p>}
             {conversations.map((item) => {
               const otherUserId = item.customerId === user?.id ? item.salonOwnerId : item.customerId;
               const active = conversation?.id === item.id;
+
               return (
                 <button
                   key={item.id}
                   type="button"
                   onClick={() => {
                     navigate(`/chat/${otherUserId}`);
-                    openConversation(otherUserId);
                   }}
-                  className={`w-full text-left rounded-xl border px-3 py-3 ${active ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-white'}`}
+                  className={`w-full text-left rounded-xl border px-3 py-3 transition ${
+                    active
+                      ? 'border-primary-300 bg-primary-50'
+                      : 'border-slate-200 bg-white hover:border-primary-200 hover:bg-slate-50'
+                  }`}
                 >
                   <p className="font-semibold text-slate-900">User #{otherUserId}</p>
                   <p className="text-sm text-slate-600 truncate">{item.lastMessage?.content || 'No messages yet'}</p>
@@ -188,9 +222,9 @@ export default function ChatPage() {
               );
             })}
           </div>
-        </div>
+        </aside>
 
-        <div className="card-base rounded-2xl p-4 lg:col-span-2 flex flex-col h-[75vh]">
+        <section className="card-base rounded-2xl p-4 lg:col-span-2 flex flex-col h-[76vh]">
           <div className="flex items-center justify-between border-b border-slate-200 pb-3">
             <div>
               <p className="text-slate-600 text-sm">Conversation</p>
@@ -202,19 +236,26 @@ export default function ChatPage() {
             </div>
           </div>
 
-          {error && <div className="mt-3 rounded-lg border border-red-300 bg-red-50 text-red-700 p-3 text-sm">{error}</div>}
+          {error && <div className="notice-box notice-error mt-3">{error}</div>}
 
-          <div className="flex-1 overflow-auto space-y-2 py-4">
-            {messages.map((message) => (
-              <div key={getMessageKey(message)} className={`flex ${message.senderId === user?.id ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[75%] rounded-xl px-3 py-2 ${message.senderId === user?.id ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-900'}`}>
-                  <p>{message.content}</p>
-                  <p className={`text-[11px] mt-1 ${message.senderId === user?.id ? 'text-blue-100' : 'text-slate-500'}`}>
-                    {new Date(message.createdAt || Date.now()).toLocaleTimeString()} • {message.status}
-                  </p>
+          <div className="flex-1 overflow-auto space-y-2 py-4 pr-1">
+            {messages.map((message) => {
+              const ownMessage = message.senderId === user?.id;
+              return (
+                <div key={getMessageKey(message)} className={`flex ${ownMessage ? 'justify-end' : 'justify-start'}`}>
+                  <div
+                    className={`max-w-[80%] rounded-xl px-3 py-2 ${
+                      ownMessage ? 'bg-primary-600 text-white' : 'surface-muted text-slate-900'
+                    }`}
+                  >
+                    <p>{message.content}</p>
+                    <p className={`text-[11px] mt-1 ${ownMessage ? 'text-blue-100' : 'text-slate-500'}`}>
+                      {new Date(message.createdAt || Date.now()).toLocaleTimeString()} • {message.status}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
             <div ref={bottomRef} />
           </div>
 
@@ -222,21 +263,25 @@ export default function ChatPage() {
             <form onSubmit={onSend} className="border-t border-slate-200 pt-3 flex gap-2">
               <input
                 value={text}
-                onChange={(e) => setText(e.target.value)}
+                onChange={(event) => setText(event.target.value)}
                 className="input-field"
                 placeholder="Type your message"
                 maxLength={2000}
               />
-              <button type="submit" className="btn-primary flex items-center gap-2" disabled={!connected || !text.trim()}>
+              <button type="submit" className="btn-primary inline-flex items-center gap-2" disabled={!connected || !text.trim()}>
                 <Send size={16} /> Send
               </button>
             </form>
           ) : (
             <div className="border-t border-slate-200 pt-3 text-slate-600 text-sm">
-              Open a conversation from list or start from <Link className="text-blue-700 underline" to="/bookings">My Bookings</Link>.
+              Open a conversation from the list or start from{' '}
+              <Link className="text-blue-700 underline" to="/bookings">
+                My Bookings
+              </Link>
+              .
             </div>
           )}
-        </div>
+        </section>
       </div>
     </div>
   );

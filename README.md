@@ -26,7 +26,7 @@ BookMySalon is a full-stack application that lets customers discover salons, boo
 - Backend: Java 21, Spring Boot 3.5, Spring Security, JPA, Flyway, WebSocket/STOMP
 - Frontend: React 18, Vite, Tailwind CSS, Axios, Framer Motion
 - Payments/Comms: Stripe, Twilio (optional), MSG91 (optional)
-- DB: MySQL (production) or H2 (dev)
+- DB: MySQL (persistent runtime), H2 (tests only)
 - Deploy: Docker + Render
 
 ## Repository Layout
@@ -70,6 +70,17 @@ Backend config lives in `bookmysalon-app/src/main/resources/application.yml`. Ke
 - `STRIPE_API_KEY`
 - `APP_CORS_ALLOWED_ORIGIN_PATTERNS`
 - `APP_OTP_DEV_MODE`
+- `OTP_EMAIL_ENABLED`
+- `OTP_EMAIL_FROM`
+- `SPRING_MAIL_HOST`
+- `SPRING_MAIL_PORT`
+- `SPRING_MAIL_USERNAME`
+- `SPRING_MAIL_PASSWORD`
+- `APP_OAUTH2_ENABLED`
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
+- `APP_OAUTH2_REDIRECT_URI`
+- `APP_OAUTH2_FAILURE_URI`
 - `MSG91_ENABLED`
 - `MSG91_AUTHKEY`
 - `OTP_SMS_ENABLED`
@@ -77,6 +88,28 @@ Backend config lives in `bookmysalon-app/src/main/resources/application.yml`. Ke
 - `TWILIO_ACCOUNT_SID`
 - `TWILIO_AUTH_TOKEN`
 - `TWILIO_FROM_NUMBER`
+
+Security note:
+- Keep all backend secrets only in Render environment variables (never in git).
+- For Vercel, only use `VITE_*` variables. These are client-side and visible in browser bundles.
+- Never put secret keys like `STRIPE_API_KEY`, `GOOGLE_CLIENT_SECRET`, `SECURITY_JWT_SECRET`, Twilio auth token, or DB passwords in frontend env files.
+
+## Local Persistent Database Setup (MySQL)
+BookMySalon backend can run with persistent local MySQL:
+- Database: `bookmysalon`
+- Host: `localhost`
+- Port: `3306`
+- Username: set via `SPRING_DATASOURCE_USERNAME`
+- Password: set via `SPRING_DATASOURCE_PASSWORD`
+
+Create/reset local schema:
+```bash
+mysql -u root -p < bookmysalon-app/sql/local-init.sql
+```
+Optional full reset (destructive):
+```bash
+mysql -u root -p < bookmysalon-app/sql/reset-schema.sql
+```
 
 ## API Surface (Highlights)
 Base path: `/api`
