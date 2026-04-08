@@ -43,6 +43,7 @@ public class SalonServiceImpl implements SalonService {
         if (salonDto.getPhoneNumber() == null || salonDto.getPhoneNumber().trim().isEmpty()) {
             throw new IllegalArgumentException("Phone number is required");
         }
+        validatePhoneNumber(salonDto.getPhoneNumber());
         if (salonDto.getEmail() == null || !salonDto.getEmail().contains("@")) {
             throw new IllegalArgumentException("Valid email is required");
         }
@@ -52,6 +53,7 @@ public class SalonServiceImpl implements SalonService {
         validateCoordinates(salonDto.getLatitude(), salonDto.getLongitude());
 
         String normalizedEmail = salonDto.getEmail().trim().toLowerCase();
+        String normalizedPhone = salonDto.getPhoneNumber().trim();
         validateSalonEmailAvailability(normalizedEmail, salonDto.getOwnerId(), null);
         String normalizedAddress = salonDto.getAddress() == null ? "" : salonDto.getAddress().trim();
 
@@ -61,7 +63,7 @@ public class SalonServiceImpl implements SalonService {
         salon.setAddress(normalizedAddress);
         salon.setLatitude(salonDto.getLatitude());
         salon.setLongitude(salonDto.getLongitude());
-        salon.setPhoneNumber(salonDto.getPhoneNumber().trim());
+        salon.setPhoneNumber(normalizedPhone);
         salon.setEmail(normalizedEmail);
         salon.setCity(salonDto.getCity().trim());
         salon.setOwnerId(salonDto.getOwnerId());
@@ -72,7 +74,7 @@ public class SalonServiceImpl implements SalonService {
             Salon savedSalon = salonRepository.save(salon);
             return mapToDto(savedSalon);
         } catch (DataIntegrityViolationException ex) {
-            throw new IllegalArgumentException("This salon email is already in use. Use a different email.");
+            throw resolveDataIntegrityViolation(ex, salonDto.getOwnerId(), normalizedEmail, normalizedPhone, null);
         }
     }
 
@@ -125,7 +127,14 @@ public class SalonServiceImpl implements SalonService {
         if (salonDto.getName() != null) salon.setName(salonDto.getName().trim());
         if (salonDto.getImages() != null) salon.setImages(salonDto.getImages());
         if (salonDto.getAddress() != null) salon.setAddress(salonDto.getAddress().trim());
-        if (salonDto.getPhoneNumber() != null) salon.setPhoneNumber(salonDto.getPhoneNumber().trim());
+        if (salonDto.getPhoneNumber() != null) {
+            String normalizedPhone = salonDto.getPhoneNumber().trim();
+            if (normalizedPhone.isEmpty()) {
+                throw new IllegalArgumentException("Phone number is required");
+            }
+            validatePhoneNumber(normalizedPhone);
+            salon.setPhoneNumber(normalizedPhone);
+        }
         if (salonDto.getEmail() != null) {
             String normalizedEmail = salonDto.getEmail().trim().toLowerCase();
             if (!normalizedEmail.contains("@")) {
@@ -148,7 +157,7 @@ public class SalonServiceImpl implements SalonService {
             Salon updatedSalon = salonRepository.save(salon);
             return mapToDto(updatedSalon);
         } catch (DataIntegrityViolationException ex) {
-            throw new IllegalArgumentException("This salon email is already in use. Use a different email.");
+            throw resolveDataIntegrityViolation(ex, salon.getOwnerId(), salon.getEmail(), salon.getPhoneNumber(), id);
         }
     }
 
@@ -218,6 +227,88 @@ public class SalonServiceImpl implements SalonService {
             throw new IllegalArgumentException("You already have a salon with this email. Please edit the existing salon.");
         }
         throw new IllegalArgumentException("This salon email is already in use. Use a different email.");
+    }
+
+    private IllegalArgumentException resolveDataIntegrityViolation(
+            DataIntegrityViolationException ex,
+            Long ownerId,
+            String normalizedEmail,
+            String normalizedPhone,
+            Long currentSalonId
+    ) {
+        String rootMessage = rootCauseMessage(ex).toLowerCase();
+        boolean duplicateLike = rootMessage.contains("duplicate")
+                || rootMessage.contains("unique")
+                || rootMessage.contains("constraint");
+
+        if (duplicateLike && isEmailAlreadyUsed(normalizedEmail, currentSalonId)) {
+            return new IllegalArgumentException("This salon email is already in use. Use a different email.");
+        }
+
+        if (duplicateLike && isPhoneAlreadyUsed(normalizedPhone, currentSalonId)) {
+            return new IllegalArgumentException("This salon phone number is already in use. Use a different phone number.");
+        }
+
+        if (duplicateLike && (rootMessage.contains("owner_id") || rootMessage.contains("owner")) && ownerId != null) {
+            return new IllegalArgumentException("Your account already has a salon profile. Edit the existing profile instead of creating a new one.");
+        }
+
+        if (duplicateLike && ownerId != null && salonRepository.existsByOwnerId(ownerId)) {
+            return new IllegalArgumentException("Your account already has a salon profile. Edit the existing profile instead of creating a new one.");
+        }
+
+        if (duplicateLike && rootMessage.contains("email")) {
+            return new IllegalArgumentException("This salon email is already in use. Use a different email.");
+        }
+        if (duplicateLike && rootMessage.contains("phone")) {
+            return new IllegalArgumentException("This salon phone number is already in use. Use a different phone number.");
+        }
+
+        return new IllegalArgumentException("Unable to save salon right now. Please verify details and try again.");
+    }
+
+    private boolean isEmailAlreadyUsed(String normalizedEmail, Long currentSalonId) {
+        if (normalizedEmail == null || normalizedEmail.isBlank()) {
+            return false;
+        }
+        if (currentSalonId == null) {
+            return salonRepository.existsByEmailIgnoreCase(normalizedEmail);
+        }
+        return salonRepository.existsByEmailIgnoreCaseAndIdNot(normalizedEmail, currentSalonId);
+    }
+
+    private boolean isPhoneAlreadyUsed(String normalizedPhone, Long currentSalonId) {
+        if (normalizedPhone == null || normalizedPhone.isBlank()) {
+            return false;
+        }
+        if (currentSalonId == null) {
+            return salonRepository.existsByPhoneNumber(normalizedPhone);
+        }
+        return salonRepository.existsByPhoneNumberAndIdNot(normalizedPhone, currentSalonId);
+    }
+
+    private String rootCauseMessage(Throwable throwable) {
+        Throwable current = throwable;
+        while (current.getCause() != null && current.getCause() != current) {
+            current = current.getCause();
+        }
+        return current.getMessage() == null ? "" : current.getMessage();
+    }
+
+    private void validatePhoneNumber(String rawPhoneNumber) {
+        String phoneNumber = rawPhoneNumber == null ? "" : rawPhoneNumber.trim();
+        if (phoneNumber.isEmpty()) {
+            throw new IllegalArgumentException("Phone number is required");
+        }
+
+        if (phoneNumber.contains("@")) {
+            throw new IllegalArgumentException("Phone number format is invalid. Enter a valid phone number, not an email.");
+        }
+
+        String digitsOnly = phoneNumber.replaceAll("\\D", "");
+        if (digitsOnly.length() < 7 || digitsOnly.length() > 15) {
+            throw new IllegalArgumentException("Phone number format is invalid. Enter a valid phone number with 7 to 15 digits.");
+        }
     }
 
     private double haversineDistanceKm(double lat1, double lon1, double lat2, double lon2) {

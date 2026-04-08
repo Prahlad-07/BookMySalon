@@ -15,9 +15,14 @@ import java.util.Optional;
 @Repository
 public interface SalonRepository extends JpaRepository<Salon, Long> {
     List<Salon> findByOwnerId(Long ownerId);
+    Optional<Salon> findFirstByOwnerId(Long ownerId);
+    boolean existsByOwnerId(Long ownerId);
     List<Salon> findByCity(String city);
     List<Salon> findByLatitudeIsNotNullAndLongitudeIsNotNull();
     Optional<Salon> findByEmailIgnoreCase(String email);
     boolean existsByEmailIgnoreCase(String email);
     boolean existsByEmailIgnoreCaseAndIdNot(String email, Long id);
+    Optional<Salon> findByPhoneNumber(String phoneNumber);
+    boolean existsByPhoneNumber(String phoneNumber);
+    boolean existsByPhoneNumberAndIdNot(String phoneNumber, Long id);
 }

@@ -36,6 +36,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Base64;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -143,7 +144,8 @@ public class AuthServiceImpl implements AuthService {
                 : providedPhone;
         session.setPhone(sessionPhone);
         session.setPasswordHash(passwordEncoder.encode(request.getPassword().trim()));
-        session.setRequestedRole(request.getRole() == null || request.getRole().isBlank() ? "CUSTOMER" : request.getRole().trim().toUpperCase());
+        Set<UserRole> requestedRoles = resolveRequestedRoles(request.getRole());
+        session.setRequestedRole(resolvePrimaryRole(requestedRoles).name());
 
         return issueAndSendOtp(session);
     }
@@ -357,11 +359,23 @@ public class AuthServiceImpl implements AuthService {
             return Set.of(UserRole.CUSTOMER);
         }
 
-        String normalized = roleValue.trim().toUpperCase();
-        if ("SALON_OWNER".equals(normalized)) {
+        String normalized = roleValue.trim()
+                .toUpperCase(Locale.ROOT)
+                .replace("ROLE_", "")
+                .replace('-', '_')
+                .replace(' ', '_')
+                .replaceAll("[^A-Z_]", "");
+
+        if ("SALON_OWNER".equals(normalized)
+                || "SALONOWNER".equals(normalized)
+                || "OWNER".equals(normalized)
+                || (normalized.contains("SALON") && normalized.contains("OWNER"))) {
             return Set.of(UserRole.SALON_OWNER);
         }
-        if ("USER".equals(normalized) || "CUSTOMER".equals(normalized)) {
+        if ("USER".equals(normalized)
+                || "CUSTOMER".equals(normalized)
+                || "CLIENT".equals(normalized)
+                || normalized.contains("CUSTOMER")) {
             return Set.of(UserRole.CUSTOMER);
         }
         throw new AuthException("Invalid role selected. Choose CUSTOMER or SALON_OWNER.");

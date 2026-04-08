@@ -153,7 +153,7 @@ export default function MapboxLocationPicker({
 
   if (!accessToken) {
     return (
-      <div className={`rounded-2xl border border-amber-300 bg-amber-50 p-4 text-amber-800 ${className}`}>
+      <div className={`notice-box notice-warning ${className}`}>
         Mapbox token is missing. Add <code>VITE_MAPBOX_ACCESS_TOKEN</code> to use location picker.
       </div>
     );
@@ -164,7 +164,7 @@ export default function MapboxLocationPicker({
       <div className="map-shell relative">
         <div ref={containerRef} className="h-80 w-full" />
         {isInitializing && (
-          <div className="absolute inset-0 bg-slate-200/55 backdrop-blur-[1px] flex items-center justify-center">
+          <div className="map-loading-overlay">
             <div className="card-base rounded-xl px-4 py-3 text-sm text-slate-700">Loading map...</div>
           </div>
         )}

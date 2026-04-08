@@ -24,10 +24,10 @@ const ChatRoute = lazy(() => import('./pages/ChatRoute'));
 
 function RouteLoader() {
   return (
-    <div className="min-h-[55vh] flex items-center justify-center">
-      <div className="inline-flex items-center gap-3 card-base rounded-xl px-4 py-3 text-slate-700">
-        <div className="w-4 h-4 border-2 border-blue-300 border-t-blue-600 rounded-full animate-spin" />
-        Loading...
+    <div className="min-h-[58vh] flex items-center justify-center px-4">
+      <div className="inline-flex items-center gap-3 card-base rounded-2xl px-5 py-4 text-slate-700">
+        <div className="h-4 w-4 rounded-full border-2 border-primary-300 border-t-primary-700 animate-spin" />
+        <span className="font-semibold text-sm sm:text-base">Loading your BookMySalon workspace...</span>
       </div>
     </div>
   );
@@ -143,11 +143,11 @@ export default function App() {
                   path="*"
                   element={
                     <div className="min-h-screen flex items-center justify-center">
-                      <div className="text-center">
-                        <h1 className="text-4xl font-bold text-secondary-900 mb-4">404</h1>
-                        <p className="text-lg text-secondary-600 mb-8">Page not found</p>
+                      <div className="text-center card-base rounded-3xl px-8 py-10 max-w-md mx-4">
+                        <h1 className="text-4xl font-bold text-secondary-900 mb-3">404</h1>
+                        <p className="text-lg text-secondary-600 mb-6">This page is unavailable.</p>
                         <Link to="/" className="btn-primary inline-block">
-                          Go Home
+                          Go to Home
                         </Link>
                       </div>
                     </div>

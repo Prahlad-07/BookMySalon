@@ -86,7 +86,7 @@ export default function SalonList() {
     try {
       setLoading(true);
       setError('');
-      setInfo('Showing all salons.');
+      setInfo('Showing all available salons.');
 
       const [salonData, serviceData] = await Promise.all([api.get('/api/salons'), api.get('/api/service-offerings')]);
       const normalizedSalons = Array.isArray(salonData) ? salonData : [];
@@ -96,7 +96,7 @@ export default function SalonList() {
       setServiceCountBySalon(computeServiceCountBySalon(normalizedServices));
       setActiveSalonId(normalizedSalons[0]?.id || null);
     } catch (err) {
-      setError(err?.response?.data?.error || 'Failed to load salons');
+      setError(err?.response?.data?.error || 'Unable to load salons right now.');
     } finally {
       setLoading(false);
     }
@@ -135,15 +135,15 @@ export default function SalonList() {
       setSalons(normalizedSalons);
       setServiceCountBySalon(computeServiceCountBySalon(normalizedServices));
       setActiveSalonId(normalizedSalons[0]?.id || null);
-      setInfo(`Showing salons within ${radius} km of your location.`);
+      setInfo(`Showing salons within ${radius} km from your live location.`);
     } catch (err) {
-      setError(err?.response?.data?.error || 'Failed to load nearby salons');
+      setError(err?.response?.data?.error || 'Unable to load nearby salons right now.');
     } finally {
       setLoading(false);
     }
   };
 
-  const useCurrentLocation = async () => {
+  const detectAndLoadCurrentLocation = async () => {
     try {
       setError('');
       setIsLocating(true);
@@ -159,7 +159,7 @@ export default function SalonList() {
 
   const searchNearby = async () => {
     if (!userLocation) {
-      await useCurrentLocation();
+      await detectAndLoadCurrentLocation();
       return;
     }
     await loadNearbySalons(userLocation, radiusKm);
@@ -203,20 +203,20 @@ export default function SalonList() {
   const isFiltering = nameQuery !== deferredNameQuery || cityQuery !== deferredCityQuery;
 
   return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto space-y-7">
-        <div>
-          <h1 className="text-4xl font-bold text-slate-900">
-            {isCustomerDashboard ? 'Customer Dashboard' : 'Find Salons Near You'}
-          </h1>
-          <p className="text-slate-600 mt-2">
-            Discover nearby salons, compare services, and move from search to booking in one smooth flow.
-          </p>
+    <div className="page-shell">
+      <div className="page-content page-stack">
+        <div className="page-header">
+          <div>
+            <h1 className="page-title">{isCustomerDashboard ? 'Customer Booking Hub' : 'Discover Salons Near You'}</h1>
+            <p className="page-subtitle">
+              Compare top salons, evaluate services, and move from search to confirmed booking in one smooth flow.
+            </p>
+          </div>
         </div>
 
         <div className="card-base rounded-2xl p-5 space-y-4">
           <div className="flex items-center gap-2 text-slate-700 font-semibold">
-            <Filter size={17} /> Search and Filters
+            <Filter size={17} /> Smart Search and Filters
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
@@ -268,12 +268,12 @@ export default function SalonList() {
           <div className="flex flex-wrap gap-3">
             <button
               type="button"
-              onClick={useCurrentLocation}
+              onClick={detectAndLoadCurrentLocation}
               className="btn-outline inline-flex items-center gap-2"
               disabled={isLocating}
             >
               <LocateFixed size={16} />
-              {isLocating ? 'Detecting location...' : 'Use My Location'}
+              {isLocating ? 'Detecting location...' : 'Use Current Location'}
             </button>
 
             <button
@@ -282,7 +282,7 @@ export default function SalonList() {
               className="btn-secondary inline-flex items-center gap-2"
               disabled={loading}
             >
-              <MapPin size={16} /> Search Nearby
+              <MapPin size={16} /> Find Nearby
             </button>
 
             <button
@@ -291,7 +291,7 @@ export default function SalonList() {
               className="btn-secondary inline-flex items-center gap-2"
               disabled={loading}
             >
-              <RefreshCcw size={16} /> Show All Salons
+              <RefreshCcw size={16} /> Reset to All Salons
             </button>
           </div>
         </div>
@@ -301,8 +301,8 @@ export default function SalonList() {
 
         <div className="space-y-3">
           <div className="flex items-center justify-between gap-3 flex-wrap">
-            <h2 className="text-2xl font-bold text-slate-900">Map View</h2>
-            <p className="text-sm text-slate-600">Click marker to see salon details and quick navigation links.</p>
+            <h2 className="text-2xl font-bold text-slate-900">Live Map View</h2>
+            <p className="text-sm text-slate-600">Tap any marker to preview details and open directions instantly.</p>
           </div>
 
           <NearbySalonsMap
@@ -316,12 +316,12 @@ export default function SalonList() {
 
         {loading ? (
           <div className="py-20 flex items-center justify-center">
-            <div className="w-14 h-14 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+            <div className="loading-spinner" />
           </div>
         ) : (
           <>
             <div className="flex items-center justify-between gap-2 flex-wrap">
-              <p className="text-slate-600 font-medium">{filteredSalons.length} salon(s) found</p>
+              <p className="text-slate-600 font-medium">{filteredSalons.length} salon option(s) available</p>
               <div className="flex items-center gap-2">
                 {isFiltering && <span className="status-pill status-pending">Filtering...</span>}
                 {userLocation && <span className="status-pill status-success">Location enabled</span>}
@@ -330,7 +330,7 @@ export default function SalonList() {
 
             {filteredSalons.length === 0 ? (
               <div className="card-base rounded-2xl p-10 text-center text-slate-600">
-                No salons match the current filters.
+                No salons match your current filters. Try another city, name, or radius.
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -389,7 +389,7 @@ export default function SalonList() {
                           </a>
                         ) : (
                           <button type="button" className="btn-secondary w-full" disabled>
-                            Directions N/A
+                            Directions Unavailable
                           </button>
                         )}
                       </div>

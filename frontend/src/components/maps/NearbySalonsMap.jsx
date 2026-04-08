@@ -404,7 +404,7 @@ export default function NearbySalonsMap({
 
   if (!accessToken) {
     return (
-      <div className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-amber-800">
+      <div className="notice-box notice-warning">
         Mapbox token is missing. Add <code>VITE_MAPBOX_ACCESS_TOKEN</code> to use map features.
       </div>
     );
@@ -415,7 +415,7 @@ export default function NearbySalonsMap({
       <div ref={containerRef} className="h-[430px] w-full" />
 
       {isInitializing && (
-        <div className="absolute inset-0 bg-slate-200/55 backdrop-blur-[1px] flex items-center justify-center">
+        <div className="map-loading-overlay">
           <div className="card-base rounded-xl px-4 py-3 text-sm text-slate-700">Loading nearby map...</div>
         </div>
       )}

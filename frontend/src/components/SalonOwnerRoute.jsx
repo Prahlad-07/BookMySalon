@@ -13,7 +13,7 @@ export default function SalonOwnerRoute({ children }) {
       </div>
     );
   }
-
+  
   if (!user) {
     return <Navigate to="/login" replace />;
   }

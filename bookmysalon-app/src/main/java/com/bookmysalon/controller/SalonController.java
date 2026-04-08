@@ -67,7 +67,13 @@ public class SalonController {
             User user = userRepository.findById(principal.getId())
                     .orElseThrow(() -> new UnauthorizedException("User account not found"));
 
-            if (!isOwnerOrAdmin(user)) {
+            List<SalonDto> salons = salonService.getSalonsByOwnerId(principal.getId());
+
+            if (!salons.isEmpty() && !isOwnerOrAdmin(user)) {
+                promoteToSalonOwnerIfNeeded(principal.getId());
+            }
+
+            if (salons.isEmpty()) {
                 return ResponseEntity.ok(ApiResponse.<List<SalonDto>>builder()
                         .success(true)
                         .message("No owner salons yet. Create your first salon.")
@@ -75,9 +81,9 @@ public class SalonController {
                         .build());
             }
 
-            List<SalonDto> salons = salonService.getSalonsByOwnerId(principal.getId());
             return ResponseEntity.ok(ApiResponse.<List<SalonDto>>builder()
                     .success(true)
+                    .message("Owner salons fetched successfully")
                     .data(salons)
                     .build());
         } catch (UnauthorizedException e) {

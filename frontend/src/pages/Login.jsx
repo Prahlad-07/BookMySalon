@@ -51,23 +51,23 @@ export default function Login() {
   const renderedError = error || loginMessage;
 
   return (
-    <div className="min-h-screen px-4 py-12 flex items-center justify-center">
-      <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="auth-shell">
+      <div className="page-content page-content--wide grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="hidden lg:flex glass-effect rounded-3xl p-10 flex-col justify-between">
           <div>
             <span className="badge-primary inline-flex items-center gap-2">
               <Sparkles size={14} /> Welcome Back
             </span>
             <h1 className="text-4xl font-bold text-slate-900 mt-5 leading-tight">
-              Manage bookings, messages, and salon activity from one dashboard.
+              Bookings, messages, and operations in one powerful workspace.
             </h1>
             <p className="text-slate-600 mt-4 leading-7">
-              Login as customer or owner and continue your workflow exactly where you left off.
+              Sign in as customer or salon owner and continue exactly where you paused.
             </p>
           </div>
 
-          <div className="card-base p-6 bg-gradient-to-br from-blue-50/70 via-white to-teal-50/60">
-            <p className="text-slate-700 font-semibold mb-3">Quick demo access</p>
+          <div className="card-base p-6 surface-muted">
+            <p className="text-slate-700 font-semibold mb-3">Instant demo access</p>
             <div className="space-y-2">
               {DEMO_USERS.map((demoUser) => (
                 <button
@@ -93,7 +93,7 @@ export default function Login() {
           </div>
 
           <h2 className="text-3xl font-bold text-slate-900">Sign In</h2>
-          <p className="text-slate-600 mt-2">Use your email or username to continue.</p>
+          <p className="text-slate-600 mt-2">Use your email or username to access your workspace.</p>
 
           {renderedError && <div className="notice-box notice-error mt-5">{renderedError}</div>}
 
@@ -134,7 +134,7 @@ export default function Login() {
                 </button>
               </div>
               <div className="mt-2 text-right">
-                <Link to="/forgot-password" className="text-sm text-blue-700 hover:text-blue-800 font-semibold">
+                <Link to="/forgot-password" className="text-sm app-link">
                   Forgot password?
                 </Link>
               </div>
@@ -146,8 +146,8 @@ export default function Login() {
             </button>
           </form>
 
-          <div className="mt-5 lg:hidden card-base p-4 bg-gradient-to-br from-blue-50/70 via-white to-teal-50/60">
-            <p className="text-sm font-semibold text-slate-800 mb-2">Demo credentials</p>
+          <div className="mt-5 lg:hidden card-base p-4 surface-muted">
+            <p className="text-sm font-semibold text-slate-800 mb-2">Try demo accounts</p>
             <div className="space-y-2">
               {DEMO_USERS.map((demoUser) => (
                 <button
@@ -173,7 +173,7 @@ export default function Login() {
                 onClick={() => {
                   window.location.href = GOOGLE_AUTH_URL;
                 }}
-                className="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-semibold inline-flex items-center justify-center gap-2"
+                className="w-full btn-secondary inline-flex items-center justify-center gap-2"
               >
                 <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
                   <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303C33.653 32.657 29.233 36 24 36c-6.627 0-12-5.373-12-12S17.373 12 24 12c3.059 0 5.849 1.154 7.971 3.029l5.657-5.657C34.053 6.053 29.279 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.651-.389-3.917z" />
@@ -187,9 +187,9 @@ export default function Login() {
           )}
 
           <p className="text-slate-600 text-sm mt-6">
-            No account?{' '}
-            <Link to="/signup" className="text-blue-700 hover:text-blue-800 font-semibold">
-              Create one
+            New to BookMySalon?{' '}
+            <Link to="/signup" className="app-link">
+              Create your account
             </Link>
           </p>
         </div>

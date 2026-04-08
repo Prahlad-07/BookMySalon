@@ -5,16 +5,50 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e7f2f231-d1e0-492a-a8bc-b12374d2d4c7" name="Changes" comment="frontend-added">
+      <change afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/ProjectScreenshots/img.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/ProjectScreenshots/img_1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/ProjectScreenshots/img_2.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/architecture-images/general-architecture.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/architecture-images/owner-and-user-flows.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/architecture-images/security-flows.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/SalonController.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/SalonController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/auth/RegisterRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/auth/RegisterRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/auth/SignupInitiateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/auth/SignupInitiateRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/repository/SalonRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/repository/SalonRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/security/JwtService.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/security/JwtService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/auth/AuthServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/auth/AuthServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/SalonServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/SalonServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/AppErrorBoundary.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/AppErrorBoundary.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Footer.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Footer.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Navbar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Navbar.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/SalonOwnerRoute.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/SalonOwnerRoute.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/maps/MapboxLocationPicker.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/maps/MapboxLocationPicker.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/maps/NearbySalonsMap.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/maps/NearbySalonsMap.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/context/AuthContext.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/context/AuthContext.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/index.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/AdminDashboard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/AdminDashboard.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/ChatPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/ChatPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/ForgotPassword.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/ForgotPassword.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Home.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Home.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Login.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Login.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/MyBookings.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/MyBookings.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/OAuthCallback.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/OAuthCallback.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Profile.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Profile.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/ResetPassword.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/ResetPassword.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/SalonDetail.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/SalonDetail.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/SalonList.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/SalonList.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/SalonOwnerDashboard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/SalonOwnerDashboard.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Signup.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Signup.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="448" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -42,31 +76,33 @@
   <component name="ProjectViewState">
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;Node.js.App.jsx.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/prahladyadav/Desktop/BookMySalon/Architecture&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;editing.templates&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Node.js.App.jsx.executor": "Run",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "main",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/prahladyadav/Desktop/BookMySalon/Architecture",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "prettierjs.PrettierConfiguration.Package": "/Users/prahladyadav/Desktop/BookMySalon/frontend/node_modules/prettier",
+    "settings.editor.selected.configurable": "ml.llm.LLMThirdPartyAiProvidersConfigurable",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/Architecture" />
@@ -93,17 +129,6 @@
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <method v="2" />
-    </configuration>
-    <configuration default="true" type="JetRunConfigurationType">
-      <module name="BookMySalon" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
-      <module name="BookMySalon" />
-      <option name="filePath" />
       <method v="2" />
     </configuration>
   </component>
@@ -155,7 +180,19 @@
       <workItem from="1772757502748" duration="6087000" />
       <workItem from="1772820330651" duration="289000" />
       <workItem from="1772857504580" duration="7808000" />
-      <workItem from="1772908154654" duration="1531000" />
+      <workItem from="1772908154654" duration="5101000" />
+      <workItem from="1773052548953" duration="1303000" />
+      <workItem from="1773142938618" duration="7000" />
+      <workItem from="1773459386032" duration="1445000" />
+      <workItem from="1773658681553" duration="5800000" />
+      <workItem from="1773724921826" duration="470000" />
+      <workItem from="1773814362357" duration="5064000" />
+      <workItem from="1773843617669" duration="23000" />
+      <workItem from="1773888256183" duration="8750000" />
+      <workItem from="1774244889769" duration="1262000" />
+      <workItem from="1774249365173" duration="6000" />
+      <workItem from="1775544677701" duration="741000" />
+      <workItem from="1775626806475" duration="1455000" />
     </task>
     <task id="LOCAL-00001" summary="frontend-added">
       <option name="closed" value="true" />

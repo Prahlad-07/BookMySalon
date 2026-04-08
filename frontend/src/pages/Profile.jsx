@@ -25,9 +25,9 @@ export default function Profile() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="card-base rounded-2xl p-8 text-center">
-          <p className="text-slate-700">Please sign in to view your profile.</p>
+      <div className="page-shell flex items-center justify-center">
+        <div className="card-base rounded-2xl p-8 text-center page-content page-content--narrow">
+          <p className="text-slate-700">Sign in to view your profile details.</p>
         </div>
       </div>
     );
@@ -42,11 +42,13 @@ export default function Profile() {
   };
 
   return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto space-y-6">
-        <div>
-          <h1 className="text-4xl font-bold text-slate-900">My Profile</h1>
-          <p className="text-slate-600 mt-2">Account details and access role.</p>
+    <div className="page-shell">
+      <div className="page-content page-content--medium page-stack">
+        <div className="page-header">
+          <div>
+            <h1 className="page-title">My Profile</h1>
+            <p className="page-subtitle">Your account identity, contact details, and access permissions.</p>
+          </div>
         </div>
 
         <div className="card-base rounded-3xl p-8 space-y-7">
@@ -56,8 +58,8 @@ export default function Profile() {
                 <User size={28} />
               </div>
               <div>
-                <p className="text-lg font-semibold text-slate-900">{user.firstName || user.name || 'BookMySalon User'}</p>
-                <p className="text-sm text-slate-600">{user.email || 'No email available'}</p>
+                <p className="text-lg font-semibold text-slate-900">{user.firstName || user.name || 'BookMySalon Member'}</p>
+                <p className="text-sm text-slate-600">{user.email || 'Email not available'}</p>
               </div>
             </div>
             <span className={roleInfo.statusClass}>{roleInfo.label}</span>
@@ -104,7 +106,7 @@ export default function Profile() {
             <button
               type="button"
               onClick={handleLogout}
-              className="px-6 py-3 rounded-xl font-semibold text-white bg-red-600 hover:bg-red-700"
+              className="btn-danger"
             >
               Logout
             </button>

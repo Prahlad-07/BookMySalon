@@ -72,7 +72,7 @@ export default function MyBookings() {
       setSalons(Array.isArray(salonData) ? salonData : []);
       setServices(Array.isArray(serviceData) ? serviceData : []);
     } catch (err) {
-      setError(err?.response?.data?.error || 'Failed to load bookings');
+      setError(err?.response?.data?.error || 'Unable to load bookings right now.');
     } finally {
       setLoading(false);
     }
@@ -102,7 +102,7 @@ export default function MyBookings() {
         )
       );
     } catch (err) {
-      setError(err?.response?.data?.error || 'Failed to cancel booking');
+      setError(err?.response?.data?.error || 'Unable to cancel this booking right now.');
     }
   };
 
@@ -128,25 +128,25 @@ export default function MyBookings() {
       });
       setBookings((previous) => previous.map((item) => (item.id === booking.id ? { ...item, ...updated } : item)));
     } catch (err) {
-      setError(err?.response?.data?.error || 'Failed to reschedule booking');
+      setError(err?.response?.data?.error || 'Unable to reschedule this booking right now.');
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-14 h-14 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+      <div className="page-shell flex items-center justify-center">
+        <div className="loading-spinner" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto space-y-6">
-        <div className="flex items-center justify-between flex-wrap gap-4">
+    <div className="page-shell">
+      <div className="page-content page-stack">
+        <div className="page-header">
           <div>
-            <h1 className="text-4xl font-bold text-slate-900">My Bookings</h1>
-            <p className="text-slate-600 mt-2">Reschedule upcoming slots or cancel plans instantly.</p>
+            <h1 className="page-title">My Bookings</h1>
+            <p className="page-subtitle">Track every appointment, reschedule when needed, or cancel in seconds.</p>
           </div>
           <button type="button" onClick={loadData} className="btn-secondary inline-flex items-center gap-2">
             <RefreshCcw size={16} /> Refresh
@@ -157,7 +157,7 @@ export default function MyBookings() {
 
         {bookings.length === 0 ? (
           <div className="card-base rounded-2xl p-10 text-center text-slate-600">
-            No bookings yet. Start by booking a salon service.
+            No bookings yet. Explore salons and schedule your first appointment.
           </div>
         ) : (
           <div className="space-y-4">
@@ -188,9 +188,9 @@ export default function MyBookings() {
                   </div>
 
                   <div className="mb-5">
-                    <p className="text-slate-900 font-semibold mb-2">Services</p>
+                    <p className="text-slate-900 font-semibold mb-2">Booked Services</p>
                     {bookingServices.length === 0 ? (
-                      <p className="text-slate-500">No service names available.</p>
+                      <p className="text-slate-500">Service details are currently unavailable for this booking.</p>
                     ) : (
                       <div className="flex flex-wrap gap-2">
                         {bookingServices.map((service) => (
@@ -217,13 +217,13 @@ export default function MyBookings() {
                         className="input-field md:col-span-2"
                       />
                       <button type="button" onClick={() => rescheduleBooking(booking)} className="btn-secondary">
-                        Reschedule
+                        Reschedule Slot
                       </button>
 
                       <button
                         type="button"
                         onClick={() => cancelBooking(booking.id)}
-                        className="md:col-span-3 w-full bg-red-600 hover:bg-red-700 text-white rounded-xl px-4 py-3 inline-flex items-center justify-center gap-2"
+                        className="md:col-span-3 w-full btn-danger inline-flex items-center justify-center gap-2"
                       >
                         <XCircle size={18} /> Cancel Booking
                       </button>
@@ -233,12 +233,12 @@ export default function MyBookings() {
                   {salon?.ownerId && Number(salon.ownerId) !== Number(user?.id) && (
                     <div className="mt-3">
                       <Link to={`/chat/${salon.ownerId}`} className="btn-secondary inline-block">
-                        Chat with Salon Owner
+                        Message Salon Owner
                       </Link>
                     </div>
                   )}
                   {salon?.ownerId && Number(salon.ownerId) === Number(user?.id) && (
-                    <p className="mt-3 text-sm text-slate-500">This salon is owned by your account.</p>
+                    <p className="mt-3 text-sm text-slate-500">This booking belongs to your salon owner account.</p>
                   )}
                 </div>
               );

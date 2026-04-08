@@ -168,11 +168,11 @@ export default function SalonDetail() {
         serviceOfferingIds: Array.from(selectedServiceIds),
       });
 
-      setBookingSuccess('Booking confirmed. Track progress in My Bookings.');
+      setBookingSuccess('Booking confirmed. Follow every update in My Bookings.');
       setSelectedServiceIds(new Set());
       setStartTimeInput(toDateTimeInput(new Date(Date.now() + 3600 * 1000)));
     } catch (err) {
-      const errorMessage = err?.response?.data?.error || 'Booking failed, please try again.';
+      const errorMessage = err?.response?.data?.error || 'Booking could not be completed. Please try again.';
       if (String(errorMessage).toLowerCase().includes('another user')) {
         setBookingError('Your session is out of sync. Please logout and login again, then retry booking.');
       } else {
@@ -219,25 +219,29 @@ export default function SalonDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-14 h-14 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+      <div className="page-shell flex items-center justify-center">
+        <div className="loading-spinner" />
       </div>
     );
   }
 
   if (!salon) {
-    return <div className="min-h-screen flex items-center justify-center text-slate-700">Unable to load salon details.</div>;
+    return (
+      <div className="page-shell flex items-center justify-center text-slate-700">
+        We could not load this salon right now. Please go back and try again.
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen py-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="page-shell">
+      <div className="page-content page-stack">
         <button
           type="button"
           onClick={() => navigate('/salons')}
-          className="text-blue-700 font-semibold hover:text-blue-800 inline-flex items-center gap-2"
+          className="app-link inline-flex items-center gap-2"
         >
-          <ArrowLeft size={18} /> Back to salons
+          <ArrowLeft size={18} /> Back to all salons
         </button>
 
         <div className="glass-effect rounded-3xl p-8">
@@ -245,7 +249,7 @@ export default function SalonDetail() {
             <div>
               <h1 className="text-4xl font-bold text-slate-900">{salon.name}</h1>
               <p className="text-slate-600 mt-2 inline-flex items-center gap-2">
-                <MapPin size={16} /> {salonLocationLabel || 'Location not available'}
+                <MapPin size={16} /> {salonLocationLabel || 'Location details unavailable'}
               </p>
               <p className="text-slate-600 mt-2 inline-flex items-center gap-2">
                 <Clock size={16} /> {salonHoursLabel}
@@ -263,10 +267,10 @@ export default function SalonDetail() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
             <div className="card-base rounded-2xl p-6">
-              <h2 className="text-2xl font-bold text-slate-900 mb-5">Select Services</h2>
+              <h2 className="text-2xl font-bold text-slate-900 mb-5">Choose Your Services</h2>
 
               {services.length === 0 ? (
-                <p className="text-slate-600">No services available for this salon yet.</p>
+                <p className="text-slate-600">This salon has not added services yet.</p>
               ) : (
                 <div className="space-y-3">
                   {services.map((service) => {
@@ -290,7 +294,7 @@ export default function SalonDetail() {
                             />
                             <div>
                               <p className="text-slate-900 font-semibold">{service.name}</p>
-                              <p className="text-slate-600 text-sm">{service.description || 'No description available'}</p>
+                              <p className="text-slate-600 text-sm">{service.description || 'Details will be updated soon.'}</p>
                             </div>
                           </div>
 
@@ -307,10 +311,10 @@ export default function SalonDetail() {
             </div>
 
             <div className="card-base rounded-2xl p-6">
-              <h2 className="text-2xl font-bold text-slate-900 mb-5">Customer Reviews</h2>
+              <h2 className="text-2xl font-bold text-slate-900 mb-5">Customer Reviews and Ratings</h2>
 
               <div className="space-y-4">
-                {reviews.length === 0 && <p className="text-slate-600">No reviews yet.</p>}
+                {reviews.length === 0 && <p className="text-slate-600">No reviews yet. Be the first to share your experience.</p>}
 
                 {reviews.map((review) => (
                   <div key={review.id} className="surface-muted rounded-xl p-4">
@@ -327,7 +331,7 @@ export default function SalonDetail() {
 
               {user?.role === 'CUSTOMER' && (
                 <form onSubmit={submitReview} className="mt-6 space-y-3 border-t border-slate-200 pt-5">
-                  <h3 className="text-slate-900 font-semibold">Add your review</h3>
+                  <h3 className="text-slate-900 font-semibold">Write a review</h3>
 
                   <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                     <select
@@ -357,7 +361,7 @@ export default function SalonDetail() {
                       }
                       className="input-field sm:col-span-3"
                       rows={3}
-                      placeholder="Share your experience (minimum 10 characters)"
+                      placeholder="Share what you liked and what can improve (minimum 10 characters)"
                     />
                   </div>
 
@@ -379,10 +383,10 @@ export default function SalonDetail() {
               </h2>
 
               <div className="notice-box notice-info mb-4 text-sm">
-                1. Select services. 2. Choose a start time in working hours. 3. Confirm and track in My Bookings.
+                1. Pick services. 2. Choose a time within salon hours. 3. Confirm and track in My Bookings.
               </div>
 
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Start Date and Time</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Start date and time</label>
               <input
                 type="datetime-local"
                 value={startTimeInput}
@@ -390,7 +394,7 @@ export default function SalonDetail() {
                 min={toDateTimeInput(new Date(Date.now() + 15 * 60 * 1000))}
                 className="input-field mb-2"
               />
-              <p className="text-xs text-slate-500 mb-5">Salon hours: {salonHoursLabel}</p>
+              <p className="text-xs text-slate-500 mb-5">Operating hours: {salonHoursLabel}</p>
 
               <div className="surface-muted rounded-xl p-4 mb-5">
                 <p className="text-slate-700 text-sm">Selected services: {selectedServices.length}</p>
@@ -420,7 +424,7 @@ export default function SalonDetail() {
                 disabled={isBooking || selectedServiceIds.size === 0}
                 className="btn-primary w-full disabled:opacity-60"
               >
-                {isBooking ? 'Booking...' : 'Confirm Booking'}
+                {isBooking ? 'Booking...' : 'Confirm Appointment'}
               </button>
             </div>
           </div>

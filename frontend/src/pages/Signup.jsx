@@ -18,12 +18,12 @@ const ACCOUNT_ROLES = [
   {
     value: 'CUSTOMER',
     label: 'Customer',
-    subtitle: 'Book and manage appointments',
+    subtitle: 'Discover and book top-rated salons',
   },
   {
     value: 'SALON_OWNER',
     label: 'Salon Owner',
-    subtitle: 'Create salons and manage operations',
+    subtitle: 'Launch your salon and run bookings smoothly',
   },
 ];
 
@@ -59,6 +59,14 @@ export default function Signup() {
     setLocalError('');
   };
 
+  const handleRoleSelect = (role) => {
+    setFormData((previous) => ({
+      ...previous,
+      role,
+    }));
+    setLocalError('');
+  };
+
   const handleSignup = async (event) => {
     event.preventDefault();
     setLocalError('');
@@ -90,15 +98,15 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen px-4 py-12 flex items-center justify-center">
-      <div className="w-full max-w-3xl card-base rounded-3xl p-8 sm:p-10">
+    <div className="auth-shell">
+      <div className="auth-card page-content card-base rounded-3xl p-8 sm:p-10">
         <div className="flex items-start justify-between gap-4 mb-6">
           <div>
             <div className="login-brand-wrap mb-4">
               <img src={brandLogo} alt="BookMySalon logo" className="signup-brand-logo" />
             </div>
-            <h1 className="text-3xl font-bold text-slate-900">Create Account</h1>
-            <p className="text-slate-600 mt-2">Choose role, add your details, and get started instantly.</p>
+            <h1 className="text-3xl font-bold text-slate-900">Create Your Account</h1>
+            <p className="text-slate-600 mt-2">Pick your role, set your details, and launch in under a minute.</p>
           </div>
           <div className="hidden sm:flex w-12 h-12 rounded-xl bg-primary-50 border border-primary-100 items-center justify-center text-primary-700">
             <Sparkles size={20} />
@@ -116,25 +124,18 @@ export default function Signup() {
             {ACCOUNT_ROLES.map((roleOption) => {
               const isSelected = formData.role === roleOption.value;
               return (
-                <label
+                <button
+                  type="button"
                   key={roleOption.value}
-                  className={`cursor-pointer rounded-xl border px-3 py-3 transition ${
-                    isSelected
-                      ? 'border-primary-300 bg-primary-50'
-                      : 'border-slate-200 bg-white hover:border-primary-200 hover:bg-slate-50'
+                  onClick={() => handleRoleSelect(roleOption.value)}
+                  aria-pressed={isSelected}
+                  className={`role-option cursor-pointer rounded-xl px-3 py-3 transition ${
+                    isSelected ? 'role-option-active' : ''
                   }`}
                 >
-                  <input
-                    type="radio"
-                    name="role"
-                    value={roleOption.value}
-                    checked={isSelected}
-                    onChange={handleChange}
-                    className="hidden"
-                  />
                   <p className="text-sm font-semibold text-slate-900">{roleOption.label}</p>
                   <p className="text-xs text-slate-600 mt-0.5">{roleOption.subtitle}</p>
-                </label>
+                </button>
               );
             })}
           </div>
@@ -221,7 +222,7 @@ export default function Signup() {
           </div>
 
           <button className="btn-primary w-full inline-flex items-center justify-center gap-2" disabled={isLoading}>
-            {isLoading ? 'Creating account...' : 'Create Account'}
+            {isLoading ? 'Creating account...' : 'Create My Account'}
             {!isLoading && <ArrowRight size={16} />}
           </button>
         </form>
@@ -230,10 +231,10 @@ export default function Signup() {
           <div className="mt-5">
             <button
               type="button"
-              onClick={() => {
-                window.location.href = GOOGLE_AUTH_URL;
-              }}
-              className="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-semibold inline-flex items-center justify-center gap-2"
+                onClick={() => {
+                  window.location.href = GOOGLE_AUTH_URL;
+                }}
+              className="w-full btn-secondary inline-flex items-center justify-center gap-2"
             >
               <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
                 <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303C33.653 32.657 29.233 36 24 36c-6.627 0-12-5.373-12-12S17.373 12 24 12c3.059 0 5.849 1.154 7.971 3.029l5.657-5.657C34.053 6.053 29.279 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.651-.389-3.917z" />
@@ -247,8 +248,8 @@ export default function Signup() {
         )}
 
         <p className="text-slate-600 text-sm mt-6 text-center">
-          Already have an account?{' '}
-          <Link to="/login" className="text-blue-700 hover:text-blue-800 font-semibold">
+          Already with us?{' '}
+          <Link to="/login" className="app-link">
             Sign in
           </Link>
         </p>

@@ -69,18 +69,20 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-14 h-14 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+      <div className="page-shell flex items-center justify-center">
+        <div className="loading-spinner" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto space-y-8">
-        <div>
-          <h1 className="text-4xl font-bold text-slate-900">Admin Dashboard</h1>
-          <p className="text-slate-600 mt-2">Platform metrics, booking trends, and top-performing salons.</p>
+    <div className="page-shell">
+      <div className="page-content page-stack">
+        <div className="page-header">
+          <div>
+            <h1 className="page-title">Admin Dashboard</h1>
+            <p className="page-subtitle">Real-time platform health, booking momentum, and top-performing salons.</p>
+          </div>
         </div>
 
         {error && <div className="notice-box notice-error">{error}</div>}
@@ -109,7 +111,7 @@ export default function AdminDashboard() {
           </div>
           <div className={statCardClass}>
             <div className="flex items-center justify-between text-slate-600 mb-3">
-              <span>Revenue</span>
+              <span>Total Revenue</span>
               <DollarSign size={18} />
             </div>
             <p className="text-3xl font-bold text-slate-900">${stats.totalRevenue.toFixed(2)}</p>
@@ -119,7 +121,7 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="card-base rounded-2xl p-6">
             <h2 className="text-xl font-bold text-slate-900 mb-5 flex items-center gap-2">
-              <BarChart3 size={20} /> Booking Status
+              <BarChart3 size={20} /> Booking Pipeline
             </h2>
             <div className="space-y-3 text-slate-700">
               <div className="flex justify-between surface-muted rounded-lg p-3">
@@ -139,17 +141,17 @@ export default function AdminDashboard() {
 
           <div className="card-base rounded-2xl p-6">
             <h2 className="text-xl font-bold text-slate-900 mb-5 flex items-center gap-2">
-              <Star size={20} /> Top Salons
+              <Star size={20} /> Top Performing Salons
             </h2>
             {stats.topSalons.length === 0 ? (
-              <p className="text-slate-600">No booking data yet.</p>
+              <p className="text-slate-600">No booking data yet. Metrics will populate after first transactions.</p>
             ) : (
               <div className="space-y-3">
                 {stats.topSalons.map((item) => (
                   <div key={item.salonId} className="surface-muted rounded-lg p-3">
                     <p className="text-slate-900 font-semibold">{item.name}</p>
                     <p className="text-sm text-slate-600">
-                      {item.city} • {item.count} bookings
+                      {item.city} • {item.count} bookings processed
                     </p>
                   </div>
                 ))}

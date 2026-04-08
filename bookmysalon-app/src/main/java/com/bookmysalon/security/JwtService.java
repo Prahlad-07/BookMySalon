@@ -10,18 +10,23 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
 @Service
+@Slf4j
 public class JwtService {
 
     @Value("${security.jwt.secret}")
@@ -97,7 +102,58 @@ public class JwtService {
     }
 
     private SecretKey getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
+        byte[] keyBytes = resolveSigningKeyBytes(jwtSecret);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    private byte[] resolveSigningKeyBytes(String configuredSecret) {
+        String secret = configuredSecret == null ? "" : configuredSecret.trim();
+        if (secret.isEmpty()) {
+            throw new IllegalStateException("security.jwt.secret must not be empty");
+        }
+
+        byte[] decodedBase64 = tryDecode(secret, false);
+        if (decodedBase64 != null) {
+            return ensureMinimumKeyLength(decodedBase64, "Base64");
+        }
+
+        byte[] decodedBase64Url = tryDecode(secret, true);
+        if (decodedBase64Url != null) {
+            return ensureMinimumKeyLength(decodedBase64Url, "Base64URL");
+        }
+
+        byte[] raw = secret.getBytes(StandardCharsets.UTF_8);
+        if (raw.length >= 32) {
+            log.warn("JWT secret is not Base64/Base64URL; using raw bytes. Set SECURITY_JWT_SECRET to a Base64-encoded key for portability.");
+            return raw;
+        }
+
+        log.warn("JWT secret is not Base64/Base64URL and shorter than 256 bits. Deriving a 256-bit key from configured value.");
+        return sha256(raw);
+    }
+
+    private byte[] tryDecode(String value, boolean urlSafe) {
+        try {
+            return urlSafe ? Decoders.BASE64URL.decode(value) : Decoders.BASE64.decode(value);
+        } catch (RuntimeException ex) {
+            return null;
+        }
+    }
+
+    private byte[] ensureMinimumKeyLength(byte[] decoded, String encodingName) {
+        if (decoded.length >= 32) {
+            return decoded;
+        }
+
+        log.warn("JWT secret is {} but shorter than 256 bits. Deriving a 256-bit key from configured value.", encodingName);
+        return sha256(decoded);
+    }
+
+    private byte[] sha256(byte[] value) {
+        try {
+            return MessageDigest.getInstance("SHA-256").digest(value);
+        } catch (NoSuchAlgorithmException ex) {
+            throw new IllegalStateException("SHA-256 algorithm is unavailable", ex);
+        }
     }
 }

@@ -62,12 +62,12 @@ export default function OAuthCallback() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="card-base max-w-md w-full rounded-2xl p-6 text-center">
-          <h1 className="text-2xl font-bold text-slate-900">Google Sign-In Failed</h1>
+      <div className="auth-shell">
+        <div className="auth-card page-content card-base rounded-2xl p-6 text-center">
+          <h1 className="text-2xl font-bold text-slate-900">Google Sign-In Could Not Be Completed</h1>
           <p className="text-slate-600 mt-3">{error}</p>
           <Link to="/login" className="btn-primary inline-block mt-6">
-            Back to Login
+            Return to Sign In
           </Link>
         </div>
       </div>
@@ -75,11 +75,13 @@ export default function OAuthCallback() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="card-base max-w-md w-full rounded-2xl p-6 text-center">
-        <h1 className="text-2xl font-bold text-slate-900">Signing You In</h1>
+    <div className="auth-shell">
+      <div className="auth-card page-content card-base rounded-2xl p-6 text-center">
+        <h1 className="text-2xl font-bold text-slate-900">Signing You In Securely</h1>
         <p className="text-slate-600 mt-3">
-          {hasCode || hasLegacyToken ? 'Completing Google authentication...' : 'Waiting for Google response...'}
+          {hasCode || hasLegacyToken
+            ? 'Finishing Google authentication and preparing your workspace...'
+            : 'Waiting for Google authentication response...'}
         </p>
       </div>
     </div>

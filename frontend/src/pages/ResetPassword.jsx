@@ -58,22 +58,22 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="min-h-screen px-4 py-12 flex items-center justify-center">
-      <div className="w-full max-w-md card-base rounded-3xl p-8">
-        <h1 className="text-3xl font-bold text-slate-900">Reset Password</h1>
-        <p className="text-slate-600 mt-2">Set your new password and sign in again.</p>
+    <div className="auth-shell">
+      <div className="auth-card page-content card-base rounded-3xl p-8">
+        <h1 className="text-3xl font-bold text-slate-900">Create a New Password</h1>
+        <p className="text-slate-600 mt-2">Set a strong password to secure your account and continue.</p>
 
         {message && <div className="notice-box notice-success mt-5">{message}</div>}
         {error && <div className="notice-box notice-error mt-5">{error}</div>}
 
         <form onSubmit={submit} className="space-y-4 mt-6">
           <div>
-            <label className="text-sm font-semibold text-slate-700">Reset Token</label>
+            <label className="text-sm font-semibold text-slate-700">Reset token</label>
             <input
               className="input-field mt-1.5"
               value={token}
               onChange={(event) => setToken(event.target.value)}
-              placeholder="Paste reset token"
+              placeholder="Paste token from your email"
               required
             />
           </div>
@@ -112,13 +112,13 @@ export default function ResetPassword() {
           </div>
 
           <button className="btn-primary w-full" disabled={loading}>
-            {loading ? 'Resetting...' : 'Reset Password'}
+            {loading ? 'Updating...' : 'Update Password'}
           </button>
         </form>
 
         <p className="text-slate-600 text-sm mt-6 text-center">
           Back to{' '}
-          <Link to="/login" className="text-blue-700 hover:text-blue-800 font-semibold">
+          <Link to="/login" className="app-link">
             Sign In
           </Link>
         </p>

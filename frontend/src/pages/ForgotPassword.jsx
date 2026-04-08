@@ -31,10 +31,10 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen px-4 py-12 flex items-center justify-center">
-      <div className="w-full max-w-md card-base rounded-3xl p-8">
-        <h1 className="text-3xl font-bold text-slate-900">Forgot Password</h1>
-        <p className="text-slate-600 mt-2">Enter your account email and we will send reset instructions.</p>
+    <div className="auth-shell">
+      <div className="auth-card page-content card-base rounded-3xl p-8">
+        <h1 className="text-3xl font-bold text-slate-900">Reset Your Password</h1>
+        <p className="text-slate-600 mt-2">Enter your registered email and we will send a secure reset link.</p>
 
         {message && <div className="notice-box notice-success mt-5">{message}</div>}
         {error && <div className="notice-box notice-error mt-5">{error}</div>}
@@ -56,13 +56,13 @@ export default function ForgotPassword() {
           </div>
 
           <button className="btn-primary w-full" disabled={loading}>
-            {loading ? 'Sending...' : 'Send Reset Link'}
+            {loading ? 'Sending...' : 'Send Secure Reset Link'}
           </button>
         </form>
 
         <p className="text-slate-600 text-sm mt-6 text-center">
           Back to{' '}
-          <Link to="/login" className="text-blue-700 hover:text-blue-800 font-semibold">
+          <Link to="/login" className="app-link">
             Sign In
           </Link>
         </p>

@@ -36,6 +36,6 @@ public class RegisterRequest {
 
     private Set<UserRole> roles;
 
-    @JsonAlias({"role"})
+    @JsonAlias({"role", "userType", "user_type", "accountType", "account_type"})
     private String role;
 }

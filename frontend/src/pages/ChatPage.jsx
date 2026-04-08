@@ -60,7 +60,7 @@ export default function ChatPage() {
     if (isSelfParticipant(targetParticipantId)) {
       setConversation(null);
       setMessages([]);
-      setError('Open a chat with another user from bookings or owner console.');
+      setError('Start a conversation with another user from My Bookings or Owner Console.');
       return;
     }
 
@@ -93,7 +93,7 @@ export default function ChatPage() {
           setError('');
         }
       } catch (err) {
-        const errorMessage = err?.response?.data?.error || 'Failed to load chat data';
+        const errorMessage = err?.response?.data?.error || 'Unable to load conversations right now.';
         if (String(errorMessage).toLowerCase().includes('yourself')) {
           setError('You cannot start a conversation with yourself.');
           navigate('/chat', { replace: true });
@@ -176,29 +176,29 @@ export default function ChatPage() {
     } catch (err) {
       setMessages((previous) => previous.filter((message) => getMessageKey(message) !== getMessageKey(optimistic)));
       setText(content);
-      setError(err?.message || 'Failed to send message');
+      setError(err?.message || 'Message could not be sent. Please retry.');
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-14 h-14 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+      <div className="page-shell flex items-center justify-center">
+        <div className="loading-spinner" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div className="page-shell">
+      <div className="page-content grid grid-cols-1 lg:grid-cols-3 gap-6">
         <aside className="card-base rounded-2xl p-4 lg:col-span-1">
           <div className="flex items-center justify-between mb-3">
-            <h1 className="text-2xl font-bold text-slate-900">Chats</h1>
-            <span className="status-pill status-pending">Unread {unread.unreadMessages}</span>
+            <h1 className="text-2xl font-bold text-slate-900">Conversations</h1>
+            <span className="status-pill status-pending">Unread messages {unread.unreadMessages}</span>
           </div>
 
           <div className="space-y-2 max-h-[70vh] overflow-auto pr-1">
-            {conversations.length === 0 && <p className="text-slate-600">No conversations yet.</p>}
+            {conversations.length === 0 && <p className="text-slate-600">No conversations yet. Start from My Bookings or Owner Console.</p>}
             {conversations.map((item) => {
               const otherUserId = item.customerId === user?.id ? item.salonOwnerId : item.customerId;
               const active = conversation?.id === item.id;
@@ -217,7 +217,7 @@ export default function ChatPage() {
                   }`}
                 >
                   <p className="font-semibold text-slate-900">User #{otherUserId}</p>
-                  <p className="text-sm text-slate-600 truncate">{item.lastMessage?.content || 'No messages yet'}</p>
+                  <p className="text-sm text-slate-600 truncate">{item.lastMessage?.content || 'No messages yet.'}</p>
                 </button>
               );
             })}
@@ -227,12 +227,12 @@ export default function ChatPage() {
         <section className="card-base rounded-2xl p-4 lg:col-span-2 flex flex-col h-[76vh]">
           <div className="flex items-center justify-between border-b border-slate-200 pb-3">
             <div>
-              <p className="text-slate-600 text-sm">Conversation</p>
-              <p className="font-semibold text-slate-900">{conversation ? `#${conversation.id}` : 'Select a chat'}</p>
+              <p className="text-slate-600 text-sm">Active conversation</p>
+              <p className="font-semibold text-slate-900">{conversation ? `#${conversation.id}` : 'Select a conversation'}</p>
             </div>
             <div className="text-sm flex items-center gap-2 text-slate-600">
               {connected ? <Wifi size={16} className="text-emerald-600" /> : <WifiOff size={16} className="text-red-600" />}
-              {connected ? 'Connected' : 'Reconnecting'}
+              {connected ? 'Connected' : 'Reconnecting...'}
             </div>
           </div>
 
@@ -265,7 +265,7 @@ export default function ChatPage() {
                 value={text}
                 onChange={(event) => setText(event.target.value)}
                 className="input-field"
-                placeholder="Type your message"
+                placeholder="Type your message..."
                 maxLength={2000}
               />
               <button type="submit" className="btn-primary inline-flex items-center gap-2" disabled={!connected || !text.trim()}>
@@ -274,8 +274,8 @@ export default function ChatPage() {
             </form>
           ) : (
             <div className="border-t border-slate-200 pt-3 text-slate-600 text-sm">
-              Open a conversation from the list or start from{' '}
-              <Link className="text-blue-700 underline" to="/bookings">
+              Select a conversation from the list or start one from{' '}
+              <Link className="app-link underline" to="/bookings">
                 My Bookings
               </Link>
               .

@@ -48,6 +48,14 @@ const parseCoordinate = (value) => {
   return Number.isFinite(parsed) ? parsed : null;
 };
 
+const isPhoneNumberInvalid = (phoneNumber) => {
+  const value = String(phoneNumber || '').trim();
+  if (!value) return true;
+  if (value.includes('@')) return true;
+  const digits = value.replace(/\D/g, '');
+  return digits.length < 7 || digits.length > 15;
+};
+
 const normalizeSalonRecord = (salon = {}) => ({
   ...salon,
   openTime: toTimeInputValue(salon.openTime, '09:00'),
@@ -57,11 +65,21 @@ const normalizeSalonRecord = (salon = {}) => ({
 const normalizeDashboardError = (err, fallbackMessage) => {
   const rawMessage = String(err?.response?.data?.error || err?.message || fallbackMessage || 'Request failed');
   const normalized = rawMessage.toLowerCase();
+  const duplicateLike =
+    normalized.includes('duplicate entry') ||
+    normalized.includes('already in use') ||
+    normalized.includes('unique constraint') ||
+    normalized.includes('constraint');
 
-  if (
-    (normalized.includes('duplicate entry') || normalized.includes('already in use')) &&
-    normalized.includes('email')
-  ) {
+  if (normalized.includes('already has a salon profile') || normalized.includes('owner_id')) {
+    return 'Your account already has a salon profile. Please edit the existing salon details.';
+  }
+
+  if (duplicateLike && normalized.includes('phone')) {
+    return 'Salon phone number already exists. Use a different phone number or edit the existing salon.';
+  }
+
+  if (duplicateLike && normalized.includes('email')) {
     return 'Salon email already exists. Use a different salon email or edit the existing salon.';
   }
 
@@ -70,7 +88,7 @@ const normalizeDashboardError = (err, fallbackMessage) => {
   }
 
   if (normalized.includes('could not execute statement') && normalized.includes('salons')) {
-    return 'Unable to save salon right now. Check salon email/phone for duplicates and retry.';
+    return 'Unable to save salon right now. Verify salon email, phone number, and owner profile details, then retry.';
   }
 
   return rawMessage;
@@ -304,6 +322,11 @@ export default function SalonOwnerDashboard() {
         longitude,
       };
 
+      if (isPhoneNumberInvalid(payload.phoneNumber)) {
+        setError('Phone number is invalid. Enter a valid phone number (7-15 digits), not an email.');
+        return;
+      }
+
       await api.post('/api/salons/me', payload);
       setCreateSalonForm(emptySalonForm);
       setShowCreateSalonForm(false);
@@ -439,6 +462,10 @@ export default function SalonOwnerDashboard() {
         setError('Opening time must be earlier than closing time.');
         return;
       }
+      if (isPhoneNumberInvalid(selectedSalon.phoneNumber)) {
+        setError('Phone number is invalid. Enter a valid phone number (7-15 digits), not an email.');
+        return;
+      }
 
       await api.put(`/api/salons/${selectedSalon.id}`, {
         ...selectedSalon,
@@ -456,19 +483,19 @@ export default function SalonOwnerDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-16 h-16 border-4 border-violet-200/30 border-t-violet-600 rounded-full animate-spin" />
+      <div className="page-shell flex items-center justify-center">
+        <div className="loading-spinner" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen py-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto space-y-8">
-        <div className="flex flex-wrap items-center justify-between gap-4">
+    <div className="page-shell">
+      <div className="page-content page-stack">
+        <div className="page-header">
           <div>
-            <h1 className="text-4xl font-bold text-slate-900">Salon Owner Console</h1>
-            <p className="text-slate-600 mt-2">Create your salon, then manage profile, services and booking operations.</p>
+            <h1 className="page-title">Salon Owner Command Center</h1>
+            <p className="page-subtitle">Create your salon, publish services, and manage daily bookings from one workspace.</p>
           </div>
 
           <div className="flex gap-2">
@@ -489,34 +516,35 @@ export default function SalonOwnerDashboard() {
               onClick={() => setShowCreateSalonForm((prev) => !prev)}
               className="btn-primary"
             >
-              {showCreateSalonForm ? 'Close Form' : 'Create New Salon'}
+              {showCreateSalonForm ? 'Hide Form' : 'Create Salon'}
             </button>
           </div>
         </div>
 
-        {error && <div className="border border-red-300 bg-red-50 text-red-700 rounded-xl p-4">{error}</div>}
-        {success && <div className="border border-emerald-300 bg-emerald-50 text-emerald-700 rounded-xl p-4">{success}</div>}
+        {error && <div className="notice-box notice-error">{error}</div>}
+        {success && <div className="notice-box notice-success">{success}</div>}
 
         {(showCreateSalonForm || salons.length === 0) && (
           <form onSubmit={createSalon} className="card-base rounded-2xl p-6 space-y-4">
-            <h2 className="text-2xl text-slate-900 font-semibold">Create Salon</h2>
-            <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-slate-700">
+            <h2 className="text-2xl text-slate-900 font-semibold">Create Salon Profile</h2>
+            <div className="notice-box notice-info text-sm">
               <p className="font-semibold text-slate-900 flex items-center gap-2 mb-1">
-                <Info size={16} /> Recommended posting flow
+                <Info size={16} /> High-impact setup flow
               </p>
-              <p>1. Fill salon basics: name, contact and city.</p>
-              <p>2. Set exact map location using click/drag or current location.</p>
-              <p>3. Create salon, then add categories and services immediately.</p>
+              <p>1. Add salon basics: name, contact, and city.</p>
+              <p>2. Pin exact location using map click/drag or live location.</p>
+              <p>3. Create salon, then publish categories and services immediately.</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <input className="input-field" placeholder="Salon Name" value={createSalonForm.name} onChange={(e) => setCreateSalonForm((p) => ({ ...p, name: e.target.value }))} required />
               <input className="input-field" placeholder="Salon Email" type="email" value={createSalonForm.email} onChange={(e) => setCreateSalonForm((p) => ({ ...p, email: e.target.value }))} required />
               <p className="text-xs text-slate-500 md:col-span-2">Use a unique salon email. Reusing an existing salon email is not allowed.</p>
-              <input className="input-field" placeholder="Phone Number (e.g. +91XXXXXXXXXX)" value={createSalonForm.phoneNumber} onChange={(e) => setCreateSalonForm((p) => ({ ...p, phoneNumber: e.target.value }))} required />
+              <input className="input-field" type="tel" inputMode="tel" placeholder="Phone Number (e.g. +91XXXXXXXXXX)" value={createSalonForm.phoneNumber} onChange={(e) => setCreateSalonForm((p) => ({ ...p, phoneNumber: e.target.value }))} required />
               <input className="input-field" placeholder="City" value={createSalonForm.city} onChange={(e) => setCreateSalonForm((p) => ({ ...p, city: e.target.value }))} required />
               <input className="input-field md:col-span-2" placeholder="Address (optional)" value={createSalonForm.address} onChange={(e) => setCreateSalonForm((p) => ({ ...p, address: e.target.value }))} />
               <input className="input-field" type="time" value={createSalonForm.openTime} onChange={(e) => setCreateSalonForm((p) => ({ ...p, openTime: e.target.value }))} required />
               <input className="input-field" type="time" value={createSalonForm.closeTime} onChange={(e) => setCreateSalonForm((p) => ({ ...p, closeTime: e.target.value }))} required />
+              <p className="text-xs text-slate-500 md:col-span-2">Phone field accepts phone numbers only, not email addresses.</p>
               <p className="text-xs text-slate-500 md:col-span-2">Working hours: {formatTimeRange(createSalonForm.openTime, createSalonForm.closeTime)}</p>
               <input
                 className="input-field"
@@ -539,7 +567,7 @@ export default function SalonOwnerDashboard() {
             </div>
             <div className="rounded-2xl border border-slate-200 p-4 bg-slate-50">
               <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-                <p className="text-sm text-slate-700 font-medium">Select salon location on map (click or drag marker).</p>
+                <p className="text-sm text-slate-700 font-medium">Pin exact salon location on the map (click or drag marker).</p>
                 <button
                   type="button"
                   onClick={useCurrentLocationForCreateSalon}
@@ -560,7 +588,7 @@ export default function SalonOwnerDashboard() {
               />
               <p className={`mt-3 text-sm inline-flex items-center gap-2 ${createSalonCoordinatesReady ? 'text-emerald-700' : 'text-amber-700'}`}>
                 <MapPinned size={16} />
-                {createSalonCoordinatesReady ? 'Location selected and ready for posting.' : 'Select salon location to enable Create Salon.'}
+                {createSalonCoordinatesReady ? 'Location locked. Ready to create salon.' : 'Select location to enable Create Salon.'}
               </p>
             </div>
             <button type="submit" className="btn-secondary" disabled={!createSalonCoordinatesReady}>
@@ -571,7 +599,7 @@ export default function SalonOwnerDashboard() {
 
         {salons.length === 0 ? (
           <div className="card-base rounded-2xl p-8 text-center text-slate-700">
-            No salons yet. Use the form above to create your first salon.
+            No salon profiles yet. Create your first salon using the form above.
           </div>
         ) : (
           <>
@@ -581,7 +609,7 @@ export default function SalonOwnerDashboard() {
                 <p className="text-3xl font-bold text-slate-900 mt-2">{stats.bookingCount}</p>
               </div>
               <div className="card-base rounded-2xl p-5">
-                <p className="text-slate-600">Revenue</p>
+                <p className="text-slate-600">Total Revenue</p>
                 <p className="text-3xl font-bold text-slate-900 mt-2">${stats.totalRevenue.toFixed(2)}</p>
               </div>
               <div className="card-base rounded-2xl p-5">
@@ -589,23 +617,23 @@ export default function SalonOwnerDashboard() {
                 <p className="text-3xl font-bold text-slate-900 mt-2">{stats.serviceCount}</p>
               </div>
               <div className="card-base rounded-2xl p-5">
-                <p className="text-slate-600">Confirmed</p>
+                <p className="text-slate-600">Confirmed Bookings</p>
                 <p className="text-3xl font-bold text-slate-900 mt-2">{stats.confirmedCount}</p>
               </div>
               <div className="card-base rounded-2xl p-5">
-                <p className="text-slate-600">Pending</p>
+                <p className="text-slate-600">Pending Bookings</p>
                 <p className="text-3xl font-bold text-slate-900 mt-2">{stats.pendingCount}</p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
               <motion.form onSubmit={saveSalonProfile} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="card-base rounded-2xl p-6 space-y-4">
-                <h2 className="text-2xl text-slate-900 font-semibold flex items-center gap-2"><Building2 size={20} /> Salon Profile</h2>
+                <h2 className="text-2xl text-slate-900 font-semibold flex items-center gap-2"><Building2 size={20} /> Salon Profile Settings</h2>
                 <input className="input-field" value={selectedSalon.name || ''} onChange={(e) => setSalons((prev) => prev.map((salon) => (salon.id === selectedSalon.id ? { ...salon, name: e.target.value } : salon)))} placeholder="Salon name" />
                 <input className="input-field" value={selectedSalon.address || ''} onChange={(e) => setSalons((prev) => prev.map((salon) => (salon.id === selectedSalon.id ? { ...salon, address: e.target.value } : salon)))} placeholder="Address" />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <input className="input-field" value={selectedSalon.city || ''} onChange={(e) => setSalons((prev) => prev.map((salon) => (salon.id === selectedSalon.id ? { ...salon, city: e.target.value } : salon)))} placeholder="City" />
-                  <input className="input-field" value={selectedSalon.phoneNumber || ''} onChange={(e) => setSalons((prev) => prev.map((salon) => (salon.id === selectedSalon.id ? { ...salon, phoneNumber: e.target.value } : salon)))} placeholder="Phone" />
+                  <input className="input-field" type="tel" inputMode="tel" value={selectedSalon.phoneNumber || ''} onChange={(e) => setSalons((prev) => prev.map((salon) => (salon.id === selectedSalon.id ? { ...salon, phoneNumber: e.target.value } : salon)))} placeholder="Phone" />
                 </div>
                 <input className="input-field" value={selectedSalon.email || ''} onChange={(e) => setSalons((prev) => prev.map((salon) => (salon.id === selectedSalon.id ? { ...salon, email: e.target.value } : salon)))} placeholder="Email" />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -643,7 +671,7 @@ export default function SalonOwnerDashboard() {
                 </div>
                 <div className="rounded-2xl border border-slate-200 p-4 bg-slate-50">
                   <div className="flex items-center justify-between gap-2 mb-3">
-                    <p className="text-sm text-slate-700 font-medium">Drag marker or click map to update profile location.</p>
+                    <p className="text-sm text-slate-700 font-medium">Update profile location by dragging marker or clicking map.</p>
                     <button
                       type="button"
                       onClick={useCurrentLocationForProfile}
@@ -664,7 +692,7 @@ export default function SalonOwnerDashboard() {
                   />
                   <p className={`mt-3 text-sm inline-flex items-center gap-2 ${selectedSalonCoordinatesReady ? 'text-emerald-700' : 'text-amber-700'}`}>
                     <MapPinned size={16} />
-                    {selectedSalonCoordinatesReady ? 'Profile location is valid.' : 'Please set a valid profile location.'}
+                    {selectedSalonCoordinatesReady ? 'Profile location looks good.' : 'Please set a valid profile location.'}
                   </p>
                 </div>
                 <button type="submit" className="btn-primary flex items-center gap-2" disabled={!selectedSalonCoordinatesReady}>
@@ -673,7 +701,7 @@ export default function SalonOwnerDashboard() {
               </motion.form>
 
               <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="card-base rounded-2xl p-6">
-                <h2 className="text-2xl text-slate-900 font-semibold mb-4 flex items-center gap-2"><Plus size={20} /> Service Management</h2>
+                <h2 className="text-2xl text-slate-900 font-semibold mb-4 flex items-center gap-2"><Plus size={20} /> Service and Category Management</h2>
                 <form onSubmit={createOrUpdateService} className="space-y-3 mb-5">
                   <input className="input-field" placeholder="Service name" value={serviceForm.name} onChange={(e) => setServiceForm((prev) => ({ ...prev, name: e.target.value }))} required />
                   <textarea className="input-field" placeholder="Description" rows={2} value={serviceForm.description} onChange={(e) => setServiceForm((prev) => ({ ...prev, description: e.target.value }))} />
@@ -703,7 +731,7 @@ export default function SalonOwnerDashboard() {
                     )}
                   </div>
                   {categories.length === 0 && (
-                    <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                    <p className="notice-box notice-warning text-sm">
                       Create at least one category before adding a service.
                     </p>
                   )}
@@ -728,26 +756,26 @@ export default function SalonOwnerDashboard() {
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <p className="text-slate-900 font-semibold">{service.name}</p>
-                          <p className="text-slate-600 text-sm">{service.description || 'No description'}</p>
+                          <p className="text-slate-600 text-sm">{service.description || 'Description coming soon.'}</p>
                           <p className="text-slate-500 text-sm mt-1">
                             ${service.price} • {formatDurationLabel(service.duration)} • Category {categoryNameById[String(service.categoryId)] || service.categoryId}
                           </p>
                         </div>
                         <div className="flex gap-2">
                           <button type="button" className="btn-secondary" onClick={() => editService(service)}>Edit</button>
-                          <button type="button" className="bg-red-600 hover:bg-red-700 text-white rounded-xl px-3 py-2" onClick={() => deleteService(service.id)}><Trash2 size={16} /></button>
+                          <button type="button" className="btn-danger !px-3 !py-2" onClick={() => deleteService(service.id)}><Trash2 size={16} /></button>
                         </div>
                       </div>
                     </div>
                   ))}
-                  {services.length === 0 && <p className="text-slate-600">No services yet.</p>}
+                  {services.length === 0 && <p className="text-slate-600">No services yet. Add your first service above.</p>}
                 </div>
               </motion.div>
             </div>
 
             <div className="card-base rounded-2xl p-6">
               <h2 className="text-2xl text-slate-900 font-semibold mb-4 flex items-center gap-2"><Calendar size={20} /> Booking Operations</h2>
-              {bookings.length === 0 ? <p className="text-slate-600">No bookings for this salon yet.</p> : (
+              {bookings.length === 0 ? <p className="text-slate-600">No bookings for this salon yet. New bookings will appear here.</p> : (
                 <div className="space-y-3">
                   {bookings.map((booking) => (
                     <div key={booking.id} className="card-base rounded-xl p-4">
@@ -761,14 +789,14 @@ export default function SalonOwnerDashboard() {
                           <span className="px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-sm">{booking.status}</span>
                           {Number(booking.customerId) !== Number(user?.id) ? (
                             <Link to={`/chat/${booking.customerId}`} className="btn-secondary">
-                              Chat
+                              Message Customer
                             </Link>
                           ) : (
                             <span className="text-xs text-slate-500 px-2">Self booking</span>
                           )}
                           <button type="button" className="btn-secondary flex items-center gap-1" onClick={() => updateBookingStatus(booking, 'CONFIRMED')}><CheckCircle size={15} /> Confirm</button>
-                          <button type="button" className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-3 py-2" onClick={() => updateBookingStatus(booking, 'COMPLETED')}>Complete</button>
-                          <button type="button" className="bg-red-600 hover:bg-red-700 text-white rounded-xl px-3 py-2" onClick={() => updateBookingStatus(booking, 'CANCELLED')}>Cancel</button>
+                          <button type="button" className="btn-info !px-3 !py-2" onClick={() => updateBookingStatus(booking, 'COMPLETED')}>Complete</button>
+                          <button type="button" className="btn-danger !px-3 !py-2" onClick={() => updateBookingStatus(booking, 'CANCELLED')}>Cancel</button>
                         </div>
                       </div>
                     </div>

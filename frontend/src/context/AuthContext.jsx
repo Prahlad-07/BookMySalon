@@ -13,10 +13,26 @@ const extractErrorMessage = (err, fallbackMessage) => {
 };
 
 const normalizeRoleToken = (value) => {
-  return String(value || '')
+  const normalized = String(value || '')
     .trim()
     .toUpperCase()
-    .replace(/^ROLE_/, '');
+    .replace(/^ROLE_/, '')
+    .replace(/[\s-]+/g, '_')
+    .replace(/[^A-Z_]/g, '');
+
+  if (!normalized) return '';
+  if (normalized.includes('ADMIN')) return 'ADMIN';
+  if (normalized.includes('SALON') && normalized.includes('OWNER')) return 'SALON_OWNER';
+  if (normalized.includes('CUSTOMER') || normalized === 'USER') return 'CUSTOMER';
+  return normalized;
+};
+
+const normalizeRequestedRole = (value) => {
+  const normalized = normalizeRoleToken(value);
+  if (normalized === 'SALON_OWNER') {
+    return 'SALON_OWNER';
+  }
+  return 'CUSTOMER';
 };
 
 const parseRole = (rawUser = {}) => {
@@ -32,10 +48,19 @@ const parseRole = (rawUser = {}) => {
     roleSet.add(normalized);
   };
 
-  String(rawUser.role || '')
-    .split(/[,\s;|]+/)
-    .filter(Boolean)
-    .forEach(addRoleValue);
+  [rawUser.role, rawUser.userType, rawUser.accountType].forEach((roleValue) => {
+    String(roleValue || '')
+      .split(/[\s,;|()[\]{}]+/)
+      .filter(Boolean)
+      .forEach(addRoleValue);
+  });
+
+  if (typeof rawUser.roles === 'string') {
+    rawUser.roles
+      .split(/[\s,;|()[\]{}]+/)
+      .filter(Boolean)
+      .forEach(addRoleValue);
+  }
 
   if (Array.isArray(rawUser.roles)) {
     rawUser.roles.forEach((roleItem) => {
@@ -172,6 +197,7 @@ export const AuthProvider = ({ children }) => {
       const name = data.name?.trim();
       const email = data.email?.trim().toLowerCase();
       const phone = data.phone?.trim();
+      const role = normalizeRequestedRole(data.role);
 
       const signupPayload = {
         name,
@@ -180,7 +206,9 @@ export const AuthProvider = ({ children }) => {
         email,
         phone,
         password: data.password,
-        role: data.role,
+        role,
+        userType: role,
+        roles: [role],
       };
 
       const response = await api.post('/api/auth/register', signupPayload);
@@ -210,6 +238,7 @@ export const AuthProvider = ({ children }) => {
         setError('Name, email and password are required');
         return null;
       }
+      const role = normalizeRequestedRole(data.role);
 
       const payload = {
         fullName: data.name.trim(),
@@ -217,7 +246,9 @@ export const AuthProvider = ({ children }) => {
         email: data.email.trim().toLowerCase(),
         phone: data.phone?.trim() || '',
         password: data.password,
-        role: data.role,
+        role,
+        userType: role,
+        roles: [role],
         username: data.email.trim().toLowerCase().split('@')[0],
       };
 

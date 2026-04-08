@@ -33,6 +33,6 @@ public class SignupInitiateRequest {
     @NotBlank
     private String password;
 
-    @JsonAlias({"role"})
+    @JsonAlias({"role", "userType", "user_type", "accountType", "account_type"})
     private String role;
 }
