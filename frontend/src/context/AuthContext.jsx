@@ -27,6 +27,29 @@ const normalizeRoleToken = (value) => {
   return normalized;
 };
 
+const tokenizeRoleValue = (value) =>
+  String(value || '')
+    .split(/[\s,;|()[\]{}]+/)
+    .map(normalizeRoleToken)
+    .filter(Boolean);
+
+const pickFirstSupportedRole = (tokens = []) => {
+  for (const token of tokens) {
+    if (token === 'ADMIN' || token === 'SALON_OWNER' || token === 'CUSTOMER') {
+      return token;
+    }
+  }
+  return '';
+};
+
+const pickHighestPrivilegeRole = (tokens = []) => {
+  const roleSet = new Set(tokens);
+  if (roleSet.has('ADMIN')) return 'ADMIN';
+  if (roleSet.has('SALON_OWNER')) return 'SALON_OWNER';
+  if (roleSet.has('CUSTOMER')) return 'CUSTOMER';
+  return '';
+};
+
 const normalizeRequestedRole = (value) => {
   const normalized = normalizeRoleToken(value);
   if (normalized === 'SALON_OWNER') {
@@ -36,54 +59,41 @@ const normalizeRequestedRole = (value) => {
 };
 
 const parseRole = (rawUser = {}) => {
-  const roleSet = new Set();
+  const explicitTokens = [rawUser.role, rawUser.userType, rawUser.accountType].flatMap(tokenizeRoleValue);
+  const explicitRole = pickFirstSupportedRole(explicitTokens);
+  if (explicitRole) {
+    return explicitRole;
+  }
 
-  const addRoleValue = (roleValue) => {
-    const normalized = normalizeRoleToken(roleValue);
-    if (!normalized) return;
-    if (normalized === 'USER') {
-      roleSet.add('CUSTOMER');
-      return;
-    }
-    roleSet.add(normalized);
+  const fallbackTokens = [];
+
+  const collectRoleTokens = (roleValue) => {
+    fallbackTokens.push(...tokenizeRoleValue(roleValue));
   };
 
-  [rawUser.role, rawUser.userType, rawUser.accountType].forEach((roleValue) => {
-    String(roleValue || '')
-      .split(/[\s,;|()[\]{}]+/)
-      .filter(Boolean)
-      .forEach(addRoleValue);
-  });
-
   if (typeof rawUser.roles === 'string') {
-    rawUser.roles
-      .split(/[\s,;|()[\]{}]+/)
-      .filter(Boolean)
-      .forEach(addRoleValue);
+    collectRoleTokens(rawUser.roles);
   }
 
   if (Array.isArray(rawUser.roles)) {
     rawUser.roles.forEach((roleItem) => {
       if (typeof roleItem === 'string') {
-        addRoleValue(roleItem);
+        collectRoleTokens(roleItem);
         return;
       }
       if (roleItem && typeof roleItem === 'object') {
-        addRoleValue(roleItem.name);
-        addRoleValue(roleItem.role);
-        addRoleValue(roleItem.authority);
+        collectRoleTokens(roleItem.name);
+        collectRoleTokens(roleItem.role);
+        collectRoleTokens(roleItem.authority);
       }
     });
   }
 
   if (Array.isArray(rawUser.authorities)) {
-    rawUser.authorities.forEach((authority) => addRoleValue(authority?.authority || authority));
+    rawUser.authorities.forEach((authority) => collectRoleTokens(authority?.authority || authority));
   }
 
-  if (roleSet.has('ADMIN')) return 'ADMIN';
-  if (roleSet.has('SALON_OWNER')) return 'SALON_OWNER';
-  if (roleSet.has('CUSTOMER')) return 'CUSTOMER';
-  return 'CUSTOMER';
+  return pickHighestPrivilegeRole(fallbackTokens) || 'CUSTOMER';
 };
 
 const normalizeUser = (rawUser = {}) => {

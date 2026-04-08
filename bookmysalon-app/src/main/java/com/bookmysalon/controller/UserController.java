@@ -7,20 +7,20 @@ package com.bookmysalon.controller;
 
 import com.bookmysalon.dto.response.ApiResponse;
 import com.bookmysalon.dto.response.CurrentUserResponse;
+import com.bookmysalon.entity.Role;
 import com.bookmysalon.entity.User;
+import com.bookmysalon.entity.UserRole;
 import com.bookmysalon.repository.UserRepository;
 import com.bookmysalon.security.CustomUserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/user")
@@ -42,15 +42,13 @@ public class UserController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         CustomUserPrincipal principal = (CustomUserPrincipal) authentication.getPrincipal();
 
-        Set<String> roles = principal.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toSet());
+        User user = userRepository.findById(principal.getId()).orElse(null);
+        String primaryRole = resolvePrimaryRole(user);
+        Set<String> roles = Set.of("ROLE_" + primaryRole);
 
-        String primaryRole = resolvePrimaryRole(roles);
-
-        String fullName = userRepository.findById(principal.getId())
-                .map(User::getFullName)
-                .orElse(principal.getUsername());
+        String fullName = user != null && user.getFullName() != null && !user.getFullName().isBlank()
+                ? user.getFullName()
+                : principal.getUsername();
 
         CurrentUserResponse response = CurrentUserResponse.builder()
                 .id(principal.getId())
@@ -68,16 +66,48 @@ public class UserController {
                 .build());
     }
 
-    private String resolvePrimaryRole(Set<String> roles) {
-        if (roles.contains("ROLE_ADMIN")) {
-            return "ADMIN";
+    private String resolvePrimaryRole(User user) {
+        if (user == null) {
+            return UserRole.CUSTOMER.name();
         }
-        if (roles.contains("ROLE_SALON_OWNER")) {
-            return "SALON_OWNER";
+
+        if (user.getRole() != null && user.getRole() != UserRole.USER) {
+            return user.getRole().name();
         }
-        if (roles.contains("ROLE_CUSTOMER") || roles.contains("ROLE_USER")) {
-            return "CUSTOMER";
+
+        if (user.getRoles() != null) {
+            boolean hasAdmin = false;
+            boolean hasSalonOwner = false;
+            boolean hasCustomer = false;
+
+            for (Role role : user.getRoles()) {
+                if (role == null || role.getName() == null || role.getName() == UserRole.USER) {
+                    continue;
+                }
+                if (role.getName() == UserRole.ADMIN) {
+                    hasAdmin = true;
+                    continue;
+                }
+                if (role.getName() == UserRole.SALON_OWNER) {
+                    hasSalonOwner = true;
+                    continue;
+                }
+                if (role.getName() == UserRole.CUSTOMER) {
+                    hasCustomer = true;
+                }
+            }
+
+            if (hasAdmin) {
+                return UserRole.ADMIN.name();
+            }
+            if (hasSalonOwner) {
+                return UserRole.SALON_OWNER.name();
+            }
+            if (hasCustomer) {
+                return UserRole.CUSTOMER.name();
+            }
         }
-        return "CUSTOMER";
+
+        return UserRole.CUSTOMER.name();
     }
 }

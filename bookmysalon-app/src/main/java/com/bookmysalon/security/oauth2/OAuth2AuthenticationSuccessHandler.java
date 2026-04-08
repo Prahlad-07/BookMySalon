@@ -37,7 +37,6 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -152,15 +151,10 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
     }
 
     private CustomUserPrincipal buildPrincipal(User user) {
-        Set<SimpleGrantedAuthority> authorities = new HashSet<>();
-
-        if (user.getRoles() != null && !user.getRoles().isEmpty()) {
-            user.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName().name())));
-        } else if (user.getRole() != null) {
-            authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
-        } else {
-            authorities.add(new SimpleGrantedAuthority("ROLE_CUSTOMER"));
-        }
+        UserRole effectiveRole = resolveEffectiveRole(user);
+        Set<SimpleGrantedAuthority> authorities = Set.of(
+                new SimpleGrantedAuthority("ROLE_" + effectiveRole.name())
+        );
 
         return new CustomUserPrincipal(
                 user.getId(),
@@ -171,21 +165,45 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         );
     }
 
-    private String summarizeRoles(User user) {
-        if (user.getRoles() != null && !user.getRoles().isEmpty()) {
-            return user.getRoles().stream()
-                    .map(role -> normalizeRole(role.getName()))
-                    .sorted()
-                    .collect(Collectors.joining(","));
+    private UserRole resolveEffectiveRole(User user) {
+        if (user.getRole() != null && user.getRole() != UserRole.USER) {
+            return user.getRole();
         }
-        return normalizeRole(user.getRole());
-    }
 
-    private String normalizeRole(UserRole role) {
-        if (role == null || role == UserRole.USER) {
-            return UserRole.CUSTOMER.name();
+        if (user.getRoles() != null) {
+            boolean hasAdmin = false;
+            boolean hasSalonOwner = false;
+            boolean hasCustomer = false;
+
+            for (Role role : user.getRoles()) {
+                if (role == null || role.getName() == null || role.getName() == UserRole.USER) {
+                    continue;
+                }
+                if (role.getName() == UserRole.ADMIN) {
+                    hasAdmin = true;
+                    continue;
+                }
+                if (role.getName() == UserRole.SALON_OWNER) {
+                    hasSalonOwner = true;
+                    continue;
+                }
+                if (role.getName() == UserRole.CUSTOMER) {
+                    hasCustomer = true;
+                }
+            }
+
+            if (hasAdmin) {
+                return UserRole.ADMIN;
+            }
+            if (hasSalonOwner) {
+                return UserRole.SALON_OWNER;
+            }
+            if (hasCustomer) {
+                return UserRole.CUSTOMER;
+            }
         }
-        return role.name();
+
+        return UserRole.CUSTOMER;
     }
 
     private String valueAsString(Object value) {
@@ -223,7 +241,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
     }
 
     private AuthResponse buildAuthResponse(User user, String accessToken, RefreshToken refreshToken) {
-        String roleSummary = summarizeRoles(user);
+        String resolvedRole = resolveEffectiveRole(user).name();
         long now = System.currentTimeMillis();
 
         return AuthResponse.builder()
@@ -235,7 +253,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
                 .name(user.getFullName())
                 .username(user.getUsername())
                 .email(user.getEmail())
-                .role(roleSummary)
+                .role(resolvedRole)
                 .message("OAuth login successful")
                 .build();
     }

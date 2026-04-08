@@ -396,14 +396,14 @@ public class AuthServiceImpl implements AuthService {
         if (roles.contains(UserRole.CUSTOMER)) {
             return UserRole.CUSTOMER;
         }
-        return UserRole.USER;
+        return UserRole.CUSTOMER;
     }
 
     private CustomUserPrincipal buildPrincipal(User user) {
-        Set<SimpleGrantedAuthority> authorities = new HashSet<>();
-        Set<String> roleNames = resolveRoleNames(user);
-
-        roleNames.forEach(roleName -> authorities.add(new SimpleGrantedAuthority("ROLE_" + roleName)));
+        UserRole effectiveRole = resolveEffectiveRole(user);
+        Set<SimpleGrantedAuthority> authorities = Set.of(
+                new SimpleGrantedAuthority("ROLE_" + effectiveRole.name())
+        );
 
         return new CustomUserPrincipal(
                 user.getId(),
@@ -415,10 +415,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private AuthResponse buildAuthResponse(User user, String accessToken, RefreshToken refreshToken, String message) {
-        String roleSummary = resolveRoleNames(user).stream()
-                .map(this::normalizeRole)
-                .sorted()
-                .collect(Collectors.joining(","));
+        String resolvedRole = resolveEffectiveRole(user).name();
 
         long now = System.currentTimeMillis();
 
@@ -431,32 +428,54 @@ public class AuthServiceImpl implements AuthService {
                 .name(user.getFullName())
                 .username(user.getUsername())
                 .email(user.getEmail())
-                .role(roleSummary)
+                .role(resolvedRole)
                 .message(message)
                 .build();
     }
 
-    private Set<String> resolveRoleNames(User user) {
-        Set<String> roleNames = new HashSet<>();
+    private UserRole resolveEffectiveRole(User user) {
+        if (user != null) {
+            UserRole normalizedPrimaryRole = normalizeRole(user.getRole());
+            if (normalizedPrimaryRole != null) {
+                return normalizedPrimaryRole;
+            }
 
-        if (user.getRoles() != null) {
-            user.getRoles().stream()
-                    .map(Role::getName)
-                    .filter(java.util.Objects::nonNull)
-                    .map(Enum::name)
-                    .forEach(roleNames::add);
+            if (user.getRoles() != null) {
+                boolean hasAdmin = false;
+                boolean hasSalonOwner = false;
+                boolean hasCustomer = false;
+
+                for (Role role : user.getRoles()) {
+                    if (role == null) {
+                        continue;
+                    }
+                    UserRole normalizedRole = normalizeRole(role.getName());
+                    if (normalizedRole == UserRole.ADMIN) {
+                        hasAdmin = true;
+                        continue;
+                    }
+                    if (normalizedRole == UserRole.SALON_OWNER) {
+                        hasSalonOwner = true;
+                        continue;
+                    }
+                    if (normalizedRole == UserRole.CUSTOMER) {
+                        hasCustomer = true;
+                    }
+                }
+
+                if (hasAdmin) {
+                    return UserRole.ADMIN;
+                }
+                if (hasSalonOwner) {
+                    return UserRole.SALON_OWNER;
+                }
+                if (hasCustomer) {
+                    return UserRole.CUSTOMER;
+                }
+            }
         }
 
-        if (user.getRole() != null) {
-            roleNames.add(user.getRole().name());
-        }
-
-        if (roleNames.isEmpty() || roleNames.contains(UserRole.USER.name())) {
-            roleNames.remove(UserRole.USER.name());
-            roleNames.add(UserRole.CUSTOMER.name());
-        }
-
-        return roleNames;
+        return UserRole.CUSTOMER;
     }
 
     private String resolveAvailableUsername(String requestedUsername, String email) {
@@ -515,18 +534,11 @@ public class AuthServiceImpl implements AuthService {
         return "******" + phone.substring(phone.length() - 4);
     }
 
-    private String normalizeRole(UserRole role) {
+    private UserRole normalizeRole(UserRole role) {
         if (role == null || role == UserRole.USER) {
-            return UserRole.CUSTOMER.name();
+            return null;
         }
-        return role.name();
-    }
-
-    private String normalizeRole(String roleName) {
-        if (roleName == null || roleName.isBlank() || UserRole.USER.name().equals(roleName)) {
-            return UserRole.CUSTOMER.name();
-        }
-        return roleName;
+        return role;
     }
 
     private boolean isPhoneVerificationValid(VerifySignupOtpRequest request, SignupVerificationSession session) {

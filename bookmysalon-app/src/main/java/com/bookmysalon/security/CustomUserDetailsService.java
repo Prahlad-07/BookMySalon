@@ -7,6 +7,7 @@ package com.bookmysalon.security;
 
 import com.bookmysalon.entity.Role;
 import com.bookmysalon.entity.User;
+import com.bookmysalon.entity.UserRole;
 import com.bookmysalon.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -16,9 +17,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -41,26 +40,48 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     private Collection<SimpleGrantedAuthority> resolveAuthorities(User user) {
-        Set<String> roleNames = new LinkedHashSet<>();
+        UserRole effectiveRole = resolveEffectiveRole(user);
+        return Set.of(new SimpleGrantedAuthority("ROLE_" + effectiveRole.name()));
+    }
+
+    private UserRole resolveEffectiveRole(User user) {
+        if (user.getRole() != null && user.getRole() != UserRole.USER) {
+            return user.getRole();
+        }
 
         if (user.getRoles() != null) {
-            roleNames.addAll(user.getRoles().stream()
-                    .map(Role::getName)
-                    .map(Enum::name)
-                    .collect(Collectors.toSet()));
+            boolean hasAdmin = false;
+            boolean hasSalonOwner = false;
+            boolean hasCustomer = false;
+
+            for (Role role : user.getRoles()) {
+                if (role == null || role.getName() == null || role.getName() == UserRole.USER) {
+                    continue;
+                }
+                if (role.getName() == UserRole.ADMIN) {
+                    hasAdmin = true;
+                    continue;
+                }
+                if (role.getName() == UserRole.SALON_OWNER) {
+                    hasSalonOwner = true;
+                    continue;
+                }
+                if (role.getName() == UserRole.CUSTOMER) {
+                    hasCustomer = true;
+                }
+            }
+
+            if (hasAdmin) {
+                return UserRole.ADMIN;
+            }
+            if (hasSalonOwner) {
+                return UserRole.SALON_OWNER;
+            }
+            if (hasCustomer) {
+                return UserRole.CUSTOMER;
+            }
         }
 
-        if (user.getRole() != null) {
-            roleNames.add(user.getRole().name());
-        }
-
-        if (roleNames.contains("USER")) {
-            roleNames.remove("USER");
-            roleNames.add("CUSTOMER");
-        }
-
-        return roleNames.stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                .collect(Collectors.toSet());
+        return UserRole.CUSTOMER;
     }
 }
