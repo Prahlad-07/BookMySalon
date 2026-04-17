@@ -17,3 +17,5 @@ public class ResendSignupOtpRequest {
     @NotBlank
     private String sessionToken;
 }
+
+
