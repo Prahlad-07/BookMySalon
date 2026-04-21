@@ -21,6 +21,7 @@ public class CurrentUserResponse {
     private String fullName;
     private String username;
     private String email;
+    private String phone;
     private Set<String> roles;
     private String role;
 }

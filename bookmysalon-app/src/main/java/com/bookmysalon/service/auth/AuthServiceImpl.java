@@ -83,8 +83,14 @@ public class AuthServiceImpl implements AuthService {
         if (email == null || email.isBlank()) {
             throw new AuthException("Email is required");
         }
-        if (request.getPassword() == null || request.getPassword().isBlank()) {
-            throw new AuthException("Password is required");
+        if (request.getPassword() == null || request.getPassword().trim().length() < 8) {
+            throw new AuthException("Password must be at least 8 characters");
+        }
+        if (fullName == null || fullName.isBlank()) {
+            throw new AuthException("Full name is required");
+        }
+        if (phone != null && !phone.isBlank()) {
+            validatePhoneNumber(phone);
         }
         String username = resolveAvailableUsername(request.getUsername(), email);
         if (userRepository.existsByEmailIgnoreCase(email)) {
@@ -656,5 +662,15 @@ public class AuthServiceImpl implements AuthService {
             return "";
         }
         return value.replaceAll("\\D", "");
+    }
+
+    private void validatePhoneNumber(String phone) {
+        if (phone.contains("@")) {
+            throw new AuthException("Phone number format is invalid");
+        }
+        String digitsOnly = phone.replaceAll("\\D", "");
+        if (digitsOnly.length() < 7 || digitsOnly.length() > 15) {
+            throw new AuthException("Phone number format is invalid");
+        }
     }
 }

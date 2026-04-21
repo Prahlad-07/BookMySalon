@@ -71,7 +71,13 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new CategoryNotFoundException("Category not found with id: " + id));
 
-        if (categoryDto.getName() != null) category.setName(categoryDto.getName());
+        if (categoryDto.getName() != null) {
+            String name = categoryDto.getName().trim();
+            if (name.isEmpty()) {
+                throw new IllegalArgumentException("Category name is required");
+            }
+            category.setName(name);
+        }
         if (categoryDto.getImage() != null) category.setImage(categoryDto.getImage());
 
         Category updatedCategory = categoryRepository.save(category);

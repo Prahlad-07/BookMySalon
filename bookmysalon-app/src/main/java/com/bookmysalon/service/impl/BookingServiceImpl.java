@@ -23,6 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -57,7 +59,7 @@ public class BookingServiceImpl implements BookingService {
         if (bookingRequestDto.getEndTime() == null) {
             throw new IllegalArgumentException("End time is required");
         }
-        if (bookingRequestDto.getEndTime().isBefore(bookingRequestDto.getStartTime())) {
+        if (!bookingRequestDto.getEndTime().isAfter(bookingRequestDto.getStartTime())) {
             throw new IllegalArgumentException("End time must be after start time");
         }
         if (!bookingRequestDto.getStartTime().isAfter(LocalDateTime.now())) {
@@ -66,6 +68,13 @@ public class BookingServiceImpl implements BookingService {
         if (bookingRequestDto.getServiceOfferingIds() == null || bookingRequestDto.getServiceOfferingIds().isEmpty()) {
             throw new IllegalArgumentException("At least one service offering must be selected");
         }
+        Salon salon = salonRepository.findById(bookingRequestDto.getSalonId())
+                .orElseThrow(() -> new IllegalArgumentException("Salon not found with id: " + bookingRequestDto.getSalonId()));
+        List<ServiceOffering> selectedServices = loadValidatedServiceOfferings(
+                bookingRequestDto.getSalonId(),
+                bookingRequestDto.getServiceOfferingIds()
+        );
+        validateWithinSalonHours(salon, bookingRequestDto.getStartTime(), bookingRequestDto.getEndTime());
         validateNoOverlap(bookingRequestDto.getSalonId(), bookingRequestDto.getStartTime(), bookingRequestDto.getEndTime(), null);
 
         Booking booking = new Booking();
@@ -75,7 +84,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setEndTime(bookingRequestDto.getEndTime());
         booking.setServiceOfferingIds(bookingRequestDto.getServiceOfferingIds());
         booking.setStatus(BookingStatus.PENDING);
-        booking.setTotalPrice(calculateTotalPrice(bookingRequestDto.getSalonId(), bookingRequestDto.getServiceOfferingIds()));
+        booking.setTotalPrice(calculateTotalPrice(selectedServices));
 
         Booking savedBooking = bookingRepository.save(booking);
         return mapToDto(savedBooking);
@@ -117,11 +126,20 @@ public class BookingServiceImpl implements BookingService {
 
         LocalDateTime updatedStart = bookingDto.getStartTime() != null ? bookingDto.getStartTime() : booking.getStartTime();
         LocalDateTime updatedEnd = bookingDto.getEndTime() != null ? bookingDto.getEndTime() : booking.getEndTime();
+        boolean isRescheduling = bookingDto.getStartTime() != null || bookingDto.getEndTime() != null;
 
         if (!updatedEnd.isAfter(updatedStart)) {
             throw new IllegalArgumentException("End time must be after start time");
         }
-        validateNoOverlap(booking.getSalonId(), updatedStart, updatedEnd, booking.getId());
+        if (isRescheduling) {
+            if (!updatedStart.isAfter(LocalDateTime.now())) {
+                throw new IllegalArgumentException("Start time must be in the future");
+            }
+            Salon salon = salonRepository.findById(booking.getSalonId())
+                    .orElseThrow(() -> new IllegalArgumentException("Salon not found with id: " + booking.getSalonId()));
+            validateWithinSalonHours(salon, updatedStart, updatedEnd);
+            validateNoOverlap(booking.getSalonId(), updatedStart, updatedEnd, booking.getId());
+        }
 
         if (bookingDto.getStartTime() != null) booking.setStartTime(updatedStart);
         if (bookingDto.getEndTime() != null) booking.setEndTime(updatedEnd);
@@ -144,12 +162,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Double calculateTotalPrice(Long salonId, Set<Long> serviceOfferingIds) {
-        return serviceOfferingIds.stream()
-                .map(serviceOfferingRepository::findById)
-                .filter(java.util.Optional::isPresent)
-                .map(java.util.Optional::get)
-                .mapToDouble(ServiceOffering::getPrice)
-                .sum();
+        return calculateTotalPrice(loadValidatedServiceOfferings(salonId, serviceOfferingIds));
     }
 
     private BookingDto mapToDto(Booking booking) {
@@ -220,6 +233,54 @@ public class BookingServiceImpl implements BookingService {
 
         if (hasOverlap) {
             throw new IllegalArgumentException("Selected slot is already booked for this salon");
+        }
+    }
+
+    private List<ServiceOffering> loadValidatedServiceOfferings(Long salonId, Set<Long> serviceOfferingIds) {
+        if (serviceOfferingIds == null || serviceOfferingIds.isEmpty()) {
+            throw new IllegalArgumentException("At least one service offering must be selected");
+        }
+
+        List<ServiceOffering> selectedServices = new ArrayList<>();
+        for (Long serviceOfferingId : serviceOfferingIds) {
+            if (serviceOfferingId == null || serviceOfferingId <= 0) {
+                throw new IllegalArgumentException("Selected service offering is invalid");
+            }
+            ServiceOffering serviceOffering = serviceOfferingRepository.findById(serviceOfferingId)
+                    .orElseThrow(() -> new IllegalArgumentException("Service offering not found with id: " + serviceOfferingId));
+            if (!salonId.equals(serviceOffering.getSalonId())) {
+                throw new IllegalArgumentException("Selected services must belong to the selected salon");
+            }
+            selectedServices.add(serviceOffering);
+        }
+
+        return selectedServices;
+    }
+
+    private Double calculateTotalPrice(List<ServiceOffering> serviceOfferings) {
+        return serviceOfferings.stream()
+                .mapToDouble(ServiceOffering::getPrice)
+                .sum();
+    }
+
+    private void validateWithinSalonHours(Salon salon, LocalDateTime startTime, LocalDateTime endTime) {
+        if (salon.getOpenTime() == null || salon.getCloseTime() == null) {
+            return;
+        }
+        if (!startTime.toLocalDate().equals(endTime.toLocalDate())) {
+            throw new IllegalArgumentException("Booking must start and end on the same day");
+        }
+
+        LocalTime openTime = salon.getOpenTime();
+        LocalTime closeTime = salon.getCloseTime();
+        if (!closeTime.isAfter(openTime)) {
+            throw new IllegalArgumentException("Salon operating hours are not configured correctly");
+        }
+
+        LocalTime requestedStart = startTime.toLocalTime();
+        LocalTime requestedEnd = endTime.toLocalTime();
+        if (requestedStart.isBefore(openTime) || requestedEnd.isAfter(closeTime)) {
+            throw new IllegalArgumentException("Selected slot is outside salon operating hours");
         }
     }
 }

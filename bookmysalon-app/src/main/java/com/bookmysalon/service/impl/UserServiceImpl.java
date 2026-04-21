@@ -85,8 +85,23 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
         
-        if (userDto.getFullName() != null) user.setFullName(userDto.getFullName());
-        if (userDto.getPhone() != null) user.setPhone(userDto.getPhone());
+        if (userDto.getFullName() != null) {
+            String normalizedName = userDto.getFullName().trim();
+            if (normalizedName.isEmpty()) {
+                throw new IllegalArgumentException("Name cannot be empty");
+            }
+            user.setFullName(normalizedName);
+        }
+        if (userDto.getPhone() != null) {
+            String normalizedPhone = userDto.getPhone().trim();
+            if (!normalizedPhone.isBlank()) {
+                String digitsOnly = normalizedPhone.replaceAll("\\D", "");
+                if (digitsOnly.length() < 7 || digitsOnly.length() > 15) {
+                    throw new IllegalArgumentException("Phone number format is invalid");
+                }
+            }
+            user.setPhone(normalizedPhone);
+        }
 
         User updatedUser = userRepository.save(user);
         return mapToDto(updatedUser);

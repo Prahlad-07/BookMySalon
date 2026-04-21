@@ -7,23 +7,15 @@ package com.bookmysalon.controller;
 
 import com.bookmysalon.dto.SalonDto;
 import com.bookmysalon.dto.response.ApiResponse;
-import com.bookmysalon.entity.Role;
-import com.bookmysalon.entity.User;
-import com.bookmysalon.entity.UserRole;
 import com.bookmysalon.exception.UnauthorizedException;
-import com.bookmysalon.repository.RoleRepository;
-import com.bookmysalon.repository.UserRepository;
-import com.bookmysalon.security.CustomUserPrincipal;
+import com.bookmysalon.security.SecurityUtils;
 import com.bookmysalon.service.SalonService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api/salons")
@@ -31,16 +23,13 @@ import java.util.Set;
 public class SalonController {
 
     private final SalonService salonService;
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
 
     @PostMapping("/me")
     public ResponseEntity<ApiResponse<SalonDto>> createSalonForCurrentOwner(@RequestBody SalonDto salonDto) {
         try {
-            CustomUserPrincipal principal = getCurrentUserPrincipal();
-            promoteToSalonOwnerIfNeeded(principal.getId());
+            ensureSalonOwnerAccess();
 
-            salonDto.setOwnerId(principal.getId());
+            salonDto.setOwnerId(SecurityUtils.currentUserId());
             SalonDto createdSalon = salonService.createSalon(salonDto);
             return ResponseEntity.ok(ApiResponse.<SalonDto>builder()
                     .success(true)
@@ -63,15 +52,9 @@ public class SalonController {
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<List<SalonDto>>> getCurrentOwnerSalons() {
         try {
-            CustomUserPrincipal principal = getCurrentUserPrincipal();
-            User user = userRepository.findById(principal.getId())
-                    .orElseThrow(() -> new UnauthorizedException("User account not found"));
+            ensureSalonOwnerAccess();
 
-            List<SalonDto> salons = salonService.getSalonsByOwnerId(principal.getId());
-
-            if (!salons.isEmpty() && !isOwnerOrAdmin(user)) {
-                promoteToSalonOwnerIfNeeded(principal.getId());
-            }
+            List<SalonDto> salons = salonService.getSalonsByOwnerId(SecurityUtils.currentUserId());
 
             if (salons.isEmpty()) {
                 return ResponseEntity.ok(ApiResponse.<List<SalonDto>>builder()
@@ -102,11 +85,22 @@ public class SalonController {
     @PostMapping
     public ResponseEntity<ApiResponse<SalonDto>> createSalon(@RequestBody SalonDto salonDto) {
         try {
+            ensureSalonOwnerAccess();
+            if (!SecurityUtils.isAdmin()) {
+                salonDto.setOwnerId(SecurityUtils.currentUserId());
+            } else if (salonDto.getOwnerId() == null) {
+                salonDto.setOwnerId(SecurityUtils.currentUserId());
+            }
             SalonDto createdSalon = salonService.createSalon(salonDto);
             return ResponseEntity.ok(ApiResponse.<SalonDto>builder()
                     .success(true)
                     .message("Salon created successfully")
                     .data(createdSalon)
+                    .build());
+        } catch (UnauthorizedException e) {
+            return ResponseEntity.status(403).body(ApiResponse.<SalonDto>builder()
+                    .success(false)
+                    .error(e.getMessage())
                     .build());
         } catch (Exception e) {
             return ResponseEntity.status(400).body(ApiResponse.<SalonDto>builder()
@@ -176,10 +170,18 @@ public class SalonController {
     @GetMapping("/owner/{ownerId}")
     public ResponseEntity<ApiResponse<List<SalonDto>>> getSalonsByOwner(@PathVariable Long ownerId) {
         try {
+            if (!SecurityUtils.isAdmin() && !SecurityUtils.currentUserId().equals(ownerId)) {
+                return forbidden("You are not allowed to view this owner's salons");
+            }
             List<SalonDto> salons = salonService.getSalonsByOwnerId(ownerId);
             return ResponseEntity.ok(ApiResponse.<List<SalonDto>>builder()
                     .success(true)
                     .data(salons)
+                    .build());
+        } catch (UnauthorizedException e) {
+            return ResponseEntity.status(403).body(ApiResponse.<List<SalonDto>>builder()
+                    .success(false)
+                    .error(e.getMessage())
                     .build());
         } catch (Exception e) {
             return ResponseEntity.status(400).body(ApiResponse.<List<SalonDto>>builder()
@@ -208,11 +210,24 @@ public class SalonController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<SalonDto>> updateSalon(@PathVariable Long id, @RequestBody SalonDto salonDto) {
         try {
+            SalonDto existingSalon = salonService.getSalonById(id);
+            ensureCanManageSalon(existingSalon);
+            salonDto.setOwnerId(existingSalon.getOwnerId());
             SalonDto updatedSalon = salonService.updateSalon(id, salonDto);
             return ResponseEntity.ok(ApiResponse.<SalonDto>builder()
                     .success(true)
                     .message("Salon updated successfully")
                     .data(updatedSalon)
+                    .build());
+        } catch (UnauthorizedException e) {
+            return ResponseEntity.status(403).body(ApiResponse.<SalonDto>builder()
+                    .success(false)
+                    .error(e.getMessage())
+                    .build());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.<SalonDto>builder()
+                    .success(false)
+                    .error(e.getMessage())
                     .build());
         } catch (Exception e) {
             return ResponseEntity.status(404).body(ApiResponse.<SalonDto>builder()
@@ -225,10 +240,17 @@ public class SalonController {
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteSalon(@PathVariable Long id) {
         try {
+            SalonDto existingSalon = salonService.getSalonById(id);
+            ensureCanManageSalon(existingSalon);
             salonService.deleteSalon(id);
             return ResponseEntity.ok(ApiResponse.<Void>builder()
                     .success(true)
                     .message("Salon deleted successfully")
+                    .build());
+        } catch (UnauthorizedException e) {
+            return ResponseEntity.status(403).body(ApiResponse.<Void>builder()
+                    .success(false)
+                    .error(e.getMessage())
                     .build());
         } catch (Exception e) {
             return ResponseEntity.status(404).body(ApiResponse.<Void>builder()
@@ -238,43 +260,25 @@ public class SalonController {
         }
     }
 
-    private CustomUserPrincipal getCurrentUserPrincipal() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserPrincipal principal)) {
-            throw new UnauthorizedException("User authentication is required");
+    private void ensureSalonOwnerAccess() {
+        if (!SecurityUtils.isSalonOwner() && !SecurityUtils.isAdmin()) {
+            throw new UnauthorizedException("Only salon owners or admins can manage salon profiles");
         }
-        return principal;
     }
 
-    private boolean isOwnerOrAdmin(User user) {
-        if (user.getRole() == UserRole.SALON_OWNER || user.getRole() == UserRole.ADMIN) {
-            return true;
-        }
-
-        if (user.getRoles() == null || user.getRoles().isEmpty()) {
-            return false;
-        }
-
-        return user.getRoles().stream()
-                .map(role -> role.getName())
-                .anyMatch(roleName -> roleName == UserRole.SALON_OWNER || roleName == UserRole.ADMIN);
-    }
-
-    private void promoteToSalonOwnerIfNeeded(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UnauthorizedException("User account not found"));
-
-        if (isOwnerOrAdmin(user)) {
+    private void ensureCanManageSalon(SalonDto salon) {
+        if (SecurityUtils.isAdmin()) {
             return;
         }
+        if (!SecurityUtils.isSalonOwner() || salon.getOwnerId() == null || !salon.getOwnerId().equals(SecurityUtils.currentUserId())) {
+            throw new UnauthorizedException("You are not allowed to manage this salon");
+        }
+    }
 
-        Role ownerRole = roleRepository.findByName(UserRole.SALON_OWNER)
-                .orElseGet(() -> roleRepository.save(new Role(null, UserRole.SALON_OWNER)));
-
-        Set<Role> updatedRoles = user.getRoles() == null ? new HashSet<>() : new HashSet<>(user.getRoles());
-        updatedRoles.add(ownerRole);
-        user.setRoles(updatedRoles);
-        user.setRole(UserRole.SALON_OWNER);
-        userRepository.save(user);
+    private <T> ResponseEntity<ApiResponse<T>> forbidden(String message) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiResponse.<T>builder()
+                .success(false)
+                .error(message)
+                .build());
     }
 }

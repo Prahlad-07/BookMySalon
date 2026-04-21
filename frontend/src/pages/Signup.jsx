@@ -5,12 +5,22 @@
  */
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { AlertCircle, ArrowRight, Eye, EyeOff, Lock, Mail, Sparkles, User } from 'lucide-react';
+import {
+  AlertCircle,
+  ArrowRight,
+  Eye,
+  EyeOff,
+  Lock,
+  Mail,
+  Sparkles,
+  User,
+} from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import brandLogo from '../assets/brand-logo.png';
 import { getDashboardPathByRole } from '../utils/roleRouting';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://bookmysalon-5.onrender.com';
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || 'https://bookmysalon-5.onrender.com';
 const GOOGLE_AUTH_URL = `${API_BASE_URL}/oauth2/authorization/google`;
 const ENABLE_GOOGLE_OAUTH = import.meta.env.VITE_ENABLE_GOOGLE_OAUTH === 'true';
 
@@ -81,6 +91,11 @@ export default function Signup() {
       return;
     }
 
+    if (formData.password.trim().length < 8) {
+      setLocalError('Password must be at least 8 characters.');
+      return;
+    }
+
     setIsLoading(true);
     const result = await signup(formData);
     setIsLoading(false);
@@ -88,7 +103,9 @@ export default function Signup() {
     if (!result?.ok) {
       if (result?.code === 'EMAIL_EXISTS') {
         const email = encodeURIComponent(formData.email.trim().toLowerCase());
-        const message = encodeURIComponent('Account already exists. Please sign in.');
+        const message = encodeURIComponent(
+          'Account already exists. Please sign in.'
+        );
         navigate(`/login?email=${email}&error=${message}`);
       }
       return;
@@ -103,10 +120,18 @@ export default function Signup() {
         <div className="flex items-start justify-between gap-4 mb-6">
           <div>
             <div className="login-brand-wrap mb-4">
-              <img src={brandLogo} alt="BookMySalon logo" className="signup-brand-logo" />
+              <img
+                src={brandLogo}
+                alt="BookMySalon logo"
+                className="signup-brand-logo"
+              />
             </div>
-            <h1 className="text-3xl font-bold text-slate-900">Create Your Account</h1>
-            <p className="text-slate-600 mt-2">Pick your role, set your details, and launch in under a minute.</p>
+            <h1 className="text-3xl font-bold text-slate-900">
+              Create Your Account
+            </h1>
+            <p className="text-slate-600 mt-2">
+              Pick your role, set your details, and launch in under a minute.
+            </p>
           </div>
           <div className="hidden sm:flex w-12 h-12 rounded-xl bg-primary-50 border border-primary-100 items-center justify-center text-primary-700">
             <Sparkles size={20} />
@@ -133,17 +158,26 @@ export default function Signup() {
                     isSelected ? 'role-option-active' : ''
                   }`}
                 >
-                  <p className="text-sm font-semibold text-slate-900">{roleOption.label}</p>
-                  <p className="text-xs text-slate-600 mt-0.5">{roleOption.subtitle}</p>
+                  <p className="text-sm font-semibold text-slate-900">
+                    {roleOption.label}
+                  </p>
+                  <p className="text-xs text-slate-600 mt-0.5">
+                    {roleOption.subtitle}
+                  </p>
                 </button>
               );
             })}
           </div>
 
           <div>
-            <label className="text-sm font-semibold text-slate-700">Full Name</label>
+            <label className="text-sm font-semibold text-slate-700">
+              Full Name
+            </label>
             <div className="relative mt-1.5">
-              <User size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <User
+                size={18}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              />
               <input
                 className="input-field input-with-icon"
                 name="name"
@@ -156,9 +190,14 @@ export default function Signup() {
           </div>
 
           <div>
-            <label className="text-sm font-semibold text-slate-700">Email</label>
+            <label className="text-sm font-semibold text-slate-700">
+              Email
+            </label>
             <div className="relative mt-1.5">
-              <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Mail
+                size={18}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              />
               <input
                 className="input-field input-with-icon"
                 type="email"
@@ -173,9 +212,14 @@ export default function Signup() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-semibold text-slate-700">Password</label>
+              <label className="text-sm font-semibold text-slate-700">
+                Password
+              </label>
               <div className="relative mt-1.5">
-                <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <Lock
+                  size={18}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                />
                 <input
                   className="input-field input-with-icon pr-11"
                   type={showPassword ? 'text' : 'password'}
@@ -197,9 +241,14 @@ export default function Signup() {
             </div>
 
             <div>
-              <label className="text-sm font-semibold text-slate-700">Confirm Password</label>
+              <label className="text-sm font-semibold text-slate-700">
+                Confirm Password
+              </label>
               <div className="relative mt-1.5">
-                <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <Lock
+                  size={18}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                />
                 <input
                   className="input-field input-with-icon pr-11"
                   type={showConfirmPassword ? 'text' : 'password'}
@@ -211,17 +260,28 @@ export default function Signup() {
                 />
                 <button
                   type="button"
-                  onClick={() => setShowConfirmPassword((previous) => !previous)}
+                  onClick={() =>
+                    setShowConfirmPassword((previous) => !previous)
+                  }
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700"
-                  aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                  aria-label={
+                    showConfirmPassword ? 'Hide password' : 'Show password'
+                  }
                 >
-                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  {showConfirmPassword ? (
+                    <EyeOff size={18} />
+                  ) : (
+                    <Eye size={18} />
+                  )}
                 </button>
               </div>
             </div>
           </div>
 
-          <button className="btn-primary w-full inline-flex items-center justify-center gap-2" disabled={isLoading}>
+          <button
+            className="btn-primary w-full inline-flex items-center justify-center gap-2"
+            disabled={isLoading}
+          >
             {isLoading ? 'Creating account...' : 'Create My Account'}
             {!isLoading && <ArrowRight size={16} />}
           </button>
@@ -231,16 +291,33 @@ export default function Signup() {
           <div className="mt-5">
             <button
               type="button"
-                onClick={() => {
-                  window.location.href = GOOGLE_AUTH_URL;
-                }}
+              onClick={() => {
+                window.location.href = GOOGLE_AUTH_URL;
+              }}
               className="w-full btn-secondary inline-flex items-center justify-center gap-2"
             >
-              <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
-                <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303C33.653 32.657 29.233 36 24 36c-6.627 0-12-5.373-12-12S17.373 12 24 12c3.059 0 5.849 1.154 7.971 3.029l5.657-5.657C34.053 6.053 29.279 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.651-.389-3.917z" />
-                <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.849 1.154 7.971 3.029l5.657-5.657C34.053 6.053 29.279 4 24 4c-7.682 0-14.348 4.337-17.694 10.691z" />
-                <path fill="#4CAF50" d="M24 44c5.176 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.141 35.091 26.715 36 24 36c-5.213 0-9.62-3.33-11.283-7.946l-6.522 5.025C9.5 39.556 16.227 44 24 44z" />
-                <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.048 12.048 0 01-4.084 5.57l.003-.002 6.19 5.238C36.971 39.206 44 34 44 24c0-1.341-.138-2.651-.389-3.917z" />
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 48 48"
+                aria-hidden="true"
+              >
+                <path
+                  fill="#FFC107"
+                  d="M43.611 20.083H42V20H24v8h11.303C33.653 32.657 29.233 36 24 36c-6.627 0-12-5.373-12-12S17.373 12 24 12c3.059 0 5.849 1.154 7.971 3.029l5.657-5.657C34.053 6.053 29.279 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.651-.389-3.917z"
+                />
+                <path
+                  fill="#FF3D00"
+                  d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.849 1.154 7.971 3.029l5.657-5.657C34.053 6.053 29.279 4 24 4c-7.682 0-14.348 4.337-17.694 10.691z"
+                />
+                <path
+                  fill="#4CAF50"
+                  d="M24 44c5.176 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.141 35.091 26.715 36 24 36c-5.213 0-9.62-3.33-11.283-7.946l-6.522 5.025C9.5 39.556 16.227 44 24 44z"
+                />
+                <path
+                  fill="#1976D2"
+                  d="M43.611 20.083H42V20H24v8h11.303a12.048 12.048 0 01-4.084 5.57l.003-.002 6.19 5.238C36.971 39.206 44 34 44 24c0-1.341-.138-2.651-.389-3.917z"
+                />
               </svg>
               Continue with Google
             </button>

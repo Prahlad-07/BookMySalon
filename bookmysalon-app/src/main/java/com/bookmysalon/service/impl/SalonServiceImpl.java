@@ -51,6 +51,7 @@ public class SalonServiceImpl implements SalonService {
             throw new IllegalArgumentException("City is required");
         }
         validateCoordinates(salonDto.getLatitude(), salonDto.getLongitude());
+        validateOperatingHours(salonDto.getOpenTime(), salonDto.getCloseTime());
 
         String normalizedEmail = salonDto.getEmail().trim().toLowerCase();
         String normalizedPhone = salonDto.getPhoneNumber().trim();
@@ -124,7 +125,13 @@ public class SalonServiceImpl implements SalonService {
         Salon salon = salonRepository.findById(id)
                 .orElseThrow(() -> new SalonNotFoundException("Salon not found with id: " + id));
 
-        if (salonDto.getName() != null) salon.setName(salonDto.getName().trim());
+        if (salonDto.getName() != null) {
+            String normalizedName = salonDto.getName().trim();
+            if (normalizedName.isEmpty()) {
+                throw new IllegalArgumentException("Salon name is required");
+            }
+            salon.setName(normalizedName);
+        }
         if (salonDto.getImages() != null) salon.setImages(salonDto.getImages());
         if (salonDto.getAddress() != null) salon.setAddress(salonDto.getAddress().trim());
         if (salonDto.getPhoneNumber() != null) {
@@ -143,9 +150,16 @@ public class SalonServiceImpl implements SalonService {
             validateSalonEmailAvailability(normalizedEmail, salon.getOwnerId(), id);
             salon.setEmail(normalizedEmail);
         }
-        if (salonDto.getCity() != null) salon.setCity(salonDto.getCity().trim());
+        if (salonDto.getCity() != null) {
+            String normalizedCity = salonDto.getCity().trim();
+            if (normalizedCity.isEmpty()) {
+                throw new IllegalArgumentException("City is required");
+            }
+            salon.setCity(normalizedCity);
+        }
         if (salonDto.getOpenTime() != null) salon.setOpenTime(salonDto.getOpenTime());
         if (salonDto.getCloseTime() != null) salon.setCloseTime(salonDto.getCloseTime());
+        validateOperatingHours(salon.getOpenTime(), salon.getCloseTime());
 
         Double nextLatitude = salonDto.getLatitude() != null ? salonDto.getLatitude() : salon.getLatitude();
         Double nextLongitude = salonDto.getLongitude() != null ? salonDto.getLongitude() : salon.getLongitude();
@@ -210,6 +224,15 @@ public class SalonServiceImpl implements SalonService {
     private void validateRadius(double radiusKm) {
         if (radiusKm <= 0 || radiusKm > 200) {
             throw new IllegalArgumentException("Radius must be between 0 and 200 km");
+        }
+    }
+
+    private void validateOperatingHours(java.time.LocalTime openTime, java.time.LocalTime closeTime) {
+        if (openTime == null || closeTime == null) {
+            throw new IllegalArgumentException("Opening and closing times are required");
+        }
+        if (!closeTime.isAfter(openTime)) {
+            throw new IllegalArgumentException("Closing time must be after opening time");
         }
     }
 

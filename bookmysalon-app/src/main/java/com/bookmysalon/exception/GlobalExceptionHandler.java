@@ -52,6 +52,45 @@ public class GlobalExceptionHandler {
                         .build());
     }
 
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ApiResponse<Object>> handleUnauthorizedException(UnauthorizedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ApiResponse.builder()
+                        .success(false)
+                        .message("Access denied")
+                        .error(ex.getMessage())
+                        .build());
+    }
+
+    @ExceptionHandler({
+            IllegalArgumentException.class,
+            InvalidRequestException.class
+    })
+    public ResponseEntity<ApiResponse<Object>> handleBadRequest(RuntimeException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.builder()
+                        .success(false)
+                        .message("Invalid request")
+                        .error(ex.getMessage())
+                        .build());
+    }
+
+    @ExceptionHandler({
+            SalonNotFoundException.class,
+            CategoryNotFoundException.class,
+            ReviewNotFoundException.class,
+            BookingNotFoundException.class,
+            UserNotFoundException.class
+    })
+    public ResponseEntity<ApiResponse<Object>> handleNotFound(RuntimeException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.builder()
+                        .success(false)
+                        .message("Resource not found")
+                        .error(ex.getMessage())
+                        .build());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Object>> handleGenericException(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

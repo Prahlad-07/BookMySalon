@@ -8,8 +8,10 @@ const normalizeRoleToken = (value) => {
 
   if (!normalized) return '';
   if (normalized.includes('ADMIN')) return 'ADMIN';
-  if (normalized.includes('SALON') && normalized.includes('OWNER')) return 'SALON_OWNER';
-  if (normalized.includes('CUSTOMER') || normalized === 'USER') return 'CUSTOMER';
+  if (normalized.includes('SALON') && normalized.includes('OWNER'))
+    return 'SALON_OWNER';
+  if (normalized.includes('CUSTOMER') || normalized === 'USER')
+    return 'CUSTOMER';
   return normalized;
 };
 
@@ -44,7 +46,7 @@ export const getDashboardPathByRole = (role) => {
 
 export const canAccessCustomerRoute = (role) => {
   const normalizedRole = normalizeRole(role);
-  return normalizedRole === 'CUSTOMER' || normalizedRole === 'SALON_OWNER';
+  return normalizedRole === 'CUSTOMER';
 };
 
 export const canAccessSalonOwnerRoute = (role) => {

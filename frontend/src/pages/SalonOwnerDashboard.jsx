@@ -7,12 +7,28 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Building2, Calendar, CheckCircle, Info, LocateFixed, MapPinned, Plus, Save, Scissors, Trash2 } from 'lucide-react';
+import {
+  Building2,
+  Calendar,
+  CheckCircle,
+  LayoutDashboard,
+  LocateFixed,
+  MapPinned,
+  Plus,
+  Save,
+  Scissors,
+  Trash2,
+} from 'lucide-react';
 import api from '../config/api';
 import { MAPBOX_ACCESS_TOKEN } from '../config/mapbox';
 import MapboxLocationPicker from '../components/maps/MapboxLocationPicker';
 import { useAuth } from '../context/AuthContext';
-import { formatDurationLabel, formatTimeRange, toMinuteOfDay, toTimeInputValue } from '../utils/time';
+import {
+  formatDurationLabel,
+  formatTimeRange,
+  toMinuteOfDay,
+  toTimeInputValue,
+} from '../utils/time';
 
 const emptyServiceForm = {
   name: '',
@@ -34,6 +50,13 @@ const emptySalonForm = {
   longitude: '',
   images: [],
 };
+
+const OWNER_SECTIONS = [
+  { id: 'overview', label: 'Overview', Icon: LayoutDashboard },
+  { id: 'profile', label: 'Profile', Icon: Building2 },
+  { id: 'services', label: 'Services', Icon: Scissors },
+  { id: 'bookings', label: 'Bookings', Icon: Calendar },
+];
 
 const formatDateTime = (iso) => {
   if (!iso) return 'NA';
@@ -63,7 +86,12 @@ const normalizeSalonRecord = (salon = {}) => ({
 });
 
 const normalizeDashboardError = (err, fallbackMessage) => {
-  const rawMessage = String(err?.response?.data?.error || err?.message || fallbackMessage || 'Request failed');
+  const rawMessage = String(
+    err?.response?.data?.error ||
+      err?.message ||
+      fallbackMessage ||
+      'Request failed'
+  );
   const normalized = rawMessage.toLowerCase();
   const duplicateLike =
     normalized.includes('duplicate entry') ||
@@ -71,7 +99,10 @@ const normalizeDashboardError = (err, fallbackMessage) => {
     normalized.includes('unique constraint') ||
     normalized.includes('constraint');
 
-  if (normalized.includes('already has a salon profile') || normalized.includes('owner_id')) {
+  if (
+    normalized.includes('already has a salon profile') ||
+    normalized.includes('owner_id')
+  ) {
     return 'Your account already has a salon profile. Please edit the existing salon details.';
   }
 
@@ -87,7 +118,10 @@ const normalizeDashboardError = (err, fallbackMessage) => {
     return 'You already created a salon with this email. Edit the existing salon profile instead.';
   }
 
-  if (normalized.includes('could not execute statement') && normalized.includes('salons')) {
+  if (
+    normalized.includes('could not execute statement') &&
+    normalized.includes('salons')
+  ) {
     return 'Unable to save salon right now. Verify salon email, phone number, and owner profile details, then retry.';
   }
 
@@ -106,33 +140,51 @@ export default function SalonOwnerDashboard() {
   const [categories, setCategories] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [newCategoryName, setNewCategoryName] = useState('');
+  const [activeOwnerSection, setActiveOwnerSection] = useState('overview');
 
   const [serviceForm, setServiceForm] = useState(emptyServiceForm);
   const [editingServiceId, setEditingServiceId] = useState(null);
 
   const [showCreateSalonForm, setShowCreateSalonForm] = useState(false);
   const [createSalonForm, setCreateSalonForm] = useState(emptySalonForm);
-  const [isDetectingCreateLocation, setIsDetectingCreateLocation] = useState(false);
-  const [isDetectingProfileLocation, setIsDetectingProfileLocation] = useState(false);
+  const [isDetectingCreateLocation, setIsDetectingCreateLocation] =
+    useState(false);
+  const [isDetectingProfileLocation, setIsDetectingProfileLocation] =
+    useState(false);
   const categoryNameById = useMemo(
-    () => Object.fromEntries(categories.map((category) => [String(category.id), category.name])),
+    () =>
+      Object.fromEntries(
+        categories.map((category) => [String(category.id), category.name])
+      ),
     [categories]
   );
 
   const selectedSalon = useMemo(
-    () => salons.find((salon) => String(salon.id) === String(selectedSalonId)) || null,
+    () =>
+      salons.find((salon) => String(salon.id) === String(selectedSalonId)) ||
+      null,
     [salons, selectedSalonId]
   );
 
   const createSalonCoordinatesReady =
-    parseCoordinate(createSalonForm.latitude) != null && parseCoordinate(createSalonForm.longitude) != null;
+    parseCoordinate(createSalonForm.latitude) != null &&
+    parseCoordinate(createSalonForm.longitude) != null;
   const selectedSalonCoordinatesReady =
-    selectedSalon && parseCoordinate(selectedSalon.latitude) != null && parseCoordinate(selectedSalon.longitude) != null;
+    selectedSalon &&
+    parseCoordinate(selectedSalon.latitude) != null &&
+    parseCoordinate(selectedSalon.longitude) != null;
 
   const stats = useMemo(() => {
-    const totalRevenue = bookings.reduce((sum, booking) => sum + (booking.totalPrice || 0), 0);
-    const confirmedCount = bookings.filter((booking) => booking.status === 'CONFIRMED').length;
-    const pendingCount = bookings.filter((booking) => booking.status === 'PENDING').length;
+    const totalRevenue = bookings.reduce(
+      (sum, booking) => sum + (booking.totalPrice || 0),
+      0
+    );
+    const confirmedCount = bookings.filter(
+      (booking) => booking.status === 'CONFIRMED'
+    ).length;
+    const pendingCount = bookings.filter(
+      (booking) => booking.status === 'PENDING'
+    ).length;
 
     return {
       totalRevenue,
@@ -153,7 +205,9 @@ export default function SalonOwnerDashboard() {
       setLoading(true);
       setError('');
       const ownerSalons = await api.get('/api/salons/me');
-      const normalizedSalons = Array.isArray(ownerSalons) ? ownerSalons.map(normalizeSalonRecord) : [];
+      const normalizedSalons = Array.isArray(ownerSalons)
+        ? ownerSalons.map(normalizeSalonRecord)
+        : [];
       setSalons(normalizedSalons);
 
       const selected = normalizedSalons[0]?.id;
@@ -166,16 +220,21 @@ export default function SalonOwnerDashboard() {
         setBookings([]);
       }
     } catch (err) {
-      const errorMessage = normalizeDashboardError(err, 'Failed to load owner dashboard data');
+      const errorMessage = normalizeDashboardError(
+        err,
+        'Failed to load owner dashboard data'
+      );
       const normalizedMessage = String(errorMessage).toLowerCase();
-      if (normalizedMessage.includes('only salon owners or admins') || normalizedMessage.includes('not marked as salon_owner')) {
+      if (
+        normalizedMessage.includes('only salon owners or admins') ||
+        normalizedMessage.includes('not marked as salon_owner')
+      ) {
         setSalons([]);
         setSelectedSalonId('');
         setServices([]);
         setCategories([]);
         setBookings([]);
-        setError('');
-        setMessage('Create your first salon to auto-enable owner access for this account.');
+        setError('This workspace is available only to salon owner accounts.');
         return;
       }
       setError(errorMessage);
@@ -194,12 +253,17 @@ export default function SalonOwnerDashboard() {
       ]);
       setServices(Array.isArray(serviceData) ? serviceData : []);
       setBookings(Array.isArray(bookingData) ? bookingData : []);
-      const normalizedCategories = Array.isArray(categoryData) ? categoryData : [];
+      const normalizedCategories = Array.isArray(categoryData)
+        ? categoryData
+        : [];
       setCategories(normalizedCategories);
       setServiceForm((prev) => ({
         ...prev,
         categoryId:
-          prev.categoryId && normalizedCategories.some((c) => String(c.id) === String(prev.categoryId))
+          prev.categoryId &&
+          normalizedCategories.some(
+            (c) => String(c.id) === String(prev.categoryId)
+          )
             ? String(prev.categoryId)
             : String(normalizedCategories[0]?.id || ''),
       }));
@@ -254,7 +318,11 @@ export default function SalonOwnerDashboard() {
     setSalons((previous) =>
       previous.map((salon) =>
         salon.id === selectedSalon.id
-          ? { ...salon, latitude: Number(latitude).toFixed(6), longitude: Number(longitude).toFixed(6) }
+          ? {
+              ...salon,
+              latitude: Number(latitude).toFixed(6),
+              longitude: Number(longitude).toFixed(6),
+            }
           : salon
       )
     );
@@ -268,7 +336,9 @@ export default function SalonOwnerDashboard() {
       updateCreateSalonCoordinates(coords);
       setMessage('Salon location captured from your current position');
     } catch (err) {
-      setError(normalizeDashboardError(err, 'Unable to detect current location.'));
+      setError(
+        normalizeDashboardError(err, 'Unable to detect current location.')
+      );
     } finally {
       setIsDetectingCreateLocation(false);
     }
@@ -283,7 +353,9 @@ export default function SalonOwnerDashboard() {
       updateSelectedSalonCoordinates(coords);
       setMessage('Salon profile location updated from current position');
     } catch (err) {
-      setError(normalizeDashboardError(err, 'Unable to detect current location.'));
+      setError(
+        normalizeDashboardError(err, 'Unable to detect current location.')
+      );
     } finally {
       setIsDetectingProfileLocation(false);
     }
@@ -295,16 +367,28 @@ export default function SalonOwnerDashboard() {
       setError('');
       const latitude = parseCoordinate(createSalonForm.latitude);
       const longitude = parseCoordinate(createSalonForm.longitude);
-      const normalizedOpenTime = toTimeInputValue(createSalonForm.openTime, '09:00');
-      const normalizedCloseTime = toTimeInputValue(createSalonForm.closeTime, '18:00');
+      const normalizedOpenTime = toTimeInputValue(
+        createSalonForm.openTime,
+        '09:00'
+      );
+      const normalizedCloseTime = toTimeInputValue(
+        createSalonForm.closeTime,
+        '18:00'
+      );
       const openMinutes = toMinuteOfDay(normalizedOpenTime);
       const closeMinutes = toMinuteOfDay(normalizedCloseTime);
 
       if (latitude == null || longitude == null) {
-        setError('Please select a location on the map before creating the salon.');
+        setError(
+          'Please select a location on the map before creating the salon.'
+        );
         return;
       }
-      if (openMinutes == null || closeMinutes == null || closeMinutes <= openMinutes) {
+      if (
+        openMinutes == null ||
+        closeMinutes == null ||
+        closeMinutes <= openMinutes
+      ) {
         setError('Please provide valid opening and closing hours.');
         return;
       }
@@ -323,7 +407,9 @@ export default function SalonOwnerDashboard() {
       };
 
       if (isPhoneNumberInvalid(payload.phoneNumber)) {
-        setError('Phone number is invalid. Enter a valid phone number (7-15 digits), not an email.');
+        setError(
+          'Phone number is invalid. Enter a valid phone number (7-15 digits), not an email.'
+        );
         return;
       }
 
@@ -350,8 +436,15 @@ export default function SalonOwnerDashboard() {
       salonId: Number(selectedSalonId),
     };
 
-    if (!payload.name || payload.price <= 0 || payload.duration <= 0 || payload.categoryId <= 0) {
-      setError('Please enter valid service name, price, duration and category.');
+    if (
+      !payload.name ||
+      payload.price <= 0 ||
+      payload.duration <= 0 ||
+      payload.categoryId <= 0
+    ) {
+      setError(
+        'Please enter valid service name, price, duration and category.'
+      );
       return;
     }
     if (payload.duration > 720) {
@@ -359,9 +452,13 @@ export default function SalonOwnerDashboard() {
       return;
     }
 
-    const hasCategory = categories.some((category) => Number(category.id) === payload.categoryId);
+    const hasCategory = categories.some(
+      (category) => Number(category.id) === payload.categoryId
+    );
     if (!hasCategory) {
-      setError('Selected category is invalid for this salon. Please create/select a valid category.');
+      setError(
+        'Selected category is invalid for this salon. Please create/select a valid category.'
+      );
       return;
     }
 
@@ -449,21 +546,35 @@ export default function SalonOwnerDashboard() {
       setError('');
       const latitude = parseCoordinate(selectedSalon.latitude);
       const longitude = parseCoordinate(selectedSalon.longitude);
-      const normalizedOpenTime = toTimeInputValue(selectedSalon.openTime, '09:00');
-      const normalizedCloseTime = toTimeInputValue(selectedSalon.closeTime, '18:00');
+      const normalizedOpenTime = toTimeInputValue(
+        selectedSalon.openTime,
+        '09:00'
+      );
+      const normalizedCloseTime = toTimeInputValue(
+        selectedSalon.closeTime,
+        '18:00'
+      );
       const openMinutes = toMinuteOfDay(normalizedOpenTime);
       const closeMinutes = toMinuteOfDay(normalizedCloseTime);
 
       if (latitude == null || longitude == null) {
-        setError('Latitude and longitude are required. Use the map to set a valid location.');
+        setError(
+          'Latitude and longitude are required. Use the map to set a valid location.'
+        );
         return;
       }
-      if (openMinutes == null || closeMinutes == null || closeMinutes <= openMinutes) {
+      if (
+        openMinutes == null ||
+        closeMinutes == null ||
+        closeMinutes <= openMinutes
+      ) {
         setError('Opening time must be earlier than closing time.');
         return;
       }
       if (isPhoneNumberInvalid(selectedSalon.phoneNumber)) {
-        setError('Phone number is invalid. Enter a valid phone number (7-15 digits), not an email.');
+        setError(
+          'Phone number is invalid. Enter a valid phone number (7-15 digits), not an email.'
+        );
         return;
       }
 
@@ -495,7 +606,10 @@ export default function SalonOwnerDashboard() {
         <div className="page-header">
           <div>
             <h1 className="page-title">Salon Owner Command Center</h1>
-            <p className="page-subtitle">Create your salon, publish services, and manage daily bookings from one workspace.</p>
+            <p className="page-subtitle">
+              Create your salon, publish services, and manage daily bookings
+              from one workspace.
+            </p>
           </div>
 
           <div className="flex gap-2">
@@ -506,7 +620,9 @@ export default function SalonOwnerDashboard() {
                 className="input-field max-w-xs"
               >
                 {salons.map((salon) => (
-                  <option key={salon.id} value={salon.id}>{salon.name}</option>
+                  <option key={salon.id} value={salon.id}>
+                    {salon.name}
+                  </option>
                 ))}
               </select>
             )}
@@ -525,34 +641,107 @@ export default function SalonOwnerDashboard() {
         {success && <div className="notice-box notice-success">{success}</div>}
 
         {(showCreateSalonForm || salons.length === 0) && (
-          <form onSubmit={createSalon} className="card-base rounded-2xl p-6 space-y-4">
-            <h2 className="text-2xl text-slate-900 font-semibold">Create Salon Profile</h2>
-            <div className="notice-box notice-info text-sm">
-              <p className="font-semibold text-slate-900 flex items-center gap-2 mb-1">
-                <Info size={16} /> High-impact setup flow
-              </p>
-              <p>1. Add salon basics: name, contact, and city.</p>
-              <p>2. Pin exact location using map click/drag or live location.</p>
-              <p>3. Create salon, then publish categories and services immediately.</p>
-            </div>
+          <form
+            onSubmit={createSalon}
+            className="card-base rounded-2xl p-6 space-y-4"
+          >
+            <h2 className="text-2xl text-slate-900 font-semibold">
+              Create Salon Profile
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <input className="input-field" placeholder="Salon Name" value={createSalonForm.name} onChange={(e) => setCreateSalonForm((p) => ({ ...p, name: e.target.value }))} required />
-              <input className="input-field" placeholder="Salon Email" type="email" value={createSalonForm.email} onChange={(e) => setCreateSalonForm((p) => ({ ...p, email: e.target.value }))} required />
-              <p className="text-xs text-slate-500 md:col-span-2">Use a unique salon email. Reusing an existing salon email is not allowed.</p>
-              <input className="input-field" type="tel" inputMode="tel" placeholder="Phone Number (e.g. +91XXXXXXXXXX)" value={createSalonForm.phoneNumber} onChange={(e) => setCreateSalonForm((p) => ({ ...p, phoneNumber: e.target.value }))} required />
-              <input className="input-field" placeholder="City" value={createSalonForm.city} onChange={(e) => setCreateSalonForm((p) => ({ ...p, city: e.target.value }))} required />
-              <input className="input-field md:col-span-2" placeholder="Address (optional)" value={createSalonForm.address} onChange={(e) => setCreateSalonForm((p) => ({ ...p, address: e.target.value }))} />
-              <input className="input-field" type="time" value={createSalonForm.openTime} onChange={(e) => setCreateSalonForm((p) => ({ ...p, openTime: e.target.value }))} required />
-              <input className="input-field" type="time" value={createSalonForm.closeTime} onChange={(e) => setCreateSalonForm((p) => ({ ...p, closeTime: e.target.value }))} required />
-              <p className="text-xs text-slate-500 md:col-span-2">Phone field accepts phone numbers only, not email addresses.</p>
-              <p className="text-xs text-slate-500 md:col-span-2">Working hours: {formatTimeRange(createSalonForm.openTime, createSalonForm.closeTime)}</p>
+              <input
+                className="input-field"
+                placeholder="Salon Name"
+                value={createSalonForm.name}
+                onChange={(e) =>
+                  setCreateSalonForm((p) => ({ ...p, name: e.target.value }))
+                }
+                required
+              />
+              <input
+                className="input-field"
+                placeholder="Salon Email"
+                type="email"
+                value={createSalonForm.email}
+                onChange={(e) =>
+                  setCreateSalonForm((p) => ({ ...p, email: e.target.value }))
+                }
+                required
+              />
+              <input
+                className="input-field"
+                type="tel"
+                inputMode="tel"
+                placeholder="Phone Number (e.g. +91XXXXXXXXXX)"
+                value={createSalonForm.phoneNumber}
+                onChange={(e) =>
+                  setCreateSalonForm((p) => ({
+                    ...p,
+                    phoneNumber: e.target.value,
+                  }))
+                }
+                required
+              />
+              <input
+                className="input-field"
+                placeholder="City"
+                value={createSalonForm.city}
+                onChange={(e) =>
+                  setCreateSalonForm((p) => ({ ...p, city: e.target.value }))
+                }
+                required
+              />
+              <input
+                className="input-field md:col-span-2"
+                placeholder="Address (optional)"
+                value={createSalonForm.address}
+                onChange={(e) =>
+                  setCreateSalonForm((p) => ({ ...p, address: e.target.value }))
+                }
+              />
+              <input
+                className="input-field"
+                type="time"
+                value={createSalonForm.openTime}
+                onChange={(e) =>
+                  setCreateSalonForm((p) => ({
+                    ...p,
+                    openTime: e.target.value,
+                  }))
+                }
+                required
+              />
+              <input
+                className="input-field"
+                type="time"
+                value={createSalonForm.closeTime}
+                onChange={(e) =>
+                  setCreateSalonForm((p) => ({
+                    ...p,
+                    closeTime: e.target.value,
+                  }))
+                }
+                required
+              />
+              <p className="text-xs text-slate-500 md:col-span-2">
+                Working hours:{' '}
+                {formatTimeRange(
+                  createSalonForm.openTime,
+                  createSalonForm.closeTime
+                )}
+              </p>
               <input
                 className="input-field"
                 type="number"
                 step="any"
                 placeholder="Latitude"
                 value={createSalonForm.latitude}
-                onChange={(e) => setCreateSalonForm((p) => ({ ...p, latitude: e.target.value }))}
+                onChange={(e) =>
+                  setCreateSalonForm((p) => ({
+                    ...p,
+                    latitude: e.target.value,
+                  }))
+                }
                 required
               />
               <input
@@ -561,13 +750,20 @@ export default function SalonOwnerDashboard() {
                 step="any"
                 placeholder="Longitude"
                 value={createSalonForm.longitude}
-                onChange={(e) => setCreateSalonForm((p) => ({ ...p, longitude: e.target.value }))}
+                onChange={(e) =>
+                  setCreateSalonForm((p) => ({
+                    ...p,
+                    longitude: e.target.value,
+                  }))
+                }
                 required
               />
             </div>
             <div className="rounded-2xl border border-slate-200 p-4 bg-slate-50">
               <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-                <p className="text-sm text-slate-700 font-medium">Pin exact salon location on the map (click or drag marker).</p>
+                <p className="text-sm text-slate-700 font-medium">
+                  Salon location
+                </p>
                 <button
                   type="button"
                   onClick={useCurrentLocationForCreateSalon}
@@ -575,7 +771,9 @@ export default function SalonOwnerDashboard() {
                   disabled={isDetectingCreateLocation}
                 >
                   <LocateFixed size={16} />
-                  {isDetectingCreateLocation ? 'Detecting...' : 'Use Current Location'}
+                  {isDetectingCreateLocation
+                    ? 'Detecting...'
+                    : 'Use Current Location'}
                 </button>
               </div>
               <MapboxLocationPicker
@@ -586,13 +784,23 @@ export default function SalonOwnerDashboard() {
                 }}
                 onChange={updateCreateSalonCoordinates}
               />
-              <p className={`mt-3 text-sm inline-flex items-center gap-2 ${createSalonCoordinatesReady ? 'text-emerald-700' : 'text-amber-700'}`}>
+              <p
+                className={`mt-3 text-sm inline-flex items-center gap-2 ${createSalonCoordinatesReady ? 'text-emerald-700' : 'text-amber-700'}`}
+              >
                 <MapPinned size={16} />
-                {createSalonCoordinatesReady ? 'Location locked. Ready to create salon.' : 'Select location to enable Create Salon.'}
+                {createSalonCoordinatesReady
+                  ? 'Location selected'
+                  : 'Location required'}
               </p>
             </div>
-            <button type="submit" className="btn-secondary" disabled={!createSalonCoordinatesReady}>
-              {createSalonCoordinatesReady ? 'Create Salon' : 'Set Location To Continue'}
+            <button
+              type="submit"
+              className="btn-secondary"
+              disabled={!createSalonCoordinatesReady}
+            >
+              {createSalonCoordinatesReady
+                ? 'Create Salon'
+                : 'Set Location To Continue'}
             </button>
           </form>
         )}
@@ -603,207 +811,544 @@ export default function SalonOwnerDashboard() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
-              <div className="card-base rounded-2xl p-5">
-                <p className="text-slate-600 flex items-center gap-2"><Calendar size={16} /> Total Bookings</p>
-                <p className="text-3xl font-bold text-slate-900 mt-2">{stats.bookingCount}</p>
-              </div>
-              <div className="card-base rounded-2xl p-5">
-                <p className="text-slate-600">Total Revenue</p>
-                <p className="text-3xl font-bold text-slate-900 mt-2">${stats.totalRevenue.toFixed(2)}</p>
-              </div>
-              <div className="card-base rounded-2xl p-5">
-                <p className="text-slate-600 flex items-center gap-2"><Scissors size={16} /> Services</p>
-                <p className="text-3xl font-bold text-slate-900 mt-2">{stats.serviceCount}</p>
-              </div>
-              <div className="card-base rounded-2xl p-5">
-                <p className="text-slate-600">Confirmed Bookings</p>
-                <p className="text-3xl font-bold text-slate-900 mt-2">{stats.confirmedCount}</p>
-              </div>
-              <div className="card-base rounded-2xl p-5">
-                <p className="text-slate-600">Pending Bookings</p>
-                <p className="text-3xl font-bold text-slate-900 mt-2">{stats.pendingCount}</p>
-              </div>
+            <div className="flex flex-wrap gap-2">
+              {OWNER_SECTIONS.map(({ id, label, Icon }) => {
+                const isActive = activeOwnerSection === id;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setActiveOwnerSection(id)}
+                    className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold ${
+                      isActive
+                        ? 'border-primary-200 bg-primary-50 text-primary-700'
+                        : 'border-slate-200 bg-white/70 text-slate-700 hover:border-primary-200 hover:text-primary-700'
+                    }`}
+                    aria-pressed={isActive}
+                  >
+                    <Icon size={16} />
+                    {label}
+                  </button>
+                );
+              })}
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-              <motion.form onSubmit={saveSalonProfile} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="card-base rounded-2xl p-6 space-y-4">
-                <h2 className="text-2xl text-slate-900 font-semibold flex items-center gap-2"><Building2 size={20} /> Salon Profile Settings</h2>
-                <input className="input-field" value={selectedSalon.name || ''} onChange={(e) => setSalons((prev) => prev.map((salon) => (salon.id === selectedSalon.id ? { ...salon, name: e.target.value } : salon)))} placeholder="Salon name" />
-                <input className="input-field" value={selectedSalon.address || ''} onChange={(e) => setSalons((prev) => prev.map((salon) => (salon.id === selectedSalon.id ? { ...salon, address: e.target.value } : salon)))} placeholder="Address" />
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <input className="input-field" value={selectedSalon.city || ''} onChange={(e) => setSalons((prev) => prev.map((salon) => (salon.id === selectedSalon.id ? { ...salon, city: e.target.value } : salon)))} placeholder="City" />
-                  <input className="input-field" type="tel" inputMode="tel" value={selectedSalon.phoneNumber || ''} onChange={(e) => setSalons((prev) => prev.map((salon) => (salon.id === selectedSalon.id ? { ...salon, phoneNumber: e.target.value } : salon)))} placeholder="Phone" />
-                </div>
-                <input className="input-field" value={selectedSalon.email || ''} onChange={(e) => setSalons((prev) => prev.map((salon) => (salon.id === selectedSalon.id ? { ...salon, email: e.target.value } : salon)))} placeholder="Email" />
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <input
-                    className="input-field"
-                    type="time"
-                    value={toTimeInputValue(selectedSalon.openTime, '09:00')}
-                    onChange={(e) => setSalons((prev) => prev.map((salon) => (salon.id === selectedSalon.id ? { ...salon, openTime: e.target.value } : salon)))}
-                  />
-                  <input
-                    className="input-field"
-                    type="time"
-                    value={toTimeInputValue(selectedSalon.closeTime, '18:00')}
-                    onChange={(e) => setSalons((prev) => prev.map((salon) => (salon.id === selectedSalon.id ? { ...salon, closeTime: e.target.value } : salon)))}
-                  />
-                </div>
-                <p className="text-xs text-slate-500">Current hours: {formatTimeRange(selectedSalon.openTime, selectedSalon.closeTime)}</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <input
-                    className="input-field"
-                    type="number"
-                    step="any"
-                    value={selectedSalon.latitude ?? ''}
-                    onChange={(e) => setSalons((prev) => prev.map((salon) => (salon.id === selectedSalon.id ? { ...salon, latitude: e.target.value } : salon)))}
-                    placeholder="Latitude"
-                  />
-                  <input
-                    className="input-field"
-                    type="number"
-                    step="any"
-                    value={selectedSalon.longitude ?? ''}
-                    onChange={(e) => setSalons((prev) => prev.map((salon) => (salon.id === selectedSalon.id ? { ...salon, longitude: e.target.value } : salon)))}
-                    placeholder="Longitude"
-                  />
-                </div>
-                <div className="rounded-2xl border border-slate-200 p-4 bg-slate-50">
-                  <div className="flex items-center justify-between gap-2 mb-3">
-                    <p className="text-sm text-slate-700 font-medium">Update profile location by dragging marker or clicking map.</p>
-                    <button
-                      type="button"
-                      onClick={useCurrentLocationForProfile}
-                      className="btn-outline px-4 py-2 text-sm inline-flex items-center gap-2"
-                      disabled={isDetectingProfileLocation}
-                    >
-                      <LocateFixed size={16} />
-                      {isDetectingProfileLocation ? 'Detecting...' : 'Use Current Location'}
-                    </button>
-                  </div>
-                  <MapboxLocationPicker
-                    accessToken={MAPBOX_ACCESS_TOKEN}
-                    value={{
-                      latitude: parseCoordinate(selectedSalon.latitude),
-                      longitude: parseCoordinate(selectedSalon.longitude),
-                    }}
-                    onChange={updateSelectedSalonCoordinates}
-                  />
-                  <p className={`mt-3 text-sm inline-flex items-center gap-2 ${selectedSalonCoordinatesReady ? 'text-emerald-700' : 'text-amber-700'}`}>
-                    <MapPinned size={16} />
-                    {selectedSalonCoordinatesReady ? 'Profile location looks good.' : 'Please set a valid profile location.'}
+            {activeOwnerSection === 'overview' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
+                <div className="card-base rounded-2xl p-5">
+                  <p className="text-slate-600 flex items-center gap-2">
+                    <Calendar size={16} /> Total Bookings
+                  </p>
+                  <p className="text-3xl font-bold text-slate-900 mt-2">
+                    {stats.bookingCount}
                   </p>
                 </div>
-                <button type="submit" className="btn-primary flex items-center gap-2" disabled={!selectedSalonCoordinatesReady}>
-                  <Save size={16} /> Save Profile
-                </button>
-              </motion.form>
+                <div className="card-base rounded-2xl p-5">
+                  <p className="text-slate-600">Total Revenue</p>
+                  <p className="text-3xl font-bold text-slate-900 mt-2">
+                    ${stats.totalRevenue.toFixed(2)}
+                  </p>
+                </div>
+                <div className="card-base rounded-2xl p-5">
+                  <p className="text-slate-600 flex items-center gap-2">
+                    <Scissors size={16} /> Services
+                  </p>
+                  <p className="text-3xl font-bold text-slate-900 mt-2">
+                    {stats.serviceCount}
+                  </p>
+                </div>
+                <div className="card-base rounded-2xl p-5">
+                  <p className="text-slate-600">Confirmed Bookings</p>
+                  <p className="text-3xl font-bold text-slate-900 mt-2">
+                    {stats.confirmedCount}
+                  </p>
+                </div>
+                <div className="card-base rounded-2xl p-5">
+                  <p className="text-slate-600">Pending Bookings</p>
+                  <p className="text-3xl font-bold text-slate-900 mt-2">
+                    {stats.pendingCount}
+                  </p>
+                </div>
+              </div>
+            )}
 
-              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="card-base rounded-2xl p-6">
-                <h2 className="text-2xl text-slate-900 font-semibold mb-4 flex items-center gap-2"><Plus size={20} /> Service and Category Management</h2>
-                <form onSubmit={createOrUpdateService} className="space-y-3 mb-5">
-                  <input className="input-field" placeholder="Service name" value={serviceForm.name} onChange={(e) => setServiceForm((prev) => ({ ...prev, name: e.target.value }))} required />
-                  <textarea className="input-field" placeholder="Description" rows={2} value={serviceForm.description} onChange={(e) => setServiceForm((prev) => ({ ...prev, description: e.target.value }))} />
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    <input type="number" min="1" className="input-field" placeholder="Price" value={serviceForm.price} onChange={(e) => setServiceForm((prev) => ({ ...prev, price: e.target.value }))} required />
-                    <input type="number" min="1" max="720" className="input-field" placeholder="Duration (minutes)" value={serviceForm.duration} onChange={(e) => setServiceForm((prev) => ({ ...prev, duration: e.target.value }))} required />
+            {activeOwnerSection === 'profile' && (
+              <div className="grid grid-cols-1 gap-6">
+                <motion.form
+                  onSubmit={saveSalonProfile}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="card-base rounded-2xl p-6 space-y-4"
+                >
+                  <h2 className="text-2xl text-slate-900 font-semibold flex items-center gap-2">
+                    <Building2 size={20} /> Salon Profile Settings
+                  </h2>
+                  <input
+                    className="input-field"
+                    value={selectedSalon.name || ''}
+                    onChange={(e) =>
+                      setSalons((prev) =>
+                        prev.map((salon) =>
+                          salon.id === selectedSalon.id
+                            ? { ...salon, name: e.target.value }
+                            : salon
+                        )
+                      )
+                    }
+                    placeholder="Salon name"
+                  />
+                  <input
+                    className="input-field"
+                    value={selectedSalon.address || ''}
+                    onChange={(e) =>
+                      setSalons((prev) =>
+                        prev.map((salon) =>
+                          salon.id === selectedSalon.id
+                            ? { ...salon, address: e.target.value }
+                            : salon
+                        )
+                      )
+                    }
+                    placeholder="Address"
+                  />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <input
+                      className="input-field"
+                      value={selectedSalon.city || ''}
+                      onChange={(e) =>
+                        setSalons((prev) =>
+                          prev.map((salon) =>
+                            salon.id === selectedSalon.id
+                              ? { ...salon, city: e.target.value }
+                              : salon
+                          )
+                        )
+                      }
+                      placeholder="City"
+                    />
+                    <input
+                      className="input-field"
+                      type="tel"
+                      inputMode="tel"
+                      value={selectedSalon.phoneNumber || ''}
+                      onChange={(e) =>
+                        setSalons((prev) =>
+                          prev.map((salon) =>
+                            salon.id === selectedSalon.id
+                              ? { ...salon, phoneNumber: e.target.value }
+                              : salon
+                          )
+                        )
+                      }
+                      placeholder="Phone"
+                    />
                   </div>
-                  <div className="relative z-10">
-                    <label className="block text-sm font-semibold text-slate-700 mb-1">Select Category</label>
-                    <select
-                      className="input-field w-full"
-                      value={serviceForm.categoryId}
-                      onChange={(e) => setServiceForm((prev) => ({ ...prev, categoryId: e.target.value }))}
-                      required
+                  <input
+                    className="input-field"
+                    value={selectedSalon.email || ''}
+                    onChange={(e) =>
+                      setSalons((prev) =>
+                        prev.map((salon) =>
+                          salon.id === selectedSalon.id
+                            ? { ...salon, email: e.target.value }
+                            : salon
+                        )
+                      )
+                    }
+                    placeholder="Email"
+                  />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <input
+                      className="input-field"
+                      type="time"
+                      value={toTimeInputValue(selectedSalon.openTime, '09:00')}
+                      onChange={(e) =>
+                        setSalons((prev) =>
+                          prev.map((salon) =>
+                            salon.id === selectedSalon.id
+                              ? { ...salon, openTime: e.target.value }
+                              : salon
+                          )
+                        )
+                      }
+                    />
+                    <input
+                      className="input-field"
+                      type="time"
+                      value={toTimeInputValue(selectedSalon.closeTime, '18:00')}
+                      onChange={(e) =>
+                        setSalons((prev) =>
+                          prev.map((salon) =>
+                            salon.id === selectedSalon.id
+                              ? { ...salon, closeTime: e.target.value }
+                              : salon
+                          )
+                        )
+                      }
+                    />
+                  </div>
+                  <p className="text-xs text-slate-500">
+                    Current hours:{' '}
+                    {formatTimeRange(
+                      selectedSalon.openTime,
+                      selectedSalon.closeTime
+                    )}
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <input
+                      className="input-field"
+                      type="number"
+                      step="any"
+                      value={selectedSalon.latitude ?? ''}
+                      onChange={(e) =>
+                        setSalons((prev) =>
+                          prev.map((salon) =>
+                            salon.id === selectedSalon.id
+                              ? { ...salon, latitude: e.target.value }
+                              : salon
+                          )
+                        )
+                      }
+                      placeholder="Latitude"
+                    />
+                    <input
+                      className="input-field"
+                      type="number"
+                      step="any"
+                      value={selectedSalon.longitude ?? ''}
+                      onChange={(e) =>
+                        setSalons((prev) =>
+                          prev.map((salon) =>
+                            salon.id === selectedSalon.id
+                              ? { ...salon, longitude: e.target.value }
+                              : salon
+                          )
+                        )
+                      }
+                      placeholder="Longitude"
+                    />
+                  </div>
+                  <div className="rounded-2xl border border-slate-200 p-4 bg-slate-50">
+                    <div className="flex items-center justify-between gap-2 mb-3">
+                      <p className="text-sm text-slate-700 font-medium">
+                        Profile location
+                      </p>
+                      <button
+                        type="button"
+                        onClick={useCurrentLocationForProfile}
+                        className="btn-outline px-4 py-2 text-sm inline-flex items-center gap-2"
+                        disabled={isDetectingProfileLocation}
+                      >
+                        <LocateFixed size={16} />
+                        {isDetectingProfileLocation
+                          ? 'Detecting...'
+                          : 'Use Current Location'}
+                      </button>
+                    </div>
+                    <MapboxLocationPicker
+                      accessToken={MAPBOX_ACCESS_TOKEN}
+                      value={{
+                        latitude: parseCoordinate(selectedSalon.latitude),
+                        longitude: parseCoordinate(selectedSalon.longitude),
+                      }}
+                      onChange={updateSelectedSalonCoordinates}
+                    />
+                    <p
+                      className={`mt-3 text-sm inline-flex items-center gap-2 ${selectedSalonCoordinatesReady ? 'text-emerald-700' : 'text-amber-700'}`}
                     >
-                      <option value="" disabled>
-                        {categories.length === 0 ? 'No categories yet. Add one below.' : 'Choose a category'}
-                      </option>
-                      {categories.map((category) => (
-                        <option key={category.id} value={String(category.id)}>
-                          {category.name}
+                      <MapPinned size={16} />
+                      {selectedSalonCoordinatesReady
+                        ? 'Location selected'
+                        : 'Location required'}
+                    </p>
+                  </div>
+                  <button
+                    type="submit"
+                    className="btn-primary flex items-center gap-2"
+                    disabled={!selectedSalonCoordinatesReady}
+                  >
+                    <Save size={16} /> Save Profile
+                  </button>
+                </motion.form>
+              </div>
+            )}
+
+            {activeOwnerSection === 'services' && (
+              <div className="grid grid-cols-1 gap-6">
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="card-base rounded-2xl p-6"
+                >
+                  <h2 className="text-2xl text-slate-900 font-semibold mb-4 flex items-center gap-2">
+                    <Plus size={20} /> Service and Category Management
+                  </h2>
+                  <form
+                    onSubmit={createOrUpdateService}
+                    className="space-y-3 mb-5"
+                  >
+                    <input
+                      className="input-field"
+                      placeholder="Service name"
+                      value={serviceForm.name}
+                      onChange={(e) =>
+                        setServiceForm((prev) => ({
+                          ...prev,
+                          name: e.target.value,
+                        }))
+                      }
+                      required
+                    />
+                    <textarea
+                      className="input-field"
+                      placeholder="Description"
+                      rows={2}
+                      value={serviceForm.description}
+                      onChange={(e) =>
+                        setServiceForm((prev) => ({
+                          ...prev,
+                          description: e.target.value,
+                        }))
+                      }
+                    />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                      <input
+                        type="number"
+                        min="1"
+                        className="input-field"
+                        placeholder="Price"
+                        value={serviceForm.price}
+                        onChange={(e) =>
+                          setServiceForm((prev) => ({
+                            ...prev,
+                            price: e.target.value,
+                          }))
+                        }
+                        required
+                      />
+                      <input
+                        type="number"
+                        min="1"
+                        max="720"
+                        className="input-field"
+                        placeholder="Duration (minutes)"
+                        value={serviceForm.duration}
+                        onChange={(e) =>
+                          setServiceForm((prev) => ({
+                            ...prev,
+                            duration: e.target.value,
+                          }))
+                        }
+                        required
+                      />
+                    </div>
+                    <div className="relative z-10">
+                      <label className="block text-sm font-semibold text-slate-700 mb-1">
+                        Select Category
+                      </label>
+                      <select
+                        className="input-field w-full"
+                        value={serviceForm.categoryId}
+                        onChange={(e) =>
+                          setServiceForm((prev) => ({
+                            ...prev,
+                            categoryId: e.target.value,
+                          }))
+                        }
+                        required
+                      >
+                        <option value="" disabled>
+                          {categories.length === 0
+                            ? 'No categories yet. Add one below.'
+                            : 'Choose a category'}
                         </option>
-                      ))}
-                    </select>
-                    {categories.length > 0 && (
-                      <p className="text-xs text-slate-500 mt-1">{categories.length} category option(s) available</p>
+                        {categories.map((category) => (
+                          <option key={category.id} value={String(category.id)}>
+                            {category.name}
+                          </option>
+                        ))}
+                      </select>
+                      {categories.length > 0 && (
+                        <p className="text-xs text-slate-500 mt-1">
+                          {categories.length} category option(s) available
+                        </p>
+                      )}
+                    </div>
+                    {categories.length === 0 && (
+                      <p className="notice-box notice-warning text-sm">
+                        Create at least one category before adding a service.
+                      </p>
+                    )}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                      <input
+                        className="input-field md:col-span-2"
+                        placeholder="Create new category (e.g., Hair, Facial, Spa)"
+                        value={newCategoryName}
+                        onChange={(e) => setNewCategoryName(e.target.value)}
+                      />
+                      <button
+                        type="button"
+                        className="btn-outline"
+                        onClick={createCategory}
+                      >
+                        Add Category
+                      </button>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        type="submit"
+                        className="btn-secondary"
+                        disabled={categories.length === 0}
+                      >
+                        {editingServiceId ? 'Update Service' : 'Add Service'}
+                      </button>
+                      {editingServiceId && (
+                        <button
+                          type="button"
+                          className="btn-outline"
+                          onClick={() => {
+                            setEditingServiceId(null);
+                            setServiceForm(emptyServiceForm);
+                          }}
+                        >
+                          Cancel Edit
+                        </button>
+                      )}
+                    </div>
+                  </form>
+
+                  <div className="space-y-3 max-h-80 overflow-auto pr-1">
+                    {services.map((service) => (
+                      <div
+                        key={service.id}
+                        className="card-base rounded-xl p-4"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <p className="text-slate-900 font-semibold">
+                              {service.name}
+                            </p>
+                            <p className="text-slate-600 text-sm">
+                              {service.description ||
+                                'Description coming soon.'}
+                            </p>
+                            <p className="text-slate-500 text-sm mt-1">
+                              ${service.price} •{' '}
+                              {formatDurationLabel(service.duration)} • Category{' '}
+                              {categoryNameById[String(service.categoryId)] ||
+                                service.categoryId}
+                            </p>
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              type="button"
+                              className="btn-secondary"
+                              onClick={() => editService(service)}
+                            >
+                              Edit
+                            </button>
+                            <button
+                              type="button"
+                              className="btn-danger !px-3 !py-2"
+                              onClick={() => deleteService(service.id)}
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    {services.length === 0 && (
+                      <p className="text-slate-600">
+                        No services yet. Add your first service above.
+                      </p>
                     )}
                   </div>
-                  {categories.length === 0 && (
-                    <p className="notice-box notice-warning text-sm">
-                      Create at least one category before adding a service.
-                    </p>
-                  )}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                    <input
-                      className="input-field md:col-span-2"
-                      placeholder="Create new category (e.g., Hair, Facial, Spa)"
-                      value={newCategoryName}
-                      onChange={(e) => setNewCategoryName(e.target.value)}
-                    />
-                    <button type="button" className="btn-outline" onClick={createCategory}>Add Category</button>
-                  </div>
-                  <div className="flex gap-2">
-                    <button type="submit" className="btn-secondary" disabled={categories.length === 0}>{editingServiceId ? 'Update Service' : 'Add Service'}</button>
-                    {editingServiceId && <button type="button" className="btn-outline" onClick={() => { setEditingServiceId(null); setServiceForm(emptyServiceForm); }}>Cancel Edit</button>}
-                  </div>
-                </form>
+                </motion.div>
+              </div>
+            )}
 
-                <div className="space-y-3 max-h-80 overflow-auto pr-1">
-                  {services.map((service) => (
-                    <div key={service.id} className="card-base rounded-xl p-4">
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <p className="text-slate-900 font-semibold">{service.name}</p>
-                          <p className="text-slate-600 text-sm">{service.description || 'Description coming soon.'}</p>
-                          <p className="text-slate-500 text-sm mt-1">
-                            ${service.price} • {formatDurationLabel(service.duration)} • Category {categoryNameById[String(service.categoryId)] || service.categoryId}
-                          </p>
-                        </div>
-                        <div className="flex gap-2">
-                          <button type="button" className="btn-secondary" onClick={() => editService(service)}>Edit</button>
-                          <button type="button" className="btn-danger !px-3 !py-2" onClick={() => deleteService(service.id)}><Trash2 size={16} /></button>
+            {activeOwnerSection === 'bookings' && (
+              <div className="card-base rounded-2xl p-6">
+                <h2 className="text-2xl text-slate-900 font-semibold mb-4 flex items-center gap-2">
+                  <Calendar size={20} /> Booking Operations
+                </h2>
+                {bookings.length === 0 ? (
+                  <p className="text-slate-600">
+                    No bookings for this salon yet. New bookings will appear
+                    here.
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {bookings.map((booking) => (
+                      <div
+                        key={booking.id}
+                        className="card-base rounded-xl p-4"
+                      >
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                          <div>
+                            <p className="text-slate-900 font-semibold">
+                              Booking #{booking.id}
+                            </p>
+                            <p className="text-slate-600 text-sm">
+                              Customer #{booking.customerId} •{' '}
+                              {formatDateTime(booking.startTime)}
+                            </p>
+                            <p className="text-slate-500 text-sm">
+                              Amount: ${(booking.totalPrice || 0).toFixed(2)}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-sm">
+                              {booking.status}
+                            </span>
+                            {Number(booking.customerId) !== Number(user?.id) ? (
+                              <Link
+                                to={`/chat/${booking.customerId}`}
+                                className="btn-secondary"
+                              >
+                                Message Customer
+                              </Link>
+                            ) : (
+                              <span className="text-xs text-slate-500 px-2">
+                                Self booking
+                              </span>
+                            )}
+                            <button
+                              type="button"
+                              className="btn-secondary flex items-center gap-1"
+                              onClick={() =>
+                                updateBookingStatus(booking, 'CONFIRMED')
+                              }
+                            >
+                              <CheckCircle size={15} /> Confirm
+                            </button>
+                            <button
+                              type="button"
+                              className="btn-info !px-3 !py-2"
+                              onClick={() =>
+                                updateBookingStatus(booking, 'COMPLETED')
+                              }
+                            >
+                              Complete
+                            </button>
+                            <button
+                              type="button"
+                              className="btn-danger !px-3 !py-2"
+                              onClick={() =>
+                                updateBookingStatus(booking, 'CANCELLED')
+                              }
+                            >
+                              Cancel
+                            </button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                  {services.length === 0 && <p className="text-slate-600">No services yet. Add your first service above.</p>}
-                </div>
-              </motion.div>
-            </div>
-
-            <div className="card-base rounded-2xl p-6">
-              <h2 className="text-2xl text-slate-900 font-semibold mb-4 flex items-center gap-2"><Calendar size={20} /> Booking Operations</h2>
-              {bookings.length === 0 ? <p className="text-slate-600">No bookings for this salon yet. New bookings will appear here.</p> : (
-                <div className="space-y-3">
-                  {bookings.map((booking) => (
-                    <div key={booking.id} className="card-base rounded-xl p-4">
-                      <div className="flex flex-wrap items-center justify-between gap-3">
-                        <div>
-                          <p className="text-slate-900 font-semibold">Booking #{booking.id}</p>
-                          <p className="text-slate-600 text-sm">Customer #{booking.customerId} • {formatDateTime(booking.startTime)}</p>
-                          <p className="text-slate-500 text-sm">Amount: ${(booking.totalPrice || 0).toFixed(2)}</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-sm">{booking.status}</span>
-                          {Number(booking.customerId) !== Number(user?.id) ? (
-                            <Link to={`/chat/${booking.customerId}`} className="btn-secondary">
-                              Message Customer
-                            </Link>
-                          ) : (
-                            <span className="text-xs text-slate-500 px-2">Self booking</span>
-                          )}
-                          <button type="button" className="btn-secondary flex items-center gap-1" onClick={() => updateBookingStatus(booking, 'CONFIRMED')}><CheckCircle size={15} /> Confirm</button>
-                          <button type="button" className="btn-info !px-3 !py-2" onClick={() => updateBookingStatus(booking, 'COMPLETED')}>Complete</button>
-                          <button type="button" className="btn-danger !px-3 !py-2" onClick={() => updateBookingStatus(booking, 'CANCELLED')}>Cancel</button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </>
         )}
       </div>

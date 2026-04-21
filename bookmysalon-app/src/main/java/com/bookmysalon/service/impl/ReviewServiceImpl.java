@@ -89,8 +89,19 @@ public class ReviewServiceImpl implements ReviewService {
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new ReviewNotFoundException("Review not found with id: " + id));
 
-        if (reviewRequestDto.getText() != null) review.setText(reviewRequestDto.getText());
-        if (reviewRequestDto.getRating() != null) review.setRating(reviewRequestDto.getRating());
+        if (reviewRequestDto.getText() != null) {
+            String text = reviewRequestDto.getText().trim();
+            if (text.length() < 10) {
+                throw new IllegalArgumentException("Review text must be at least 10 characters long");
+            }
+            review.setText(text);
+        }
+        if (reviewRequestDto.getRating() != null) {
+            if (reviewRequestDto.getRating() < 1 || reviewRequestDto.getRating() > 5) {
+                throw new IllegalArgumentException("Rating must be between 1 and 5");
+            }
+            review.setRating(reviewRequestDto.getRating());
+        }
 
         Review updatedReview = reviewRepository.save(review);
         return mapToDto(updatedReview);

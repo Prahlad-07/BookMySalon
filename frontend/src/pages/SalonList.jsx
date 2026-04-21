@@ -10,6 +10,7 @@ import {
   Clock,
   Filter,
   LocateFixed,
+  Map as MapIcon,
   MapPin,
   RefreshCcw,
   Search,
@@ -73,6 +74,7 @@ export default function SalonList() {
   const [userLocation, setUserLocation] = useState(null);
   const [activeSalonId, setActiveSalonId] = useState(null);
   const [isLocating, setIsLocating] = useState(false);
+  const [showMap, setShowMap] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -86,9 +88,12 @@ export default function SalonList() {
     try {
       setLoading(true);
       setError('');
-      setInfo('Showing all available salons.');
+      setInfo('');
 
-      const [salonData, serviceData] = await Promise.all([api.get('/api/salons'), api.get('/api/service-offerings')]);
+      const [salonData, serviceData] = await Promise.all([
+        api.get('/api/salons'),
+        api.get('/api/service-offerings'),
+      ]);
       const normalizedSalons = Array.isArray(salonData) ? salonData : [];
       const normalizedServices = Array.isArray(serviceData) ? serviceData : [];
 
@@ -96,7 +101,9 @@ export default function SalonList() {
       setServiceCountBySalon(computeServiceCountBySalon(normalizedServices));
       setActiveSalonId(normalizedSalons[0]?.id || null);
     } catch (err) {
-      setError(err?.response?.data?.error || 'Unable to load salons right now.');
+      setError(
+        err?.response?.data?.error || 'Unable to load salons right now.'
+      );
     } finally {
       setLoading(false);
     }
@@ -137,7 +144,9 @@ export default function SalonList() {
       setActiveSalonId(normalizedSalons[0]?.id || null);
       setInfo(`Showing salons within ${radius} km from your live location.`);
     } catch (err) {
-      setError(err?.response?.data?.error || 'Unable to load nearby salons right now.');
+      setError(
+        err?.response?.data?.error || 'Unable to load nearby salons right now.'
+      );
     } finally {
       setLoading(false);
     }
@@ -176,12 +185,16 @@ export default function SalonList() {
     const base = salons.filter((salon) => {
       const salonName = String(salon.name || '').toLowerCase();
       const salonCity = String(salon.city || '').toLowerCase();
-      return salonName.includes(normalizedName) && salonCity.includes(normalizedCity);
+      return (
+        salonName.includes(normalizedName) && salonCity.includes(normalizedCity)
+      );
     });
 
     const sorted = [...base];
     if (sortBy === 'name') {
-      sorted.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+      sorted.sort((a, b) =>
+        String(a.name || '').localeCompare(String(b.name || ''))
+      );
     } else if (sortBy === 'distance') {
       sorted.sort((a, b) => {
         const left = toNumber(a.distanceKm);
@@ -197,31 +210,42 @@ export default function SalonList() {
   }, [deferredCityQuery, deferredNameQuery, salons, sortBy]);
 
   const cityOptions = useMemo(() => {
-    const options = Array.from(new Set(salons.map((salon) => String(salon.city || '').trim()).filter(Boolean)));
+    const options = Array.from(
+      new Set(
+        salons.map((salon) => String(salon.city || '').trim()).filter(Boolean)
+      )
+    );
     return options.sort((a, b) => a.localeCompare(b));
   }, [salons]);
-  const isFiltering = nameQuery !== deferredNameQuery || cityQuery !== deferredCityQuery;
+  const isFiltering =
+    nameQuery !== deferredNameQuery || cityQuery !== deferredCityQuery;
 
   return (
     <div className="page-shell">
       <div className="page-content page-stack">
         <div className="page-header">
           <div>
-            <h1 className="page-title">{isCustomerDashboard ? 'Customer Booking Hub' : 'Discover Salons Near You'}</h1>
+            <h1 className="page-title">
+              {isCustomerDashboard ? 'Book an Appointment' : 'Discover Salons'}
+            </h1>
             <p className="page-subtitle">
-              Compare top salons, evaluate services, and move from search to confirmed booking in one smooth flow.
+              Search by salon or city, then choose a service and appointment
+              time.
             </p>
           </div>
         </div>
 
         <div className="card-base rounded-2xl p-5 space-y-4">
           <div className="flex items-center gap-2 text-slate-700 font-semibold">
-            <Filter size={17} /> Smart Search and Filters
+            <Filter size={17} /> Search
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
             <div className="relative lg:col-span-4">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+              <Search
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                size={18}
+              />
               <input
                 className="input-field input-with-icon"
                 placeholder="Search by salon name"
@@ -231,7 +255,10 @@ export default function SalonList() {
             </div>
 
             <div className="relative lg:col-span-3">
-              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+              <MapPin
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                size={18}
+              />
               <input
                 list="city-options"
                 className="input-field input-with-icon"
@@ -252,13 +279,22 @@ export default function SalonList() {
               max="200"
               className="input-field lg:col-span-2"
               value={radiusKm}
-              onChange={(event) => setRadiusKm(Number(event.target.value || 10))}
+              onChange={(event) =>
+                setRadiusKm(Number(event.target.value || 10))
+              }
               placeholder="Radius (km)"
             />
 
             <div className="relative lg:col-span-3">
-              <SlidersHorizontal className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-              <select className="input-field input-with-icon" value={sortBy} onChange={(event) => setSortBy(event.target.value)}>
+              <SlidersHorizontal
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                size={16}
+              />
+              <select
+                className="input-field input-with-icon"
+                value={sortBy}
+                onChange={(event) => setSortBy(event.target.value)}
+              >
                 <option value="distance">Sort by distance</option>
                 <option value="name">Sort by name</option>
               </select>
@@ -293,26 +329,31 @@ export default function SalonList() {
             >
               <RefreshCcw size={16} /> Reset to All Salons
             </button>
+
+            <button
+              type="button"
+              onClick={() => setShowMap((previous) => !previous)}
+              className="btn-outline inline-flex items-center gap-2"
+            >
+              <MapIcon size={16} /> {showMap ? 'Hide Map' : 'Show Map'}
+            </button>
           </div>
         </div>
 
         {info && <div className="notice-box notice-info">{info}</div>}
         {error && <div className="notice-box notice-error">{error}</div>}
 
-        <div className="space-y-3">
-          <div className="flex items-center justify-between gap-3 flex-wrap">
-            <h2 className="text-2xl font-bold text-slate-900">Live Map View</h2>
-            <p className="text-sm text-slate-600">Tap any marker to preview details and open directions instantly.</p>
+        {showMap && (
+          <div className="space-y-3">
+            <NearbySalonsMap
+              accessToken={MAPBOX_ACCESS_TOKEN}
+              salons={filteredSalons}
+              userLocation={userLocation}
+              activeSalonId={activeSalonId}
+              onSalonSelect={(salon) => setActiveSalonId(Number(salon.id))}
+            />
           </div>
-
-          <NearbySalonsMap
-            accessToken={MAPBOX_ACCESS_TOKEN}
-            salons={filteredSalons}
-            userLocation={userLocation}
-            activeSalonId={activeSalonId}
-            onSalonSelect={(salon) => setActiveSalonId(Number(salon.id))}
-          />
-        </div>
+        )}
 
         {loading ? (
           <div className="py-20 flex items-center justify-center">
@@ -321,16 +362,27 @@ export default function SalonList() {
         ) : (
           <>
             <div className="flex items-center justify-between gap-2 flex-wrap">
-              <p className="text-slate-600 font-medium">{filteredSalons.length} salon option(s) available</p>
+              <p className="text-slate-600 font-medium">
+                {filteredSalons.length} salon option(s) available
+              </p>
               <div className="flex items-center gap-2">
-                {isFiltering && <span className="status-pill status-pending">Filtering...</span>}
-                {userLocation && <span className="status-pill status-success">Location enabled</span>}
+                {isFiltering && (
+                  <span className="status-pill status-pending">
+                    Filtering...
+                  </span>
+                )}
+                {userLocation && (
+                  <span className="status-pill status-success">
+                    Location enabled
+                  </span>
+                )}
               </div>
             </div>
 
             {filteredSalons.length === 0 ? (
               <div className="card-base rounded-2xl p-10 text-center text-slate-600">
-                No salons match your current filters. Try another city, name, or radius.
+                No salons match your current filters. Try another city, name, or
+                radius.
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -340,7 +392,9 @@ export default function SalonList() {
                     longitude: Number(salon.longitude),
                   });
                   const isActive = Number(salon.id) === Number(activeSalonId);
-                  const locationLabel = [salon.address, salon.city].filter(Boolean).join(', ');
+                  const locationLabel = [salon.address, salon.city]
+                    .filter(Boolean)
+                    .join(', ');
 
                   return (
                     <motion.div
@@ -350,9 +404,13 @@ export default function SalonList() {
                       className={`card-base rounded-2xl p-6 flex flex-col ${isActive ? 'ring-2 ring-blue-400' : ''}`}
                     >
                       <div className="flex items-start justify-between gap-3">
-                        <h3 className="text-2xl font-bold text-slate-900">{salon.name}</h3>
+                        <h3 className="text-2xl font-bold text-slate-900">
+                          {salon.name}
+                        </h3>
                         {toNumber(salon.distanceKm) != null && (
-                          <span className="status-pill status-success">{Number(salon.distanceKm).toFixed(2)} km</span>
+                          <span className="status-pill status-success">
+                            {Number(salon.distanceKm).toFixed(2)} km
+                          </span>
                         )}
                       </div>
 
@@ -362,11 +420,13 @@ export default function SalonList() {
                       </p>
 
                       <p className="text-slate-600 mt-2 flex items-center gap-2">
-                        <Clock size={16} /> {formatTimeRange(salon.openTime, salon.closeTime)}
+                        <Clock size={16} />{' '}
+                        {formatTimeRange(salon.openTime, salon.closeTime)}
                       </p>
 
                       <p className="text-sm text-slate-600 mt-2">
-                        Services available: {serviceCountBySalon[Number(salon.id)] || 0}
+                        Services available:{' '}
+                        {serviceCountBySalon[Number(salon.id)] || 0}
                       </p>
 
                       <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -388,7 +448,11 @@ export default function SalonList() {
                             Directions
                           </a>
                         ) : (
-                          <button type="button" className="btn-secondary w-full" disabled>
+                          <button
+                            type="button"
+                            className="btn-secondary w-full"
+                            disabled
+                          >
                             Directions Unavailable
                           </button>
                         )}

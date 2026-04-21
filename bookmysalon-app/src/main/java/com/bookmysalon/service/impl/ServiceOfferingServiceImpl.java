@@ -38,6 +38,9 @@ public class ServiceOfferingServiceImpl implements ServiceOfferingService {
         if (serviceOfferingDto.getDuration() == null || serviceOfferingDto.getDuration() <= 0) {
             throw new IllegalArgumentException("Duration must be greater than 0");
         }
+        if (serviceOfferingDto.getDuration() > 720) {
+            throw new IllegalArgumentException("Duration must be between 1 and 720 minutes");
+        }
         if (serviceOfferingDto.getSalonId() == null || serviceOfferingDto.getSalonId() <= 0) {
             throw new IllegalArgumentException("Salon ID is required and must be valid");
         }
@@ -47,7 +50,7 @@ public class ServiceOfferingServiceImpl implements ServiceOfferingService {
 
         ServiceOffering serviceOffering = new ServiceOffering();
         serviceOffering.setName(serviceOfferingDto.getName().trim());
-        serviceOffering.setDescription(serviceOfferingDto.getDescription());
+        serviceOffering.setDescription(normalizeDescription(serviceOfferingDto.getDescription()));
         serviceOffering.setPrice(serviceOfferingDto.getPrice());
         serviceOffering.setDuration(serviceOfferingDto.getDuration());
         serviceOffering.setSalonId(serviceOfferingDto.getSalonId());
@@ -90,11 +93,34 @@ public class ServiceOfferingServiceImpl implements ServiceOfferingService {
         ServiceOffering serviceOffering = serviceOfferingRepository.findById(id)
                 .orElseThrow(() -> new CategoryNotFoundException("Service offering not found with id: " + id));
 
-        if (serviceOfferingDto.getName() != null) serviceOffering.setName(serviceOfferingDto.getName());
-        if (serviceOfferingDto.getDescription() != null) serviceOffering.setDescription(serviceOfferingDto.getDescription());
-        if (serviceOfferingDto.getPrice() != null) serviceOffering.setPrice(serviceOfferingDto.getPrice());
-        if (serviceOfferingDto.getDuration() != null) serviceOffering.setDuration(serviceOfferingDto.getDuration());
-        if (serviceOfferingDto.getCategoryId() != null) serviceOffering.setCategoryId(serviceOfferingDto.getCategoryId());
+        if (serviceOfferingDto.getName() != null) {
+            String name = serviceOfferingDto.getName().trim();
+            if (name.isEmpty()) {
+                throw new IllegalArgumentException("Service name is required");
+            }
+            serviceOffering.setName(name);
+        }
+        if (serviceOfferingDto.getDescription() != null) {
+            serviceOffering.setDescription(normalizeDescription(serviceOfferingDto.getDescription()));
+        }
+        if (serviceOfferingDto.getPrice() != null) {
+            if (serviceOfferingDto.getPrice() <= 0) {
+                throw new IllegalArgumentException("Price must be greater than 0");
+            }
+            serviceOffering.setPrice(serviceOfferingDto.getPrice());
+        }
+        if (serviceOfferingDto.getDuration() != null) {
+            if (serviceOfferingDto.getDuration() <= 0 || serviceOfferingDto.getDuration() > 720) {
+                throw new IllegalArgumentException("Duration must be between 1 and 720 minutes");
+            }
+            serviceOffering.setDuration(serviceOfferingDto.getDuration());
+        }
+        if (serviceOfferingDto.getCategoryId() != null) {
+            if (serviceOfferingDto.getCategoryId() <= 0) {
+                throw new IllegalArgumentException("Category ID is required and must be valid");
+            }
+            serviceOffering.setCategoryId(serviceOfferingDto.getCategoryId());
+        }
 
         ServiceOffering updatedServiceOffering = serviceOfferingRepository.save(serviceOffering);
         return mapToDto(updatedServiceOffering);
@@ -118,5 +144,13 @@ public class ServiceOfferingServiceImpl implements ServiceOfferingService {
                 .salonId(serviceOffering.getSalonId())
                 .categoryId(serviceOffering.getCategoryId())
                 .build();
+    }
+
+    private String normalizeDescription(String description) {
+        String normalized = description == null ? "" : description.trim();
+        if (normalized.length() > 500) {
+            throw new IllegalArgumentException("Description must be 500 characters or less");
+        }
+        return normalized;
     }
 }

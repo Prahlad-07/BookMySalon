@@ -6,7 +6,16 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Bell, LogOut, Menu, MessageCircle, Moon, Sparkles, Sun, X } from 'lucide-react';
+import {
+  Bell,
+  LogOut,
+  Menu,
+  MessageCircle,
+  Moon,
+  Sparkles,
+  Sun,
+  X,
+} from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
@@ -14,11 +23,7 @@ import brandLogo from '../assets/brand-logo.png';
 
 const getRoleLinks = (role) => {
   if (role === 'SALON_OWNER') {
-    return [
-      { to: '/salon/dashboard', label: 'Owner Console' },
-      { to: '/salons', label: 'Find Salons' },
-      { to: '/bookings', label: 'My Bookings' },
-    ];
+    return [{ to: '/salon/dashboard', label: 'Owner Console' }];
   }
 
   if (role === 'ADMIN') {
@@ -46,7 +51,8 @@ const mobileLinkClass = ({ isActive }) =>
       : 'text-slate-700 hover:text-primary-700 hover:bg-slate-100/70 border border-transparent'
   }`;
 
-const normalizeNotificationType = (type) => String(type || 'NOTIFICATION').replaceAll('_', ' ');
+const normalizeNotificationType = (type) =>
+  String(type || 'NOTIFICATION').replaceAll('_', ' ');
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -141,14 +147,28 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav className={`sticky top-0 z-50 nav-surface ${isScrolled ? 'nav-surface-scrolled' : ''}`}>
+    <nav
+      className={`sticky top-0 z-50 nav-surface ${isScrolled ? 'nav-surface-scrolled' : ''}`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="h-[4.6rem] flex items-center justify-between gap-3">
-          <Link to="/" className="flex items-center gap-3 min-w-0" aria-label="BookMySalon home">
-            <img src={brandLogo} alt="BookMySalon" className="brand-logo-main" />
+          <Link
+            to="/"
+            className="flex items-center gap-3 min-w-0"
+            aria-label="BookMySalon home"
+          >
+            <img
+              src={brandLogo}
+              alt="BookMySalon"
+              className="brand-logo-main"
+            />
             <span className="hidden sm:flex flex-col leading-tight">
-              <span className="text-[0.95rem] font-semibold text-slate-900">BookMySalon</span>
-              <span className="text-[0.68rem] uppercase tracking-[0.14em] text-slate-500">Smart booking platform</span>
+              <span className="text-[0.95rem] font-semibold text-slate-900">
+                BookMySalon
+              </span>
+              <span className="text-[0.68rem] uppercase tracking-[0.14em] text-slate-500">
+                Smart booking platform
+              </span>
             </span>
           </Link>
 
@@ -159,7 +179,11 @@ export default function Navbar() {
 
             {user &&
               roleLinks.map((item) => (
-                <NavLink key={item.to} to={item.to} className={desktopLinkClass}>
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className={desktopLinkClass}
+                >
                   {item.label}
                 </NavLink>
               ))}
@@ -219,7 +243,9 @@ export default function Navbar() {
                         </p>
                         <div className="space-y-1 max-h-80 overflow-auto pr-1">
                           {notifications.length === 0 && (
-                            <p className="px-2 py-4 text-sm text-slate-500">No alerts yet.</p>
+                            <p className="px-2 py-4 text-sm text-slate-500">
+                              No alerts yet.
+                            </p>
                           )}
 
                           {notifications.map((item) => {
@@ -238,13 +264,17 @@ export default function Navbar() {
                                   }
                                 }}
                                 className={`w-full text-left p-2.5 rounded-lg border transition ${
-                                  isRead ? 'surface-muted border-slate-200' : 'bg-primary-50 border-primary-200'
+                                  isRead
+                                    ? 'surface-muted border-slate-200'
+                                    : 'bg-primary-50 border-primary-200'
                                 }`}
                               >
                                 <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-700">
                                   {normalizeNotificationType(item.type)}
                                 </p>
-                                <p className="text-xs text-slate-600 mt-1 line-clamp-2">{item.description}</p>
+                                <p className="text-xs text-slate-600 mt-1 line-clamp-2">
+                                  {item.description}
+                                </p>
                               </button>
                             );
                           })}
@@ -316,32 +346,57 @@ export default function Navbar() {
               transition={{ duration: 0.2 }}
               className="lg:hidden py-3 border-t border-slate-200 space-y-1"
             >
-              <NavLink to="/" className={mobileLinkClass} onClick={() => setIsOpen(false)}>
+              <NavLink
+                to="/"
+                className={mobileLinkClass}
+                onClick={() => setIsOpen(false)}
+              >
                 Home
               </NavLink>
 
               {user &&
                 roleLinks.map((item) => (
-                  <NavLink key={item.to} to={item.to} className={mobileLinkClass} onClick={() => setIsOpen(false)}>
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    className={mobileLinkClass}
+                    onClick={() => setIsOpen(false)}
+                  >
                     {item.label}
                   </NavLink>
                 ))}
 
               {user ? (
                 <>
-                  <NavLink to="/chat" className={mobileLinkClass} onClick={() => setIsOpen(false)}>
+                  <NavLink
+                    to="/chat"
+                    className={mobileLinkClass}
+                    onClick={() => setIsOpen(false)}
+                  >
                     Chat
                   </NavLink>
-                  <NavLink to="/profile" className={mobileLinkClass} onClick={() => setIsOpen(false)}>
+                  <NavLink
+                    to="/profile"
+                    className={mobileLinkClass}
+                    onClick={() => setIsOpen(false)}
+                  >
                     Profile
                   </NavLink>
-                  <button type="button" onClick={handleLogout} className="btn-primary w-full mt-2">
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="btn-primary w-full mt-2"
+                  >
                     Logout
                   </button>
                 </>
               ) : (
                 <>
-                  <NavLink to="/login" className={mobileLinkClass} onClick={() => setIsOpen(false)}>
+                  <NavLink
+                    to="/login"
+                    className={mobileLinkClass}
+                    onClick={() => setIsOpen(false)}
+                  >
                     Sign In
                   </NavLink>
                   <NavLink

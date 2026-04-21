@@ -5,10 +5,21 @@
  */
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Calendar, CheckCircle2, Clock, MapPin, Star } from 'lucide-react';
+import {
+  ArrowLeft,
+  Calendar,
+  CheckCircle2,
+  Clock,
+  MapPin,
+  Star,
+} from 'lucide-react';
 import api from '../config/api';
 import { useAuth } from '../context/AuthContext';
-import { formatDurationLabel, formatTimeRange, toMinuteOfDay } from '../utils/time';
+import {
+  formatDurationLabel,
+  formatTimeRange,
+  toMinuteOfDay,
+} from '../utils/time';
 
 const toDateTimeInput = (date) => {
   const pad = (value) => String(value).padStart(2, '0');
@@ -23,7 +34,8 @@ const toBackendLocalDateTime = (date) => {
   )}:${pad(date.getSeconds())}`;
 };
 
-const buildEndTime = (startDate, totalMinutes) => new Date(startDate.getTime() + totalMinutes * 60 * 1000);
+const buildEndTime = (startDate, totalMinutes) =>
+  new Date(startDate.getTime() + totalMinutes * 60 * 1000);
 
 export default function SalonDetail() {
   const { salonId } = useParams();
@@ -35,7 +47,9 @@ export default function SalonDetail() {
   const [reviews, setReviews] = useState([]);
 
   const [selectedServiceIds, setSelectedServiceIds] = useState(new Set());
-  const [startTimeInput, setStartTimeInput] = useState(toDateTimeInput(new Date(Date.now() + 3600 * 1000)));
+  const [startTimeInput, setStartTimeInput] = useState(
+    toDateTimeInput(new Date(Date.now() + 3600 * 1000))
+  );
 
   const [bookingError, setBookingError] = useState('');
   const [bookingSuccess, setBookingSuccess] = useState('');
@@ -77,24 +91,39 @@ export default function SalonDetail() {
   );
 
   const totalPrice = useMemo(
-    () => selectedServices.reduce((sum, service) => sum + (service.price || 0), 0),
+    () =>
+      selectedServices.reduce((sum, service) => sum + (service.price || 0), 0),
     [selectedServices]
   );
 
   const totalMinutes = useMemo(
-    () => selectedServices.reduce((sum, service) => sum + (service.duration || 0), 0),
+    () =>
+      selectedServices.reduce(
+        (sum, service) => sum + (service.duration || 0),
+        0
+      ),
     [selectedServices]
   );
 
-  const effectiveDurationMinutes = selectedServices.length > 0 ? Math.max(totalMinutes, 30) : 0;
+  const effectiveDurationMinutes =
+    selectedServices.length > 0 ? Math.max(totalMinutes, 30) : 0;
 
   const averageRating = useMemo(() => {
     if (reviews.length === 0) return 0;
-    return reviews.reduce((sum, review) => sum + (review.rating || 0), 0) / reviews.length;
+    return (
+      reviews.reduce((sum, review) => sum + (review.rating || 0), 0) /
+      reviews.length
+    );
   }, [reviews]);
 
-  const salonLocationLabel = useMemo(() => [salon?.address, salon?.city].filter(Boolean).join(', '), [salon?.address, salon?.city]);
-  const salonHoursLabel = useMemo(() => formatTimeRange(salon?.openTime, salon?.closeTime), [salon?.openTime, salon?.closeTime]);
+  const salonLocationLabel = useMemo(
+    () => [salon?.address, salon?.city].filter(Boolean).join(', '),
+    [salon?.address, salon?.city]
+  );
+  const salonHoursLabel = useMemo(
+    () => formatTimeRange(salon?.openTime, salon?.closeTime),
+    [salon?.openTime, salon?.closeTime]
+  );
 
   const estimatedEndTimeLabel = useMemo(() => {
     if (selectedServices.length === 0) return 'Select services first';
@@ -147,10 +176,18 @@ export default function SalonDetail() {
     const openMinutes = toMinuteOfDay(salon?.openTime);
     const closeMinutes = toMinuteOfDay(salon?.closeTime);
 
-    if (openMinutes != null && closeMinutes != null && closeMinutes > openMinutes) {
-      const selectedStartMinutes = startDate.getHours() * 60 + startDate.getMinutes();
+    if (
+      openMinutes != null &&
+      closeMinutes != null &&
+      closeMinutes > openMinutes
+    ) {
+      const selectedStartMinutes =
+        startDate.getHours() * 60 + startDate.getMinutes();
       const selectedEndMinutes = endDate.getHours() * 60 + endDate.getMinutes();
-      if (selectedStartMinutes < openMinutes || selectedEndMinutes > closeMinutes) {
+      if (
+        selectedStartMinutes < openMinutes ||
+        selectedEndMinutes > closeMinutes
+      ) {
         setBookingError(`Please select a slot between ${salonHoursLabel}.`);
         return;
       }
@@ -168,13 +205,19 @@ export default function SalonDetail() {
         serviceOfferingIds: Array.from(selectedServiceIds),
       });
 
-      setBookingSuccess('Booking confirmed. Follow every update in My Bookings.');
+      setBookingSuccess(
+        'Booking confirmed. Follow every update in My Bookings.'
+      );
       setSelectedServiceIds(new Set());
       setStartTimeInput(toDateTimeInput(new Date(Date.now() + 3600 * 1000)));
     } catch (err) {
-      const errorMessage = err?.response?.data?.error || 'Booking could not be completed. Please try again.';
+      const errorMessage =
+        err?.response?.data?.error ||
+        'Booking could not be completed. Please try again.';
       if (String(errorMessage).toLowerCase().includes('another user')) {
-        setBookingError('Your session is out of sync. Please logout and login again, then retry booking.');
+        setBookingError(
+          'Your session is out of sync. Please logout and login again, then retry booking.'
+        );
       } else {
         setBookingError(errorMessage);
       }
@@ -247,9 +290,12 @@ export default function SalonDetail() {
         <div className="glass-effect rounded-3xl p-8">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <h1 className="text-4xl font-bold text-slate-900">{salon.name}</h1>
+              <h1 className="text-4xl font-bold text-slate-900">
+                {salon.name}
+              </h1>
               <p className="text-slate-600 mt-2 inline-flex items-center gap-2">
-                <MapPin size={16} /> {salonLocationLabel || 'Location details unavailable'}
+                <MapPin size={16} />{' '}
+                {salonLocationLabel || 'Location details unavailable'}
               </p>
               <p className="text-slate-600 mt-2 inline-flex items-center gap-2">
                 <Clock size={16} /> {salonHoursLabel}
@@ -258,8 +304,12 @@ export default function SalonDetail() {
 
             <div className="text-right">
               <p className="text-slate-500 text-sm">Average rating</p>
-              <p className="text-3xl font-bold text-slate-900">{averageRating.toFixed(1)}</p>
-              <p className="text-slate-500 text-sm">{reviews.length} review(s)</p>
+              <p className="text-3xl font-bold text-slate-900">
+                {averageRating.toFixed(1)}
+              </p>
+              <p className="text-slate-500 text-sm">
+                {reviews.length} review(s)
+              </p>
             </div>
           </div>
         </div>
@@ -267,10 +317,14 @@ export default function SalonDetail() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
             <div className="card-base rounded-2xl p-6">
-              <h2 className="text-2xl font-bold text-slate-900 mb-5">Choose Your Services</h2>
+              <h2 className="text-2xl font-bold text-slate-900 mb-5">
+                Services
+              </h2>
 
               {services.length === 0 ? (
-                <p className="text-slate-600">This salon has not added services yet.</p>
+                <p className="text-slate-600">
+                  This salon has not added services yet.
+                </p>
               ) : (
                 <div className="space-y-3">
                   {services.map((service) => {
@@ -293,14 +347,23 @@ export default function SalonDetail() {
                               className="mt-1"
                             />
                             <div>
-                              <p className="text-slate-900 font-semibold">{service.name}</p>
-                              <p className="text-slate-600 text-sm">{service.description || 'Details will be updated soon.'}</p>
+                              <p className="text-slate-900 font-semibold">
+                                {service.name}
+                              </p>
+                              <p className="text-slate-600 text-sm">
+                                {service.description ||
+                                  'Details will be updated soon.'}
+                              </p>
                             </div>
                           </div>
 
                           <div className="text-right text-slate-700">
-                            <p className="font-semibold">${(service.price || 0).toFixed(2)}</p>
-                            <p className="text-xs text-slate-500">{formatDurationLabel(service.duration)}</p>
+                            <p className="font-semibold">
+                              ${(service.price || 0).toFixed(2)}
+                            </p>
+                            <p className="text-xs text-slate-500">
+                              {formatDurationLabel(service.duration)}
+                            </p>
                           </div>
                         </div>
                       </label>
@@ -311,15 +374,23 @@ export default function SalonDetail() {
             </div>
 
             <div className="card-base rounded-2xl p-6">
-              <h2 className="text-2xl font-bold text-slate-900 mb-5">Customer Reviews and Ratings</h2>
+              <h2 className="text-2xl font-bold text-slate-900 mb-5">
+                Reviews
+              </h2>
 
               <div className="space-y-4">
-                {reviews.length === 0 && <p className="text-slate-600">No reviews yet. Be the first to share your experience.</p>}
+                {reviews.length === 0 && (
+                  <p className="text-slate-600">
+                    No reviews yet. Be the first to share your experience.
+                  </p>
+                )}
 
                 {reviews.map((review) => (
                   <div key={review.id} className="surface-muted rounded-xl p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <p className="text-slate-800 font-semibold">User #{review.userId}</p>
+                      <p className="text-slate-800 font-semibold">
+                        User #{review.userId}
+                      </p>
                       <div className="text-amber-500 inline-flex items-center gap-1">
                         <Star size={16} fill="currentColor" /> {review.rating}
                       </div>
@@ -330,8 +401,13 @@ export default function SalonDetail() {
               </div>
 
               {user?.role === 'CUSTOMER' && (
-                <form onSubmit={submitReview} className="mt-6 space-y-3 border-t border-slate-200 pt-5">
-                  <h3 className="text-slate-900 font-semibold">Write a review</h3>
+                <form
+                  onSubmit={submitReview}
+                  className="mt-6 space-y-3 border-t border-slate-200 pt-5"
+                >
+                  <h3 className="text-slate-900 font-semibold">
+                    Write a review
+                  </h3>
 
                   <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                     <select
@@ -365,10 +441,18 @@ export default function SalonDetail() {
                     />
                   </div>
 
-                  {reviewError && <p className="text-red-700 text-sm">{reviewError}</p>}
-                  {reviewSuccess && <p className="text-emerald-700 text-sm">{reviewSuccess}</p>}
+                  {reviewError && (
+                    <p className="text-red-700 text-sm">{reviewError}</p>
+                  )}
+                  {reviewSuccess && (
+                    <p className="text-emerald-700 text-sm">{reviewSuccess}</p>
+                  )}
 
-                  <button type="submit" disabled={isSubmittingReview} className="btn-secondary">
+                  <button
+                    type="submit"
+                    disabled={isSubmittingReview}
+                    className="btn-secondary"
+                  >
                     {isSubmittingReview ? 'Submitting...' : 'Submit Review'}
                   </button>
                 </form>
@@ -379,14 +463,12 @@ export default function SalonDetail() {
           <div>
             <div className="card-base rounded-2xl p-6 sticky top-24">
               <h2 className="text-2xl font-bold text-slate-900 inline-flex items-center gap-2 mb-5">
-                <Calendar size={20} /> Book Appointment
+                <Calendar size={20} /> Appointment
               </h2>
 
-              <div className="notice-box notice-info mb-4 text-sm">
-                1. Pick services. 2. Choose a time within salon hours. 3. Confirm and track in My Bookings.
-              </div>
-
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Start date and time</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Start date and time
+              </label>
               <input
                 type="datetime-local"
                 value={startTimeInput}
@@ -394,23 +476,42 @@ export default function SalonDetail() {
                 min={toDateTimeInput(new Date(Date.now() + 15 * 60 * 1000))}
                 className="input-field mb-2"
               />
-              <p className="text-xs text-slate-500 mb-5">Operating hours: {salonHoursLabel}</p>
+              <p className="text-xs text-slate-500 mb-5">
+                Operating hours: {salonHoursLabel}
+              </p>
 
               <div className="surface-muted rounded-xl p-4 mb-5">
-                <p className="text-slate-700 text-sm">Selected services: {selectedServices.length}</p>
-                <p className="text-slate-700 text-sm mt-1">Estimated duration: {formatDurationLabel(effectiveDurationMinutes)}</p>
-                <p className="text-slate-700 text-sm mt-1">Estimated end: {estimatedEndTimeLabel}</p>
-                <p className="text-slate-900 text-2xl font-bold mt-2">${totalPrice.toFixed(2)}</p>
+                <p className="text-slate-700 text-sm">
+                  Selected services: {selectedServices.length}
+                </p>
+                <p className="text-slate-700 text-sm mt-1">
+                  Estimated duration:{' '}
+                  {formatDurationLabel(effectiveDurationMinutes)}
+                </p>
+                <p className="text-slate-700 text-sm mt-1">
+                  Estimated end: {estimatedEndTimeLabel}
+                </p>
+                <p className="text-slate-900 text-2xl font-bold mt-2">
+                  ${totalPrice.toFixed(2)}
+                </p>
               </div>
 
-              {bookingError && <div className="notice-box notice-error mb-3">{bookingError}</div>}
+              {bookingError && (
+                <div className="notice-box notice-error mb-3">
+                  {bookingError}
+                </div>
+              )}
               {bookingSuccess && (
                 <div className="notice-box notice-success mb-3">
                   <div className="inline-flex items-start gap-2">
                     <CheckCircle2 size={17} className="mt-0.5" />
                     <div>
                       <p>{bookingSuccess}</p>
-                      <button type="button" onClick={() => navigate('/bookings')} className="text-sm font-semibold underline mt-1">
+                      <button
+                        type="button"
+                        onClick={() => navigate('/bookings')}
+                        className="text-sm font-semibold underline mt-1"
+                      >
                         Open My Bookings
                       </button>
                     </div>

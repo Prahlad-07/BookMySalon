@@ -52,11 +52,17 @@ public class JwtService {
         List<String> roles = principal.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
+        String primaryRole = roles.stream()
+                .filter(role -> role != null && role.startsWith("ROLE_"))
+                .map(role -> role.substring("ROLE_".length()))
+                .findFirst()
+                .orElse("CUSTOMER");
 
         return buildToken(
                 Map.of(
                         "userId", principal.getId(),
                         "email", principal.getEmail(),
+                        "role", primaryRole,
                         "roles", roles
                 ),
                 principal,
