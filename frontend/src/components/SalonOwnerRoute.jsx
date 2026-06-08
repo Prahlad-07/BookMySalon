@@ -1,7 +1,6 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { canAccessSalonOwnerRoute, getDashboardPathByRole } from '../utils/roleRouting';
 
 export default function SalonOwnerRoute({ children }) {
   const { user, loading } = useAuth();
@@ -13,13 +12,9 @@ export default function SalonOwnerRoute({ children }) {
       </div>
     );
   }
-  
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
 
-  if (!canAccessSalonOwnerRoute(user.role)) {
-    return <Navigate to={getDashboardPathByRole(user.role)} replace />;
+  if (!user || user.role !== 'SALON_OWNER') {
+    return <Navigate to="/" replace />;
   }
 
   return children;

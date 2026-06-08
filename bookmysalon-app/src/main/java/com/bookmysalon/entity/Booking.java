@@ -14,14 +14,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
-@Table(
-        name = "bookings",
-        indexes = {
-                @Index(name = "idx_bookings_salon_start", columnList = "salon_id, start_time"),
-                @Index(name = "idx_bookings_customer_start", columnList = "customer_id, start_time"),
-                @Index(name = "idx_bookings_status", columnList = "status")
-        }
-)
+@Table(name = "bookings")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -30,15 +23,15 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "salon_id", nullable = false)
+    @Column(nullable = false)
     private Long salonId;
-    @Column(name = "customer_id", nullable = false)
+    @Column(nullable = false)
     private Long customerId;
 
-    @Column(name = "start_time", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime startTime;
 
-    @Column(name = "end_time", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime endTime;
 
     @ElementCollection
@@ -54,10 +47,14 @@ public class Booking {
     private Double totalPrice;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "salon_id", insertable = false, updatable = false)
+    @JoinColumn(name = "salonId", insertable = false, updatable = false)
     private Salon salon;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id", insertable = false, updatable = false)
+    @JoinColumn(name = "customerId", insertable = false, updatable = false)
     private User customer;
 }
+
+
+
+

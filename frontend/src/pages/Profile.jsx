@@ -1,117 +1,130 @@
 import React from 'react';
-import { Mail, Phone, ShieldCheck, User } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { User, Mail, Phone, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { getRoleLabel } from '../utils/roleRouting';
-
-const roleMeta = {
-  CUSTOMER: {
-    label: 'Customer',
-    statusClass: 'status-pill status-success',
-  },
-  SALON_OWNER: {
-    label: 'Salon Owner',
-    statusClass: 'status-pill status-pending',
-  },
-  ADMIN: {
-    label: 'Admin',
-    statusClass: 'status-pill status-danger',
-  },
-};
+import { useNavigate } from 'react-router-dom';
 
 export default function Profile() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-
-  if (!user) {
-    return (
-      <div className="page-shell flex items-center justify-center">
-        <div className="card-base rounded-2xl p-8 text-center page-content page-content--narrow">
-          <p className="text-slate-700">Sign in to view your profile details.</p>
-        </div>
-      </div>
-    );
-  }
-
-  const normalizedRole = getRoleLabel(user.role);
-  const roleInfo = roleMeta[normalizedRole] || roleMeta.CUSTOMER;
 
   const handleLogout = () => {
     logout();
     navigate('/');
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+  };
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-secondary-600">Please login to view your profile</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="page-shell">
-      <div className="page-content page-content--medium page-stack">
-        <div className="page-header">
-          <div>
-            <h1 className="page-title">My Profile</h1>
-            <p className="page-subtitle">Your account identity, contact details, and access permissions.</p>
-          </div>
-        </div>
+    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-2xl mx-auto">
+        {/* Header */}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="mb-12"
+        >
+          <h1 className="text-4xl font-bold text-secondary-900 mb-4">
+            My <span className="gradient-text">Profile</span>
+          </h1>
+        </motion.div>
 
-        <div className="card-base rounded-3xl p-8 space-y-7">
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            <div className="inline-flex items-center gap-3">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-500 to-secondary-500 text-white flex items-center justify-center shadow-lg">
-                <User size={28} />
+        {/* Profile Card */}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="bg-white rounded-2xl shadow-lg p-8"
+        >
+          {/* Avatar */}
+          <div className="flex justify-center mb-8">
+            <div className="w-24 h-24 bg-gradient-to-r from-primary-600 to-pink-600 rounded-full flex items-center justify-center">
+              <span className="text-5xl">👤</span>
+            </div>
+          </div>
+
+          {/* Profile Info */}
+          <div className="space-y-6">
+            {/* Name */}
+            <div>
+              <label className="block text-sm font-medium text-secondary-700 mb-2">
+                Full Name
+              </label>
+              <div className="flex items-center gap-3 p-4 bg-secondary-50 rounded-lg">
+                <User className="text-secondary-400" size={20} />
+                <p className="text-lg text-secondary-900">
+                  {user.firstName} {user.lastName}
+                </p>
               </div>
-              <div>
-                <p className="text-lg font-semibold text-slate-900">{user.firstName || user.name || 'BookMySalon Member'}</p>
-                <p className="text-sm text-slate-600">{user.email || 'Email not available'}</p>
+            </div>
+
+            {/* Email */}
+            <div>
+              <label className="block text-sm font-medium text-secondary-700 mb-2">
+                Email Address
+              </label>
+              <div className="flex items-center gap-3 p-4 bg-secondary-50 rounded-lg">
+                <Mail className="text-secondary-400" size={20} />
+                <p className="text-lg text-secondary-900">{user.email}</p>
               </div>
             </div>
-            <span className={roleInfo.statusClass}>{roleInfo.label}</span>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="surface-muted rounded-xl p-4">
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Full Name</p>
-              <p className="mt-2 font-semibold text-slate-900 flex items-center gap-2">
-                <User size={16} className="text-slate-500" />
-                {user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Not provided'}
-              </p>
+            {/* Phone */}
+            <div>
+              <label className="block text-sm font-medium text-secondary-700 mb-2">
+                Phone Number
+              </label>
+              <div className="flex items-center gap-3 p-4 bg-secondary-50 rounded-lg">
+                <Phone className="text-secondary-400" size={20} />
+                <p className="text-lg text-secondary-900">{user.phone || 'Not provided'}</p>
+              </div>
             </div>
 
-            <div className="surface-muted rounded-xl p-4">
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Email</p>
-              <p className="mt-2 font-semibold text-slate-900 flex items-center gap-2 break-all">
-                <Mail size={16} className="text-slate-500" />
-                {user.email || 'Not provided'}
-              </p>
-            </div>
-
-            <div className="surface-muted rounded-xl p-4">
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Phone</p>
-              <p className="mt-2 font-semibold text-slate-900 flex items-center gap-2">
-                <Phone size={16} className="text-slate-500" />
-                {user.phone || 'Not provided'}
-              </p>
-            </div>
-
-            <div className="surface-muted rounded-xl p-4">
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Access Role</p>
-              <p className="mt-2 font-semibold text-slate-900 flex items-center gap-2">
-                <ShieldCheck size={16} className="text-slate-500" />
-                {roleInfo.label}
-              </p>
+            {/* Role */}
+            <div>
+              <label className="block text-sm font-medium text-secondary-700 mb-2">
+                Account Type
+              </label>
+              <div className="p-4 bg-primary-50 rounded-lg border border-primary-200">
+                <p className="text-lg font-semibold text-primary-700">
+                  {user.role === 'SALON_OWNER' ? '💼 Salon Owner' : '👤 Customer'}
+                </p>
+              </div>
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-3">
-            <button type="button" onClick={() => navigate('/')} className="btn-secondary">
-              Back to Home
-            </button>
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="btn-danger"
+          {/* Action Buttons */}
+          <div className="mt-12 space-y-3">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="btn-secondary w-full"
             >
+              Edit Profile
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleLogout}
+              className="btn-primary w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700"
+            >
+              <LogOut size={20} />
               Logout
-            </button>
+            </motion.button>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

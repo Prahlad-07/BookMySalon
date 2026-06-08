@@ -6,29 +6,18 @@
   <component name="ChangeListManager">
     <list default="true" id="e7f2f231-d1e0-492a-a8bc-b12374d2d4c7" name="Changes" comment="frontend-added">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/BookingController.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/BookingController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/CategoryController.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/CategoryController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/ReviewController.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/ReviewController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/SalonController.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/SalonController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/ServiceOfferingController.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/ServiceOfferingController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/response/CurrentUserResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/response/CurrentUserResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/exception/GlobalExceptionHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/security/JwtService.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/security/JwtService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/auth/AuthServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/auth/AuthServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/BookingServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/BookingServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/CategoryServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/CategoryServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/ReviewServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/ReviewServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/SalonServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/SalonServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/ServiceOfferingServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/ServiceOfferingServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/UserServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/test/java/com/bookmysalon/controller/SalonControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/test/java/com/bookmysalon/controller/SalonControllerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Navbar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Navbar.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/SalonDetail.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/SalonDetail.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/SalonList.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/SalonList.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/SalonOwnerDashboard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/SalonOwnerDashboard.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Signup.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Signup.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/utils/roleRouting.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/utils/roleRouting.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/analytics/AnalyticsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/analytics/AnalyticsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/entity/Booking.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/entity/Booking.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/.env.example" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/.env.example" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/CustomerRoute.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/CustomerRoute.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/SalonOwnerRoute.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/SalonOwnerRoute.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/index.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Home.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Home.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Profile.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Profile.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,6 +46,65 @@
     <commands />
     <urls />
   </component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.0559019523517206" />
+      <entry key="MS500" value="2.9194279154098544" />
+      <entry key="S2" value="6.726439750190244" />
+      <entry key="S5" value="11.582502854331263" />
+      <entry key="S10" value="15.210619006327466" />
+      <entry key="S30" value="19.828004478601876" />
+      <entry key="S60" value="24.494483613316376" />
+      <entry key="M2" value="34.68347314685418" />
+      <entry key="M5" value="61.88266732609344" />
+      <entry key="M10" value="86.03537399617265" />
+      <entry key="M15" value="98.06362446569936" />
+      <entry key="M30" value="113.08080755702423" />
+      <entry key="H1" value="121.98433168923553" />
+      <entry key="H2" value="126.84344066636507" />
+      <entry key="H4" value="129.38324364241868" />
+      <entry key="D1" value="131.55841595063012" />
+      <entry key="W1" value="131.93678138454356" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="1.1112931493654803E-247" />
+      <entry key="S2" value="1.8295479099262012E-62" />
+      <entry key="S5" value="2.2058813820874957E-25" />
+      <entry key="S10" value="6.242791287008395E-13" />
+      <entry key="S30" value="1.6286540011225834E-4" />
+      <entry key="S60" value="0.021837405835783894" />
+      <entry key="M2" value="0.2551710108741073" />
+      <entry key="M5" value="1.1186290430985175" />
+      <entry key="M10" value="1.8316839055232823" />
+      <entry key="M15" value="2.1590480171383755" />
+      <entry key="M30" value="2.5449888150418634" />
+      <entry key="H1" value="2.7631349219229615" />
+      <entry key="H2" value="2.8791301975269192" />
+      <entry key="H4" value="2.9389431650280295" />
+      <entry key="D1" value="2.9897363888858304" />
+      <entry key="W1" value="2.9985316132818123" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="0.26101238465901266" />
+      <entry key="MS500" value="2.628214077026483" />
+      <entry key="S2" value="6.635538039911572" />
+      <entry key="S5" value="11.540190978429534" />
+      <entry key="S10" value="15.1873998807404" />
+      <entry key="S30" value="19.819567023650617" />
+      <entry key="S60" value="24.511149346609596" />
+      <entry key="M2" value="34.93303571063175" />
+      <entry key="M5" value="62.99430286065699" />
+      <entry key="M10" value="87.86134515118243" />
+      <entry key="M15" value="100.21813261982861" />
+      <entry key="M30" value="115.62307360823075" />
+      <entry key="H1" value="124.74597202090379" />
+      <entry key="H2" value="129.72178738056675" />
+      <entry key="H4" value="132.32178563051178" />
+      <entry key="D1" value="134.54808413192077" />
+      <entry key="W1" value="134.93530322049313" />
+    </decayedShown>
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 0
 }</component>
@@ -79,7 +127,7 @@
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/prahladyadav/Desktop/BookMySalon/Architecture&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/prahlad_07/Desktop/BookMySalon&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -123,8 +171,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.31033.145" />
-        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.31033.145" />
+        <option value="bundled-jdk-30f59d01ecdd-37e91769500f-intellij.indexing.shared.core-IU-261.25134.95" />
+        <option value="bundled-js-predefined-d6986cc7102b-31caf2ab9e3c-JavaScript-IU-261.25134.95" />
       </set>
     </attachedChunks>
   </component>
@@ -190,6 +238,14 @@
       <workItem from="1776543037946" duration="13000" />
       <workItem from="1776550956118" duration="1325000" />
       <workItem from="1776767814850" duration="2483000" />
+      <workItem from="1776851977536" duration="8000" />
+      <workItem from="1779953011661" duration="1557000" />
+      <workItem from="1780483945550" duration="1884000" />
+      <workItem from="1780546821677" duration="2379000" />
+      <workItem from="1780591171650" duration="1974000" />
+      <workItem from="1780895444980" duration="602000" />
+      <workItem from="1780905372603" duration="1190000" />
+      <workItem from="1780907765850" duration="12000" />
     </task>
     <task id="LOCAL-00001" summary="frontend-added">
       <option name="closed" value="true" />

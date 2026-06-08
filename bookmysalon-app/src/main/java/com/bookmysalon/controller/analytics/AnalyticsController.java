@@ -20,7 +20,7 @@ public class AnalyticsController {
     public List<?> popularServices(@RequestParam(required = false) Long salonId, @RequestParam(defaultValue = "30") int days, @RequestParam(defaultValue = "10") int limit) {
         return analyticsService.getPopularServices(salonId, days, limit);
     }
-
+   
     @GetMapping("/revenue")
     public List<Map<String, Object>> revenue(@RequestParam String start, @RequestParam String end) {
         return analyticsService.getRevenuePerDay(start, end);
