@@ -13,7 +13,7 @@ It supports role-based authentication, salon discovery, booking management, revi
 
 ## Architecture Snapshot
 
-![System Diagram](Architecture/img.png)
+![System Diagram](https://github.com/Prahlad-07/BookMySalon/blob/main/diagram.png)
 
 ## Current Project Status
 
