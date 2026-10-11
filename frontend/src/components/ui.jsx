@@ -4,10 +4,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Star } from 'lucide-react';
+import { useT } from '../i18n';
 
 export function Wordmark({ to = '/', className = '' }) {
+  const t = useT();
   return (
-    <Link to={to} className={`group inline-flex items-center gap-2.5 ${className}`} aria-label="BookMySalon home">
+    <Link to={to} className={`group inline-flex items-center gap-2.5 ${className}`} aria-label={t('nav.home')}>
       <span
         aria-hidden="true"
         className="flex h-7 w-7 items-center justify-center rounded-[7px] bg-accent font-display text-[19px] italic leading-none text-accent-ink"
@@ -50,9 +52,13 @@ export function SectionTitle({ index, title, description, action }) {
 }
 
 export function Stars({ value = 0, size = 13, className = '' }) {
+  const t = useT();
   const rounded = Math.round(Number(value) || 0);
   return (
-    <span className={`inline-flex items-center gap-[2px] ${className}`} aria-label={`${Number(value || 0).toFixed(1)} out of 5`}>
+    <span
+      className={`inline-flex items-center gap-[2px] ${className}`}
+      aria-label={t('common.ratingOutOf5', { value: Number(value || 0).toFixed(1) })}
+    >
       {[1, 2, 3, 4, 5].map((i) => (
         <Star
           key={i}
@@ -94,19 +100,20 @@ export function Avatar({ name, size = 36, className = '' }) {
   );
 }
 
-const STATUS_STYLE = {
-  PENDING: { cls: 'tag-warning', label: 'Pending' },
-  CONFIRMED: { cls: 'tag-success', label: 'Confirmed' },
-  COMPLETED: { cls: 'tag-neutral', label: 'Completed' },
-  CANCELLED: { cls: 'tag-danger', label: 'Cancelled' },
+const STATUS_CLASS = {
+  PENDING: 'tag-warning',
+  CONFIRMED: 'tag-success',
+  COMPLETED: 'tag-neutral',
+  CANCELLED: 'tag-danger',
 };
 
 export function StatusTag({ status }) {
-  const style = STATUS_STYLE[String(status || '').toUpperCase()] || { cls: 'tag-neutral', label: status || 'Unknown' };
+  const t = useT();
+  const key = String(status || '').toUpperCase();
   return (
-    <span className={style.cls}>
+    <span className={STATUS_CLASS[key] || 'tag-neutral'}>
       <span className="dot" aria-hidden="true" />
-      {style.label}
+      {STATUS_CLASS[key] ? t(`status.${key}`) : status || t('status.UNKNOWN')}
     </span>
   );
 }
@@ -121,11 +128,12 @@ export function EmptyState({ title, description, action, className = '' }) {
   );
 }
 
-export function PageLoader({ label = 'Loading' }) {
+export function PageLoader({ label }) {
+  const t = useT();
   return (
     <div className="flex min-h-[50vh] items-center justify-center gap-3 text-sm text-ink-3" role="status">
       <span className="spinner" aria-hidden="true" />
-      {label}…
+      {label || t('common.loading')}…
     </div>
   );
 }
@@ -145,13 +153,14 @@ export function Field({ label, htmlFor, hint, error, children, className = '' })
 }
 
 export function Notice({ tone = 'info', children, onDismiss }) {
+  const t = useT();
   if (!children) return null;
   return (
     <div className={`notice-${tone}`} role={tone === 'error' ? 'alert' : 'status'}>
       <div className="flex-1">{children}</div>
       {onDismiss && (
         <button type="button" onClick={onDismiss} className="text-xs font-semibold opacity-70 hover:opacity-100">
-          Dismiss
+          {t('common.dismiss')}
         </button>
       )}
     </div>
@@ -168,10 +177,5 @@ export function Stat({ label, value, note, className = '' }) {
   );
 }
 
-export const money = (value) =>
-  `$${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-
-export const shortMoney = (value) => {
-  const n = Number(value || 0);
-  return Number.isInteger(n) ? `$${n}` : money(n);
-};
+// Formatting lives in i18n/format so prices follow the active language (₹, en-IN grouping).
+export { money, shortMoney } from '../i18n/format';

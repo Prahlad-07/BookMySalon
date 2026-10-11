@@ -12,12 +12,13 @@ import { getDashboardPathByRole } from '../utils/roleRouting';
 import AuthLayout from '../components/AuthLayout';
 import GoogleButton from '../components/GoogleButton';
 import { Field, Notice } from '../components/ui';
+import { useT } from '../i18n';
 
 const ENABLE_GOOGLE_OAUTH = import.meta.env.VITE_ENABLE_GOOGLE_OAUTH === 'true';
 
 const ROLES = [
-  { value: 'CUSTOMER', title: 'I’m booking appointments', body: 'Discover salons, book and manage visits.' },
-  { value: 'SALON_OWNER', title: 'I run a salon', body: 'Publish your menu and manage your calendar.' },
+  { value: 'CUSTOMER', title: 'signup.roleCustomer', body: 'signup.roleCustomerBody' },
+  { value: 'SALON_OWNER', title: 'signup.roleOwner', body: 'signup.roleOwnerBody' },
 ];
 
 const strengthOf = (password) => {
@@ -29,11 +30,12 @@ const strengthOf = (password) => {
   if (/[^A-Za-z0-9]/.test(password)) score += 1;
   return Math.min(score, 4);
 };
-const STRENGTH_LABEL = ['Too short', 'Weak', 'Fair', 'Good', 'Strong'];
+const STRENGTH_LABEL = ['signup.strength0', 'signup.strength1', 'signup.strength2', 'signup.strength3', 'signup.strength4'];
 
 export default function Signup() {
   const navigate = useNavigate();
   const { signup, error: authError, user, loading, clearError } = useAuth();
+  const t = useT();
 
   const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '', role: 'CUSTOMER' });
   const [showPassword, setShowPassword] = useState(false);
@@ -53,10 +55,10 @@ export default function Signup() {
   const strength = useMemo(() => strengthOf(form.password), [form.password]);
 
   const fieldErrors = {
-    name: !form.name.trim() ? 'Tell us your name.' : '',
-    email: !/^\S+@\S+\.\S+$/.test(form.email.trim()) ? 'Enter a valid email address.' : '',
-    password: form.password.length < 8 ? 'Use at least 8 characters.' : '',
-    confirmPassword: form.confirmPassword !== form.password ? 'Passwords don’t match.' : '',
+    name: !form.name.trim() ? t('signup.err.name') : '',
+    email: !/^\S+@\S+\.\S+$/.test(form.email.trim()) ? t('signup.err.email') : '',
+    password: form.password.length < 8 ? t('auth.err.min8') : '',
+    confirmPassword: form.confirmPassword !== form.password ? t('auth.err.mismatch') : '',
   };
   const hasErrors = Object.values(fieldErrors).some(Boolean);
 
@@ -79,10 +81,9 @@ export default function Signup() {
     if (!result?.ok) {
       if (result?.code === 'EMAIL_EXISTS') {
         const email = encodeURIComponent(form.email.trim().toLowerCase());
-        const message = encodeURIComponent('You already have an account with that email. Sign in instead.');
-        navigate(`/login?email=${email}&error=${message}`);
+        navigate(`/login?email=${email}&notice=exists`);
       } else {
-        setLocalError(result?.error || 'We couldn’t create your account. Please try again.');
+        setLocalError(result?.error || t('auth.err.signup'));
       }
       return;
     }
@@ -93,14 +94,14 @@ export default function Signup() {
 
   return (
     <AuthLayout
-      eyebrow="Create your account"
-      title="Join BookMySalon"
-      description="One account for booking appointments or running your salon. It takes under a minute."
+      eyebrow={t('signup.eyebrow')}
+      title={t('signup.title')}
+      description={t('signup.description')}
       footer={
         <>
-          Already have an account?{' '}
+          {t('signup.haveAccount')}{' '}
           <Link to="/login" className="link">
-            Sign in
+            {t('nav.signIn')}
           </Link>
         </>
       }
@@ -113,7 +114,7 @@ export default function Signup() {
 
       <form onSubmit={submit} className="space-y-5" noValidate>
         <fieldset>
-          <legend className="label">How will you use BookMySalon?</legend>
+          <legend className="label">{t('signup.roleQuestion')}</legend>
           <div className="grid gap-2 sm:grid-cols-2">
             {ROLES.map((role) => {
               const active = form.role === role.value;
@@ -132,15 +133,15 @@ export default function Signup() {
                     onChange={update('role')}
                     className="sr-only"
                   />
-                  <span className="block text-sm font-semibold text-ink">{role.title}</span>
-                  <span className="mt-0.5 block text-[12.5px] leading-snug text-ink-3">{role.body}</span>
+                  <span className="block text-sm font-semibold text-ink">{t(role.title)}</span>
+                  <span className="mt-0.5 block text-[12.5px] leading-snug text-ink-3">{t(role.body)}</span>
                 </label>
               );
             })}
           </div>
         </fieldset>
 
-        <Field label="Full name" htmlFor="su-name" error={errorFor('name')}>
+        <Field label={t('auth.fullName')} htmlFor="su-name" error={errorFor('name')}>
           <input
             id="su-name"
             className="field"
@@ -151,7 +152,7 @@ export default function Signup() {
           />
         </Field>
 
-        <Field label="Email" htmlFor="su-email" error={errorFor('email')}>
+        <Field label={t('auth.email')} htmlFor="su-email" error={errorFor('email')}>
           <input
             id="su-email"
             type="email"
@@ -165,7 +166,7 @@ export default function Signup() {
 
         <div>
           <label htmlFor="su-password" className="label">
-            Password
+            {t('auth.password')}
           </label>
           <div className="relative">
             <input
@@ -181,7 +182,7 @@ export default function Signup() {
               type="button"
               onClick={() => setShowPassword((v) => !v)}
               className="icon-btn absolute right-1 top-1/2 -translate-y-1/2"
-              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              aria-label={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}
             >
               {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
@@ -198,13 +199,13 @@ export default function Signup() {
                   />
                 ))}
               </div>
-              <span className="w-16 text-right text-[12px] text-ink-3">{STRENGTH_LABEL[strength]}</span>
+              <span className="min-w-[4rem] text-right text-[12px] text-ink-3">{t(STRENGTH_LABEL[strength])}</span>
             </div>
           )}
           {errorFor('password') && <p className="field-error">{errorFor('password')}</p>}
         </div>
 
-        <Field label="Confirm password" htmlFor="su-confirm" error={errorFor('confirmPassword')}>
+        <Field label={t('auth.confirmPassword')} htmlFor="su-confirm" error={errorFor('confirmPassword')}>
           <input
             id="su-confirm"
             type={showPassword ? 'text' : 'password'}
@@ -217,7 +218,7 @@ export default function Signup() {
         </Field>
 
         <button type="submit" className="btn-dark btn-lg w-full" disabled={submitting}>
-          {submitting ? 'Creating your account…' : 'Create account'}
+          {submitting ? t('signup.creating') : t('signup.submit')}
         </button>
       </form>
 
@@ -225,10 +226,10 @@ export default function Signup() {
         <>
           <div className="my-6 flex items-center gap-4 text-xs text-ink-3">
             <span className="h-px flex-1 bg-line" />
-            or
+            {t('common.or')}
             <span className="h-px flex-1 bg-line" />
           </div>
-          <GoogleButton href={GOOGLE_AUTH_URL} label="Sign up with Google" />
+          <GoogleButton href={GOOGLE_AUTH_URL} label={t('auth.googleSignup')} />
         </>
       )}
     </AuthLayout>

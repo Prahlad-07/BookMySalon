@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { buildDirectionsUrl, MAPBOX_STYLE_URL } from '../../config/mapbox';
 import { loadMapboxGl } from '../../utils/loadMapboxGl';
+import { useT } from '../../i18n';
 
 const SOURCE_ID = 'nearby-salons';
 const CLUSTER_LAYER_ID = 'nearby-salons-clusters';
@@ -45,7 +46,7 @@ const toFeatureCollection = (salons = []) => ({
     })),
 });
 
-const buildPopupHtml = (salon, userLocation) => {
+const buildPopupHtml = (salon, userLocation, t) => {
   const directionsUrl = buildDirectionsUrl(userLocation, {
     latitude: Number(salon.latitude),
     longitude: Number(salon.longitude),
@@ -76,13 +77,13 @@ const buildPopupHtml = (salon, userLocation) => {
           href="/salon/${encodeURIComponent(String(salon.id))}"
           style="background: rgb(var(--accent)); color: #fff; padding: 6px 10px; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: 700;"
         >
-          View Salon
+          ${escapeHtml(t('map.viewSalon'))}
         </a>
         ${
           directionsUrl
             ? `<a href="${escapeHtml(
                 directionsUrl
-              )}" target="_blank" rel="noopener noreferrer" style="background: rgb(var(--sunken)); color: rgb(var(--ink)); padding: 6px 10px; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: 700;">Directions</a>`
+              )}" target="_blank" rel="noopener noreferrer" style="background: rgb(var(--sunken)); color: rgb(var(--ink)); padding: 6px 10px; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: 700;">${escapeHtml(t('salon.directions'))}</a>`
             : ''
         }
       </div>
@@ -108,6 +109,9 @@ export default function NearbySalonsMap({
 
   const [mapError, setMapError] = useState('');
   const [isInitializing, setIsInitializing] = useState(true);
+  const t = useT();
+  const tRef = useRef(t);
+  tRef.current = t;
 
   salonsRef.current = Array.isArray(salons) ? salons : [];
 
@@ -260,7 +264,7 @@ export default function NearbySalonsMap({
 
             popupRef.current = new mapboxgl.Popup({ offset: 12 })
               .setLngLat([Number(salon.longitude), Number(salon.latitude)])
-              .setHTML(buildPopupHtml(salon, userLocation))
+              .setHTML(buildPopupHtml(salon, userLocation, tRef.current))
               .addTo(map);
           };
 
@@ -280,7 +284,7 @@ export default function NearbySalonsMap({
         });
 
         map.on('error', () => {
-          setMapError('Map failed to load completely. Please refresh this page.');
+          setMapError(tRef.current('map.failed'));
           setIsInitializing(false);
         });
 
@@ -288,7 +292,7 @@ export default function NearbySalonsMap({
         setMapError('');
       } catch (error) {
         if (!isCancelled) {
-          setMapError(error?.message || 'Unable to load Mapbox map');
+          setMapError(tRef.current('map.failed'));
           setIsInitializing(false);
         }
       }
@@ -416,7 +420,7 @@ export default function NearbySalonsMap({
 
       {isInitializing && (
         <div className="map-loading-overlay">
-          <div className="flex items-center gap-2 rounded-md border border-line bg-surface px-4 py-2.5 text-sm text-ink-2">Loading nearby map...</div>
+          <div className="flex items-center gap-2 rounded-md border border-line bg-surface px-4 py-2.5 text-sm text-ink-2">{t('map.loading')}…</div>
         </div>
       )}
 

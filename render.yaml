@@ -24,6 +24,10 @@ services:
         sync: false
       - key: APP_CORS_ALLOWED_ORIGIN_PATTERNS
         value: http://localhost:3000,http://localhost:5173,https://*.vercel.app
+      # Seeds customer/owner/admin.test@gmail.com (Test@12345) for one-click demo login.
+      # Set to "false" once real users are on this deployment.
+      - key: APP_DEMO_SEED_USERS
+        value: "true"
       - key: APP_RATE_LIMIT_ENABLED
         value: "true"
       - key: APP_OTP_DEV_MODE

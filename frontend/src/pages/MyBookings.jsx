@@ -11,6 +11,8 @@ import { useAuth } from '../context/AuthContext';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { EmptyState, Notice, PageHeader, PageLoader, StatusTag, money } from '../components/ui';
 import { formatDurationLabel } from '../utils/time';
+import { useT } from '../i18n';
+import { formatDate, formatTime, relativeDay } from '../i18n/format';
 
 const pad = (n) => String(n).padStart(2, '0');
 const toLocalInput = (value) => {
@@ -21,34 +23,23 @@ const toLocalInput = (value) => {
 const toBackend = (d) =>
   `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:00`;
 const extractError = (err, fallback) => err?.response?.data?.error || err?.response?.data?.message || fallback;
-const timeOf = (d) => d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
-
-function relativeDay(date) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const target = new Date(date);
-  target.setHours(0, 0, 0, 0);
-  const diff = Math.round((target - today) / 86400000);
-  if (diff === 0) return 'Today';
-  if (diff === 1) return 'Tomorrow';
-  if (diff > 1 && diff < 7) return `In ${diff} days`;
-  return null;
-}
+const timeOf = formatTime;
 
 function DateBlock({ date, muted }) {
   return (
     <div className={`flex w-[72px] shrink-0 self-start flex-col items-center rounded-md border py-3 ${muted ? 'border-line text-ink-3' : 'border-line-strong bg-surface'}`}>
       <span className="text-[10.5px] font-semibold uppercase tracking-label text-ink-3">
-        {date.toLocaleDateString(undefined, { month: 'short' })}
+        {formatDate(date, { month: 'short' })}
       </span>
       <span className={`num font-display text-[36px] leading-none ${muted ? '' : 'text-ink'}`}>{date.getDate()}</span>
-      <span className="mt-0.5 text-[11px] text-ink-3">{date.toLocaleDateString(undefined, { weekday: 'short' })}</span>
+      <span className="mt-0.5 text-[11px] text-ink-3">{formatDate(date, { weekday: 'short' })}</span>
     </div>
   );
 }
 
 export default function MyBookings() {
   const { user } = useAuth();
+  const t = useT();
   const [bookings, setBookings] = useState([]);
   const [payments, setPayments] = useState({});
   const [paymentsEnabled, setPaymentsEnabled] = useState(false);
@@ -69,10 +60,11 @@ export default function MyBookings() {
       const data = await api.get(`/api/bookings/user/${user.id}`);
       setBookings(Array.isArray(data) ? data : []);
     } catch (err) {
-      setError(extractError(err, 'We couldn’t load your appointments.'));
+      setError(extractError(err, t('bookings.err.load')));
     } finally {
       setLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
   useEffect(() => {
@@ -122,7 +114,7 @@ export default function MyBookings() {
   const saveReschedule = async (booking) => {
     const start = new Date(draft);
     if (Number.isNaN(start.getTime()) || start <= new Date()) {
-      setError('Choose a time in the future.');
+      setError(t('bookings.err.future'));
       return;
     }
     const duration = new Date(booking.endTime) - new Date(booking.startTime);
@@ -133,9 +125,9 @@ export default function MyBookings() {
       const updated = await api.put(`/api/bookings/${booking.id}`, { startTime: toBackend(start), endTime: toBackend(end) });
       setBookings((prev) => prev.map((b) => (b.id === booking.id ? { ...b, ...updated } : b)));
       setRescheduling(null);
-      setNotice('Your appointment was moved. The salon has the new time.');
+      setNotice(t('bookings.moved'));
     } catch (err) {
-      setError(extractError(err, 'That time isn’t available. Try another.'));
+      setError(err?.response?.status === 409 ? t('bookings.err.unavailable') : extractError(err, t('bookings.err.unavailable')));
     } finally {
       setBusyId(null);
     }
@@ -147,9 +139,9 @@ export default function MyBookings() {
       setBusyId(id);
       await api.delete(`/api/bookings/${id}`);
       setBookings((prev) => prev.map((b) => (b.id === id ? { ...b, status: 'CANCELLED' } : b)));
-      setNotice('Appointment cancelled. The salon has been notified.');
+      setNotice(t('bookings.cancelled'));
     } catch (err) {
-      setError(extractError(err, 'We couldn’t cancel that appointment.'));
+      setError(extractError(err, t('bookings.err.cancel')));
     } finally {
       setBusyId(null);
       setPendingCancel(null);
@@ -161,35 +153,35 @@ export default function MyBookings() {
       setBusyId(id);
       const link = await api.post(`/api/payments/checkout/${id}`);
       if (link?.paymentLink) window.location.assign(link.paymentLink);
-      else setError('Checkout couldn’t start. Please try again.');
+      else setError(t('bookings.err.checkout'));
     } catch (err) {
-      setError(extractError(err, 'Checkout couldn’t start. Please try again.'));
+      setError(extractError(err, t('bookings.err.checkout')));
     } finally {
       setBusyId(null);
     }
   };
 
-  if (loading) return <PageLoader label="Loading appointments" />;
+  if (loading) return <PageLoader label={t('bookings.loading')} />;
 
   const list = tab === 'upcoming' ? upcoming : past;
 
   return (
     <div className="page">
       <PageHeader
-        eyebrow="Appointments"
-        title="Your appointments"
-        description="Everything you’ve booked, in one place. Move or cancel a visit whenever plans change."
+        eyebrow={t('nav.appointments')}
+        title={t('bookings.title')}
+        description={t('bookings.description')}
         actions={
           <Link to="/salons" className="btn-primary">
-            Book a visit
+            {t('bookings.bookVisit')}
           </Link>
         }
       />
 
       <div className="tabs mt-8" role="tablist">
         {[
-          ['upcoming', 'Upcoming', upcoming.length],
-          ['past', 'Past & cancelled', past.length],
+          ['upcoming', t('bookings.tabUpcoming'), upcoming.length],
+          ['past', t('bookings.tabPast'), past.length],
         ].map(([key, label, count]) => (
           <button
             key={key}
@@ -212,16 +204,12 @@ export default function MyBookings() {
       {list.length === 0 ? (
         <EmptyState
           className="mt-8"
-          title={tab === 'upcoming' ? 'Nothing on the books.' : 'No past visits yet.'}
-          description={
-            tab === 'upcoming'
-              ? 'When you book a visit, it’ll show up here with everything you need for the day.'
-              : 'Completed and cancelled appointments will appear here.'
-          }
+          title={tab === 'upcoming' ? t('bookings.emptyUpcoming') : t('bookings.emptyPast')}
+          description={tab === 'upcoming' ? t('bookings.emptyUpcomingBody') : t('bookings.emptyPastBody')}
           action={
             tab === 'upcoming' && (
               <Link to="/salons" className="btn-dark">
-                Find a salon
+                {t('home.hero.find')}
               </Link>
             )
           }
@@ -248,16 +236,16 @@ export default function MyBookings() {
                         <div className="flex flex-wrap items-center gap-2">
                           {soon && <span className="tag-accent">{soon}</span>}
                           <StatusTag status={b.status} />
-                          {paid && <span className="tag-success">Paid</span>}
+                          {paid && <span className="tag-success">{t('bookings.paid')}</span>}
                         </div>
                         <Link
                           to={`/salon/${b.salonId}`}
                           className="mt-2 block text-[18px] font-semibold text-ink hover:underline hover:decoration-line-strong hover:underline-offset-4"
                         >
-                          {b.salonName || `Salon #${b.salonId}`}
+                          {b.salonName || t('bookings.salonFallback', { id: b.salonId })}
                         </Link>
                         <p className="mt-1 text-sm text-ink-2">
-                          {timeOf(start)} – {timeOf(end)} · {formatDurationLabel(minutes)}
+                          {timeOf(start)} – {timeOf(end)} · {formatDurationLabel(minutes, t)}
                           {b.salonCity ? ` · ${b.salonCity}` : ''}
                         </p>
                         {b.serviceNames?.length > 0 && (
@@ -272,7 +260,7 @@ export default function MyBookings() {
                         <>
                           {paymentsEnabled && !paid && (
                             <button type="button" className="btn-primary btn-sm" onClick={() => pay(b.id)} disabled={busy}>
-                              <CreditCard size={14} /> Pay {money(b.totalPrice)}
+                              <CreditCard size={14} /> {t('bookings.pay', { amount: money(b.totalPrice) })}
                             </button>
                           )}
                           <button
@@ -284,11 +272,11 @@ export default function MyBookings() {
                             }}
                             aria-expanded={rescheduling === b.id}
                           >
-                            Reschedule
+                            {t('bookings.reschedule')}
                           </button>
                           {b.salonOwnerId && Number(b.salonOwnerId) !== Number(user?.id) && (
                             <Link to={`/chat/${b.salonOwnerId}`} className="btn-ghost btn-sm">
-                              <MessageCircle size={14} /> Message salon
+                              <MessageCircle size={14} /> {t('bookings.messageSalon')}
                             </Link>
                           )}
                           <button
@@ -297,17 +285,17 @@ export default function MyBookings() {
                             onClick={() => setPendingCancel(b.id)}
                             disabled={busy}
                           >
-                            Cancel
+                            {t('common.cancel')}
                           </button>
                         </>
                       ) : (
                         <>
                           <Link to={`/salon/${b.salonId}`} className="btn-secondary btn-sm">
-                            Book again
+                            {t('bookings.bookAgain')}
                           </Link>
                           {b.status === 'COMPLETED' && (
                             <Link to={`/salon/${b.salonId}#reviews`} className="btn-ghost btn-sm">
-                              Leave a review
+                              {t('bookings.leaveReview')}
                             </Link>
                           )}
                         </>
@@ -317,7 +305,7 @@ export default function MyBookings() {
                     {rescheduling === b.id && (
                       <div className="mt-4 flex flex-col gap-3 rounded-md border border-line bg-surface p-4 sm:flex-row sm:items-end">
                         <label className="flex-1">
-                          <span className="label">New date and time</span>
+                          <span className="label">{t('bookings.newTime')}</span>
                           <input
                             type="datetime-local"
                             className="field"
@@ -328,10 +316,10 @@ export default function MyBookings() {
                         </label>
                         <div className="flex gap-2">
                           <button type="button" className="btn-dark" onClick={() => saveReschedule(b)} disabled={busy}>
-                            {busy ? 'Saving…' : 'Save new time'}
+                            {busy ? t('common.saving') : t('bookings.saveTime')}
                           </button>
                           <button type="button" className="btn-ghost" onClick={() => setRescheduling(null)}>
-                            Close
+                            {t('common.close')}
                           </button>
                         </div>
                       </div>
@@ -346,10 +334,10 @@ export default function MyBookings() {
 
       <ConfirmDialog
         open={pendingCancel != null}
-        title="Cancel this appointment?"
-        description="The salon will be notified and the slot released for someone else. This can’t be undone."
-        confirmLabel="Cancel appointment"
-        cancelLabel="Keep it"
+        title={t('bookings.cancelTitle')}
+        description={t('bookings.cancelBody')}
+        confirmLabel={t('bookings.cancelConfirm')}
+        cancelLabel={t('bookings.keep')}
         busy={busyId != null && busyId === pendingCancel}
         onConfirm={confirmCancel}
         onCancel={() => setPendingCancel(null)}

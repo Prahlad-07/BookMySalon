@@ -50,8 +50,10 @@ export default {
       amber: { 400: v('gold'), 500: v('gold'), 700: v('warning') },
     },
     fontFamily: {
-      sans: ['"Instrument Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-      display: ['"Instrument Serif"', 'ui-serif', 'Georgia', 'serif'],
+      // --script-* is set per language (Noto Devanagari, Tamil, …). Latin glyphs
+      // keep the brand faces; Indic glyphs fall through to the Noto family.
+      sans: ['"Instrument Sans"', 'var(--script-sans)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      display: ['"Instrument Serif"', 'var(--script-serif)', 'ui-serif', 'Georgia', 'serif'],
       mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
     },
     extend: {

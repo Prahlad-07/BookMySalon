@@ -1,3 +1,8 @@
+import en from '../i18n/locales/en';
+
+// Fallback translator so these helpers still work when called outside React.
+const enT = (key, vars = {}) => (en[key] || key).replace(/\{(\w+)\}/g, (m, k) => (vars[k] != null ? vars[k] : m));
+
 const pad2 = (value) => String(value).padStart(2, '0');
 
 const toFiniteNumber = (value) => {
@@ -76,25 +81,33 @@ export const formatTimeLabel = (value, fallback = '--:--') => {
 export const formatTimeRange = (openTime, closeTime) =>
   `${formatTimeLabel(openTime, '09:00')} - ${formatTimeLabel(closeTime, '18:00')}`;
 
-export const formatDurationLabel = (minutesValue) => {
+export const formatDurationLabel = (minutesValue, t = enT) => {
   const minutes = Number(minutesValue);
-  if (!Number.isFinite(minutes) || minutes <= 0) return '0 min';
-  if (minutes < 60) return `${Math.round(minutes)} min`;
+  if (!Number.isFinite(minutes) || minutes <= 0) return t('time.minutes', { n: 0 });
+  if (minutes < 60) return t('time.minutes', { n: Math.round(minutes) });
 
   const totalMinutes = Math.round(minutes);
   const hours = Math.floor(totalMinutes / 60);
   const remainingMinutes = totalMinutes % 60;
-  return remainingMinutes === 0 ? `${hours}h` : `${hours}h ${remainingMinutes}m`;
+  return remainingMinutes === 0
+    ? t('time.hours', { h: hours })
+    : t('time.hoursMinutes', { h: hours, m: remainingMinutes });
 };
 
 /** Live open/closed state for a salon's daily hours. */
-export const openState = (openTime, closeTime, now = new Date()) => {
+export const openState = (openTime, closeTime, now = new Date(), t = enT) => {
   const open = toMinuteOfDay(openTime);
   const close = toMinuteOfDay(closeTime);
   if (open == null || close == null) return null;
   const minute = now.getHours() * 60 + now.getMinutes();
   if (minute >= open && minute < close) {
-    return { open: true, label: `Open · closes ${formatTimeLabel(closeTime)}` };
+    return { open: true, label: t('time.openCloses', { time: formatTimeLabel(closeTime) }) };
   }
-  return { open: false, label: minute < open ? `Opens ${formatTimeLabel(openTime)}` : `Closed · opens ${formatTimeLabel(openTime)}` };
+  return {
+    open: false,
+    label:
+      minute < open
+        ? t('time.opensAt', { time: formatTimeLabel(openTime) })
+        : t('time.closedOpens', { time: formatTimeLabel(openTime) }),
+  };
 };

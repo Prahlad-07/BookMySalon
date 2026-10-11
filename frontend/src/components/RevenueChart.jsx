@@ -1,9 +1,11 @@
 import React, { useMemo, useState } from 'react';
 import { money } from './ui';
+import { useT } from '../i18n';
+import { compactMoney, formatDate } from '../i18n/format';
 
 const W = 640;
 const H = 220;
-const PAD = { top: 12, right: 8, bottom: 26, left: 48 };
+const PAD = { top: 12, right: 8, bottom: 26, left: 64 };
 
 const niceMax = (value) => {
   if (value <= 0) return 100;
@@ -15,6 +17,7 @@ const niceMax = (value) => {
 /** Dependency-free daily bar chart with gridlines, axis labels and a hover readout. */
 export default function RevenueChart({ trend }) {
   const [hover, setHover] = useState(null);
+  const tr = useT();
   const max = useMemo(() => niceMax(Math.max(0, ...trend.map((p) => p.revenue))), [trend]);
   const empty = trend.every((p) => !p.revenue && !p.bookings);
 
@@ -24,7 +27,7 @@ export default function RevenueChart({ trend }) {
   const barW = Math.max(2, band * 0.62);
   const ticks = [0, 0.25, 0.5, 0.75, 1].map((f) => f * max);
   const labelEvery = Math.ceil(trend.length / 6);
-  const fmtDay = (iso) => new Date(`${iso}T00:00:00`).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+  const fmtDay = (iso) => formatDate(`${iso}T00:00:00`, { day: 'numeric', month: 'short' });
 
   const active = hover != null ? trend[hover] : null;
 
@@ -34,22 +37,22 @@ export default function RevenueChart({ trend }) {
         {active ? (
           <span>
             <span className="font-medium text-ink">{fmtDay(active.date)}</span> · {money(active.revenue)} ·{' '}
-            {active.bookings} {active.bookings === 1 ? 'booking' : 'bookings'}
+            {tr('chart.bookings', { count: active.bookings })}
           </span>
         ) : empty ? (
-          <span className="text-ink-3">No bookings in this window yet.</span>
+          <span className="text-ink-3">{tr('chart.empty')}</span>
         ) : (
-          <span className="text-ink-3">Hover a day for details</span>
+          <span className="text-ink-3">{tr('chart.hover')}</span>
         )}
       </div>
-      <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full" role="img" aria-label="Daily booked value">
+      <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full" role="img" aria-label={tr('chart.label')}>
         {ticks.map((t) => {
           const y = PAD.top + innerH - (t / max) * innerH;
           return (
             <g key={t}>
               <line x1={PAD.left} x2={W - PAD.right} y1={y} y2={y} className="stroke-line" strokeDasharray={t === 0 ? '' : '2 4'} />
               <text x={PAD.left - 8} y={y + 4} textAnchor="end" className="fill-ink-3 text-[10px]" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                {t >= 1000 ? `$${(t / 1000).toFixed(t % 1000 ? 1 : 0)}k` : `$${Math.round(t)}`}
+                {compactMoney(t)}
               </text>
             </g>
           );

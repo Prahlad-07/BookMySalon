@@ -10,45 +10,32 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import api from '../config/api';
 import { Avatar, Wordmark } from './ui';
-
-const ROLE_LABEL = { CUSTOMER: 'Customer', SALON_OWNER: 'Salon owner', ADMIN: 'Administrator' };
+import LanguageSwitcher from './LanguageSwitcher';
+import { useT } from '../i18n';
+import { relativeTime } from '../i18n/format';
 
 const linksFor = (role) => {
   if (role === 'SALON_OWNER') {
     return [
-      { to: '/salon/dashboard', label: 'Workspace' },
-      { to: '/salons', label: 'Marketplace' },
-      { to: '/chat', label: 'Messages' },
+      { to: '/salon/dashboard', label: 'nav.workspace' },
+      { to: '/salons', label: 'nav.marketplace' },
+      { to: '/chat', label: 'nav.messages' },
     ];
   }
   if (role === 'ADMIN') {
     return [
-      { to: '/admin/dashboard', label: 'Overview' },
-      { to: '/salons', label: 'Salons' },
+      { to: '/admin/dashboard', label: 'nav.overview' },
+      { to: '/salons', label: 'nav.salons' },
     ];
   }
   return [
-    { to: '/salons', label: 'Discover' },
-    { to: '/bookings', label: 'Appointments' },
-    { to: '/chat', label: 'Messages' },
+    { to: '/salons', label: 'nav.discover' },
+    { to: '/bookings', label: 'nav.appointments' },
+    { to: '/chat', label: 'nav.messages' },
   ];
 };
 
-const relativeTime = (iso) => {
-  const t = new Date(iso).getTime();
-  if (Number.isNaN(t)) return '';
-  const diff = Math.round((Date.now() - t) / 60000);
-  if (diff < 1) return 'just now';
-  if (diff < 60) return `${diff}m ago`;
-  if (diff < 1440) return `${Math.round(diff / 60)}h ago`;
-  return `${Math.round(diff / 1440)}d ago`;
-};
-
-const NOTIFICATION_COPY = {
-  NEW_MESSAGE: 'New message',
-  BOOKING_CONFIRMATION: 'Booking confirmed',
-  BOOKING_CANCELLATION: 'Booking cancelled',
-};
+const NOTIFICATION_TYPES = ['NEW_MESSAGE', 'BOOKING_CONFIRMATION', 'BOOKING_CANCELLATION'];
 
 function useDismiss(ref, open, onClose) {
   useEffect(() => {
@@ -73,6 +60,7 @@ export default function Navbar() {
   const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const t = useT();
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const [bellOpen, setBellOpen] = useState(false);
@@ -152,10 +140,10 @@ export default function Navbar() {
         <div className="flex items-center gap-10">
           <Wordmark />
           {user && (
-            <nav aria-label="Primary" className="hidden items-center gap-7 md:flex">
+            <nav aria-label={t('nav.primary')} className="hidden items-center gap-7 md:flex">
               {links.map((item) => (
                 <NavLink key={item.to} to={item.to} className={linkClass}>
-                  {item.label}
+                  {t(item.label)}
                   {item.to === '/chat' && unreadMessages > 0 && (
                     <span className="num ml-1.5 inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-accent px-1 text-[10.5px] font-semibold text-accent-ink">
                       {unreadMessages > 9 ? '9+' : unreadMessages}
@@ -168,11 +156,12 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-1">
+          <LanguageSwitcher />
           <button
             type="button"
             className="icon-btn"
             onClick={toggleTheme}
-            aria-label={isDark ? 'Switch to light theme' : 'Switch to dark theme'}
+            aria-label={isDark ? t('nav.lightTheme') : t('nav.darkTheme')}
           >
             {isDark ? <Sun size={17} strokeWidth={1.75} /> : <Moon size={17} strokeWidth={1.75} />}
           </button>
@@ -188,7 +177,11 @@ export default function Navbar() {
                     setMenuOpen(false);
                     if (!bellOpen) load();
                   }}
-                  aria-label={`Notifications${unreadNotifications ? `, ${unreadNotifications} unread` : ''}`}
+                  aria-label={
+                    unreadNotifications
+                      ? `${t('nav.notifications')}, ${t('nav.unread', { count: unreadNotifications })}`
+                      : t('nav.notifications')
+                  }
                   aria-expanded={bellOpen}
                 >
                   <Bell size={17} strokeWidth={1.75} />
@@ -200,12 +193,14 @@ export default function Navbar() {
                 {bellOpen && (
                   <div className="animate-fade absolute right-0 top-11 w-[340px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-lg border border-line bg-surface shadow-pop">
                     <div className="flex items-center justify-between border-b border-line px-4 py-3">
-                      <p className="text-sm font-semibold">Notifications</p>
-                      {unreadNotifications > 0 && <span className="text-xs text-ink-3">{unreadNotifications} unread</span>}
+                      <p className="text-sm font-semibold">{t('nav.notifications')}</p>
+                      {unreadNotifications > 0 && (
+                        <span className="text-xs text-ink-3">{t('nav.unread', { count: unreadNotifications })}</span>
+                      )}
                     </div>
                     <div className="max-h-[360px] overflow-auto scrollbar-thin">
                       {notifications.length === 0 ? (
-                        <p className="px-4 py-10 text-center text-sm text-ink-3">You’re all caught up.</p>
+                        <p className="px-4 py-10 text-center text-sm text-ink-3">{t('nav.caughtUp')}</p>
                       ) : (
                         notifications.map((item) => (
                           <button
@@ -221,7 +216,7 @@ export default function Navbar() {
                             <span className="min-w-0 flex-1">
                               <span className="flex items-baseline justify-between gap-2">
                                 <span className="text-[13px] font-semibold text-ink">
-                                  {NOTIFICATION_COPY[item.type] || 'Update'}
+                                  {NOTIFICATION_TYPES.includes(item.type) ? t(`notify.${item.type}`) : t('notify.UPDATE')}
                                 </span>
                                 <span className="shrink-0 text-[11.5px] text-ink-3">{relativeTime(item.createdAt)}</span>
                               </span>
@@ -243,7 +238,7 @@ export default function Navbar() {
                     setMenuOpen((v) => !v);
                     setBellOpen(false);
                   }}
-                  aria-label="Account menu"
+                  aria-label={t('nav.accountMenu')}
                   aria-expanded={menuOpen}
                 >
                   <Avatar name={user.fullName || user.name || user.email} size={32} />
@@ -254,18 +249,18 @@ export default function Navbar() {
                     <div className="border-b border-line px-4 py-3.5">
                       <p className="truncate text-sm font-semibold">{user.fullName || user.name}</p>
                       <p className="truncate text-[13px] text-ink-3">{user.email}</p>
-                      <p className="eyebrow mt-2 !text-[10px]">{ROLE_LABEL[user.role] || 'Member'}</p>
+                      <p className="eyebrow mt-2 !text-[10px]">{t(`role.${user.role || 'MEMBER'}`)}</p>
                     </div>
                     <div className="p-1.5">
                       <Link to="/profile" className="flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-ink-2 hover:bg-sunken hover:text-ink">
-                        <UserRound size={16} strokeWidth={1.75} /> Account settings
+                        <UserRound size={16} strokeWidth={1.75} /> {t('nav.accountSettings')}
                       </Link>
                       <button
                         type="button"
                         onClick={handleLogout}
                         className="flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-ink-2 hover:bg-sunken hover:text-ink"
                       >
-                        <LogOut size={16} strokeWidth={1.75} /> Sign out
+                        <LogOut size={16} strokeWidth={1.75} /> {t('nav.signOut')}
                       </button>
                     </div>
                   </div>
@@ -276,7 +271,7 @@ export default function Navbar() {
                 type="button"
                 className="icon-btn ml-1 md:hidden"
                 onClick={() => setMobileOpen((v) => !v)}
-                aria-label="Open menu"
+                aria-label={mobileOpen ? t('nav.closeMenu') : t('nav.openMenu')}
                 aria-expanded={mobileOpen}
               >
                 {mobileOpen ? <X size={19} /> : <Menu size={19} />}
@@ -285,10 +280,10 @@ export default function Navbar() {
           ) : (
             <div className="ml-2 flex items-center gap-2">
               <Link to="/login" className="btn-ghost btn-sm hidden sm:inline-flex">
-                Sign in
+                {t('nav.signIn')}
               </Link>
               <Link to="/signup" className="btn-dark btn-sm">
-                Get started
+                {t('nav.getStarted')}
               </Link>
             </div>
           )}
@@ -296,7 +291,7 @@ export default function Navbar() {
       </div>
 
       {user && mobileOpen && (
-        <nav aria-label="Mobile" className="animate-fade border-t border-line bg-paper md:hidden">
+        <nav aria-label={t('nav.mobile')} className="animate-fade border-t border-line bg-paper md:hidden">
           <div className="shell flex flex-col py-2">
             {links.map((item) => (
               <NavLink
@@ -308,7 +303,7 @@ export default function Navbar() {
                   }`
                 }
               >
-                {item.label}
+                {t(item.label)}
                 {item.to === '/chat' && unreadMessages > 0 && <span className="tag-accent">{unreadMessages}</span>}
               </NavLink>
             ))}

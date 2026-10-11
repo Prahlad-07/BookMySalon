@@ -9,18 +9,20 @@ import React, { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import { X } from 'lucide-react';
+import { useT } from '../i18n';
 
 export default function ConfirmDialog({
   open,
   title,
   description,
-  confirmLabel = 'Confirm',
-  cancelLabel = 'Keep',
+  confirmLabel,
+  cancelLabel,
   tone = 'danger',
   busy = false,
   onConfirm,
   onCancel,
 }) {
+  const t = useT();
   const confirmRef = useRef(null);
   const previouslyFocused = useRef(null);
 
@@ -68,7 +70,7 @@ export default function ConfirmDialog({
           <h2 id="confirm-dialog-title" className="display text-[30px] leading-tight text-ink">
             {title}
           </h2>
-          <button type="button" className="icon-btn -mr-2 -mt-1" onClick={() => !busy && onCancel?.()} aria-label="Close dialog">
+          <button type="button" className="icon-btn -mr-2 -mt-1" onClick={() => !busy && onCancel?.()} aria-label={t('dialog.close')}>
             <X size={17} />
           </button>
         </div>
@@ -80,7 +82,7 @@ export default function ConfirmDialog({
 
         <div className="mt-7 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <button type="button" className="btn-secondary" onClick={() => !busy && onCancel?.()} disabled={busy}>
-            {cancelLabel}
+            {cancelLabel || t('dialog.keep')}
           </button>
           <button
             ref={confirmRef}
@@ -89,7 +91,7 @@ export default function ConfirmDialog({
             onClick={onConfirm}
             disabled={busy}
           >
-            {busy ? 'Working…' : confirmLabel}
+            {busy ? t('dialog.working') : confirmLabel || t('dialog.confirm')}
           </button>
         </div>
       </div>

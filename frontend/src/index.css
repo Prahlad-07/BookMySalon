@@ -9,6 +9,8 @@
    ------------------------------------------------------------------ */
 :root {
   color-scheme: light;
+  --script-sans: system-ui;
+  --script-serif: Georgia;
   --paper: 245 241 234;
   --surface: 251 249 245;
   --sunken: 238 233 224;
@@ -277,6 +279,24 @@
 @keyframes shimmer {
   100% { transform: translateX(100%); }
 }
+
+/* ------------------------------------------------------------------
+   Indic scripts — letter-spacing and all-caps are Latin conventions.
+   Tracking breaks conjuncts and matras; tight leading clips them.
+   ------------------------------------------------------------------ */
+html[data-script]:not([data-script='latn']) body { line-height: 1.7; }
+html[data-script]:not([data-script='latn']) :is(h1, h2, h3, h4) { letter-spacing: 0; }
+html[data-script]:not([data-script='latn']) .display {
+  letter-spacing: 0;
+  line-height: 1.3;
+}
+html[data-script]:not([data-script='latn']) :is(.eyebrow, .data-table th, .tag-neutral, .tag-accent, .tag-success, .tag-warning, .tag-danger) {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 12.5px;
+}
+html[data-script]:not([data-script='latn']) .field,
+html[data-script]:not([data-script='latn']) .btn { line-height: 1.4; }
 
 /* Mapbox popup on-brand */
 .mapboxgl-popup-content {

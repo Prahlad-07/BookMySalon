@@ -68,6 +68,13 @@ These folders are present but not active runtime services in the current repo st
 - Live topic messaging: `/topic/messages/{conversationId}`
 - User-specific notifications: `/user/queue/notifications`
 
+### Indian Languages & India Market
+- 10 languages: English, हिन्दी, বাংলা, मराठी, తెలుగు, தமிழ், ગુજરાતી, ಕನ್ನಡ, മലയാളം, ਪੰਜਾਬੀ.
+- Picked automatically from the browser, switchable from the navbar, footer, home page or Account settings; the choice is remembered.
+- Each script gets its own Noto Sans/Serif font, loaded only when that language is chosen; Indic text drops Latin-only letter-spacing and uppercase.
+- Prices in rupees with Indian grouping (₹1,25,000; ₹2.4L on charts); dates and times follow the chosen language. Stripe charges in INR by default (`STRIPE_CURRENCY`).
+- Strings live in `frontend/src/i18n/locales/*.js` (`en.js` is the source; missing keys fall back to English). Translations were drafted in-house — have a native speaker review before a wide launch.
+
 ## Tech Stack
 
 ### Backend

@@ -1,11 +1,13 @@
 import React from 'react';
 import authImage from '../assets/auth-chair.jpg';
+import { Rich, useT } from '../i18n';
 
 /**
  * Split-screen frame for every account screen: form on the left,
  * photography + one quiet line of brand copy on the right.
  */
 export default function AuthLayout({ eyebrow, title, description, children, footer, aside }) {
+  const t = useT();
   return (
     <div className="grid min-h-[calc(100vh-4rem)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
       <div className="flex flex-col px-5 py-12 sm:px-12 lg:px-16 xl:px-24">
@@ -24,15 +26,10 @@ export default function AuthLayout({ eyebrow, title, description, children, foot
         <div className="absolute inset-x-0 bottom-0 p-12 text-white xl:p-16">
           {aside || (
             <>
-              <p className="font-display text-[40px] leading-[1.05] xl:text-[48px]">
-                Fewer phone calls.
-                <br />
-                <span className="italic">More good appointments.</span>
+              <p className="display text-[40px] leading-[1.05] xl:text-[48px]">
+                <Rich text={t('authAside.title')} />
               </p>
-              <p className="mt-6 max-w-sm text-[15px] leading-relaxed text-white/75">
-                Book, reschedule and talk to your salon from one place — and keep every detail of your appointment
-                where you can find it.
-              </p>
+              <p className="mt-6 max-w-sm text-[15px] leading-relaxed text-white/75">{t('authAside.body')}</p>
             </>
           )}
         </div>

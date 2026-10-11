@@ -13,6 +13,8 @@ import ConfirmDialog from '../components/ConfirmDialog';
 import { useAuth } from '../context/AuthContext';
 import { EmptyState, Field, Notice, PageLoader, Stat, StatusTag, money } from '../components/ui';
 import { formatDurationLabel, toMinuteOfDay, toTimeInputValue } from '../utils/time';
+import { useT } from '../i18n';
+import { formatDate, formatNumber, formatTime, statMoney } from '../i18n/format';
 
 /* ------------------------------------------------------------------ helpers */
 
@@ -49,22 +51,24 @@ const normalizeSalon = (salon = {}) => ({
   closeTime: toTimeInputValue(salon.closeTime, '18:00'),
 });
 
-const friendlyError = (err, fallback) => {
-  const raw = String(err?.response?.data?.error || err?.message || fallback || 'Request failed');
+const friendlyError = (t, err, fallback) => {
+  if (err?.response?.status === 429) return t('common.rateLimited');
+  if (err && !err.response && err.request) return t('common.network');
+  const raw = String(err?.response?.data?.error || err?.message || fallback || t('common.error'));
   const n = raw.toLowerCase();
   const dup = /duplicate|already in use|unique|constraint/.test(n);
-  if (n.includes('already has a salon profile') || n.includes('owner_id')) return 'Your account already has a salon profile.';
-  if (dup && n.includes('phone')) return 'Another salon already uses that phone number.';
-  if (dup && n.includes('email')) return 'Another salon already uses that email address.';
+  if (n.includes('already has a salon profile') || n.includes('owner_id')) return t('owner.err.hasSalon');
+  if (dup && n.includes('phone')) return t('owner.err.dupPhone');
+  if (dup && n.includes('email')) return t('owner.err.dupEmail');
   return raw;
 };
 
-const detectLocation = () =>
+const detectLocation = (t) =>
   new Promise((resolve, reject) => {
-    if (!navigator.geolocation) return reject(new Error('Your browser doesn’t support location.'));
+    if (!navigator.geolocation) return reject(new Error(t('salons.err.noGeo')));
     navigator.geolocation.getCurrentPosition(
       (p) => resolve({ latitude: p.coords.latitude, longitude: p.coords.longitude }),
-      () => reject(new Error('Location access was denied.')),
+      () => reject(new Error(t('owner.err.geoDenied'))),
       { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
     );
     return undefined;
@@ -73,23 +77,23 @@ const detectLocation = () =>
 const when = (iso) => {
   const d = new Date(iso);
   return {
-    day: d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }),
-    time: d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }),
+    day: formatDate(d, { weekday: 'short', day: 'numeric', month: 'short' }),
+    time: formatTime(d),
   };
 };
 
-const greeting = () => {
+const greetingKey = () => {
   const h = new Date().getHours();
-  if (h < 12) return 'Good morning';
-  if (h < 17) return 'Good afternoon';
-  return 'Good evening';
+  if (h < 12) return 'owner.morning';
+  if (h < 17) return 'owner.afternoon';
+  return 'owner.evening';
 };
 
 const NAV = [
-  ['overview', 'Overview'],
-  ['bookings', 'Bookings'],
-  ['menu', 'Menu'],
-  ['profile', 'Salon profile'],
+  ['overview', 'nav.overview'],
+  ['bookings', 'admin.bookings'],
+  ['menu', 'salon.menu'],
+  ['profile', 'owner.salonProfile'],
 ];
 
 /* ------------------------------------------------------------- sub-views */
@@ -107,6 +111,7 @@ function Group({ label, hint, children }) {
 }
 
 function SalonForm({ value, onChange, onSubmit, submitLabel, busy, onUseLocation, locating, title, description }) {
+  const t = useT();
   const set = (key) => (e) => onChange({ ...value, [key]: e.target.value });
   const coordsReady = parseCoordinate(value.latitude) != null && parseCoordinate(value.longitude) != null;
 
@@ -119,11 +124,11 @@ function SalonForm({ value, onChange, onSubmit, submitLabel, busy, onUseLocation
         </div>
       )}
 
-      <Group label="Basics" hint="How clients will find and recognise you.">
-        <Field label="Salon name" htmlFor="sf-name">
+      <Group label={t('owner.form.basics')} hint={t('owner.form.basicsHint')}>
+        <Field label={t('owner.form.name')} htmlFor="sf-name">
           <input id="sf-name" className="field" value={value.name || ''} onChange={set('name')} required />
         </Field>
-        <Field label="Cover photo URL" htmlFor="sf-image" hint="A wide photo of your space works best.">
+        <Field label={t('owner.form.cover')} htmlFor="sf-image" hint={t('owner.form.coverHint')}>
           <input
             id="sf-image"
             className="field"
@@ -134,20 +139,29 @@ function SalonForm({ value, onChange, onSubmit, submitLabel, busy, onUseLocation
         </Field>
       </Group>
 
-      <Group label="Contact" hint="Shown on your public page.">
+      <Group label={t('footer.contact')} hint={t('owner.form.contactHint')}>
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Phone" htmlFor="sf-phone">
-            <input id="sf-phone" type="tel" className="field" value={value.phoneNumber || ''} onChange={set('phoneNumber')} required />
+          <Field label={t('profile.phone')} htmlFor="sf-phone">
+            <input
+              id="sf-phone"
+              type="tel"
+              inputMode="tel"
+              placeholder="+91 98765 43210"
+              className="field"
+              value={value.phoneNumber || ''}
+              onChange={set('phoneNumber')}
+              required
+            />
           </Field>
-          <Field label="Email" htmlFor="sf-email">
+          <Field label={t('auth.email')} htmlFor="sf-email">
             <input id="sf-email" type="email" className="field" value={value.email || ''} onChange={set('email')} required />
           </Field>
         </div>
       </Group>
 
-      <Group label="Hours" hint="Clients can only book within these hours.">
+      <Group label={t('salon.hours')} hint={t('owner.form.hoursHint')}>
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Opens" htmlFor="sf-open">
+          <Field label={t('owner.form.opens')} htmlFor="sf-open">
             <input
               id="sf-open"
               type="time"
@@ -157,7 +171,7 @@ function SalonForm({ value, onChange, onSubmit, submitLabel, busy, onUseLocation
               required
             />
           </Field>
-          <Field label="Closes" htmlFor="sf-close">
+          <Field label={t('owner.form.closes')} htmlFor="sf-close">
             <input
               id="sf-close"
               type="time"
@@ -170,12 +184,12 @@ function SalonForm({ value, onChange, onSubmit, submitLabel, busy, onUseLocation
         </div>
       </Group>
 
-      <Group label="Location" hint="Used for directions and ‘near me’ search.">
+      <Group label={t('owner.form.location')} hint={t('owner.form.locationHint')}>
         <div className="grid gap-4 sm:grid-cols-[1fr_200px]">
-          <Field label="Street address" htmlFor="sf-address">
+          <Field label={t('owner.form.street')} htmlFor="sf-address">
             <input id="sf-address" className="field" value={value.address || ''} onChange={set('address')} />
           </Field>
-          <Field label="City" htmlFor="sf-city">
+          <Field label={t('salons.city')} htmlFor="sf-city">
             <input id="sf-city" className="field" value={value.city || ''} onChange={set('city')} required />
           </Field>
         </div>
@@ -189,22 +203,22 @@ function SalonForm({ value, onChange, onSubmit, submitLabel, busy, onUseLocation
           />
         )}
         <div className="grid gap-4 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
-          <Field label="Latitude" htmlFor="sf-lat">
+          <Field label={t('owner.form.lat')} htmlFor="sf-lat">
             <input id="sf-lat" type="number" step="any" className="field" value={value.latitude ?? ''} onChange={set('latitude')} />
           </Field>
-          <Field label="Longitude" htmlFor="sf-lng">
+          <Field label={t('owner.form.lng')} htmlFor="sf-lng">
             <input id="sf-lng" type="number" step="any" className="field" value={value.longitude ?? ''} onChange={set('longitude')} />
           </Field>
           <button type="button" className="btn-secondary" onClick={onUseLocation} disabled={locating}>
-            <LocateFixed size={15} /> {locating ? 'Locating…' : 'Use my location'}
+            <LocateFixed size={15} /> {locating ? t('salons.locating') : t('owner.form.useLocation')}
           </button>
         </div>
-        {!coordsReady && <p className="text-[13px] text-warning">Set a location to appear in nearby searches.</p>}
+        {!coordsReady && <p className="text-[13px] text-warning">{t('owner.form.needLocation')}</p>}
       </Group>
 
       <div className="flex justify-end border-t border-line pt-6">
         <button type="submit" className="btn-dark btn-lg" disabled={busy || !coordsReady}>
-          {busy ? 'Saving…' : submitLabel}
+          {busy ? t('common.saving') : submitLabel}
         </button>
       </div>
     </form>
@@ -212,35 +226,36 @@ function SalonForm({ value, onChange, onSubmit, submitLabel, busy, onUseLocation
 }
 
 function BookingActions({ booking, onStatus, onCancel, userId, compact }) {
+  const t = useT();
   const sm = compact ? 'btn-sm' : '';
   return (
     <div className="flex flex-wrap items-center justify-end gap-2">
       {booking.status === 'PENDING' && (
         <>
           <button type="button" className={`btn-dark ${sm}`} onClick={() => onStatus(booking, 'CONFIRMED')}>
-            Accept
+            {t('owner.accept')}
           </button>
           <button type="button" className={`btn-secondary ${sm}`} onClick={() => onCancel(booking)}>
-            Decline
+            {t('owner.decline')}
           </button>
         </>
       )}
       {booking.status === 'CONFIRMED' && (
         <>
           <button type="button" className={`btn-secondary ${sm}`} onClick={() => onStatus(booking, 'COMPLETED')}>
-            Mark done
+            {t('owner.markDone')}
           </button>
           <button
             type="button"
             className={`btn-ghost ${sm} text-danger hover:bg-danger-soft hover:text-danger`}
             onClick={() => onCancel(booking)}
           >
-            Cancel
+            {t('common.cancel')}
           </button>
         </>
       )}
       {Number(booking.customerId) !== Number(userId) && (
-        <Link to={`/chat/${booking.customerId}`} className={`icon-btn`} aria-label={`Message ${booking.customerName || 'client'}`}>
+        <Link to={`/chat/${booking.customerId}`} className={`icon-btn`} aria-label={t('chat.placeholder', { name: booking.customerName || t('chat.client') })}>
           <MessageCircle size={16} />
         </Link>
       )}
@@ -252,6 +267,7 @@ function BookingActions({ booking, onStatus, onCancel, userId, compact }) {
 
 export default function SalonOwnerDashboard() {
   const { user } = useAuth();
+  const t = useT();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -309,8 +325,9 @@ export default function SalonOwnerDashboard() {
         categoryId: cats.some((c) => String(c.id) === String(prev.categoryId)) ? prev.categoryId : String(cats[0]?.id || ''),
       }));
     } catch (err) {
-      setError(friendlyError(err, 'We couldn’t load your salon data.'));
+      setError(friendlyError(t, err, t('owner.err.loadSalon')));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadInsights = useCallback((salonId) => {
@@ -334,10 +351,11 @@ export default function SalonOwnerDashboard() {
       );
       if (!list.length) setCreating(true);
     } catch (err) {
-      setError(friendlyError(err, 'We couldn’t load your workspace.'));
+      setError(friendlyError(t, err, t('owner.err.load')));
     } finally {
       setLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -385,9 +403,9 @@ export default function SalonOwnerDashboard() {
     const lng = parseCoordinate(form.longitude);
     const open = toMinuteOfDay(toTimeInputValue(form.openTime, '09:00'));
     const close = toMinuteOfDay(toTimeInputValue(form.closeTime, '18:00'));
-    if (lat == null || lng == null) return 'Set your salon’s location first.';
-    if (open == null || close == null || close <= open) return 'Closing time must be after opening time.';
-    if (isPhoneInvalid(form.phoneNumber)) return 'Enter a valid phone number (7–15 digits).';
+    if (lat == null || lng == null) return t('owner.err.location');
+    if (open == null || close == null || close <= open) return t('owner.err.hours');
+    if (isPhoneInvalid(form.phoneNumber)) return t('owner.err.phone');
     return null;
   };
 
@@ -414,12 +432,12 @@ export default function SalonOwnerDashboard() {
       const created = await api.post('/api/salons/me', salonPayload(createForm));
       setCreateForm(emptySalonForm);
       setCreating(false);
-      flash('Your salon is live. Add your menu next.');
+      flash(t('owner.flash.live'));
       await loadOwner();
       if (created?.id) setSelectedSalonId(String(created.id));
       setSection('menu');
     } catch (err) {
-      setError(friendlyError(err, 'We couldn’t create your salon.'));
+      setError(friendlyError(t, err, t('owner.err.create')));
     } finally {
       setBusy(false);
     }
@@ -434,10 +452,10 @@ export default function SalonOwnerDashboard() {
       setBusy(true);
       setError('');
       await api.put(`/api/salons/${profileDraft.id}`, salonPayload(profileDraft));
-      flash('Salon profile saved.');
+      flash(t('owner.flash.profileSaved'));
       await loadOwner();
     } catch (err) {
-      setError(friendlyError(err, 'We couldn’t save your profile.'));
+      setError(friendlyError(t, err, t('owner.err.saveProfile')));
     } finally {
       setBusy(false);
     }
@@ -447,7 +465,7 @@ export default function SalonOwnerDashboard() {
   const fillLocation = async (target) => {
     try {
       setLocating(true);
-      const { latitude, longitude } = await detectLocation();
+      const { latitude, longitude } = await detectLocation(t);
       const patch = { latitude: latitude.toFixed(6), longitude: longitude.toFixed(6) };
       if (target === 'create') setCreateForm((f) => ({ ...f, ...patch }));
       else setProfileDraft((f) => ({ ...f, ...patch }));
@@ -468,25 +486,25 @@ export default function SalonOwnerDashboard() {
       categoryId: parseInt(String(serviceForm.categoryId), 10),
       salonId: Number(selectedSalonId),
     };
-    if (!payload.name) return setError('Give the service a name.');
-    if (!(payload.price > 0)) return setError('Enter a price above zero.');
-    if (!(payload.duration > 0) || payload.duration > 720) return setError('Duration must be between 1 and 720 minutes.');
-    if (!categories.some((c) => Number(c.id) === payload.categoryId)) return setError('Choose a category for this service.');
+    if (!payload.name) return setError(t('owner.err.serviceName'));
+    if (!(payload.price > 0)) return setError(t('owner.err.price'));
+    if (!(payload.duration > 0) || payload.duration > 720) return setError(t('owner.err.duration'));
+    if (!categories.some((c) => Number(c.id) === payload.categoryId)) return setError(t('owner.err.category'));
     try {
       setBusy(true);
       setError('');
       if (editingServiceId) {
         await api.put(`/api/service-offerings/${editingServiceId}`, payload);
-        flash('Service updated.');
+        flash(t('owner.flash.serviceUpdated'));
       } else {
         await api.post('/api/service-offerings', payload);
-        flash('Service added to your menu.');
+        flash(t('owner.flash.serviceAdded'));
       }
       setServiceForm((f) => ({ ...emptyServiceForm, categoryId: f.categoryId }));
       setEditingServiceId(null);
       loadSalonData(selectedSalonId);
     } catch (err) {
-      setError(friendlyError(err, 'We couldn’t save that service.'));
+      setError(friendlyError(t, err, t('owner.err.saveService')));
     } finally {
       setBusy(false);
     }
@@ -501,9 +519,9 @@ export default function SalonOwnerDashboard() {
       setCategories((prev) => [...prev, created]);
       setNewCategoryName('');
       setServiceForm((f) => ({ ...f, categoryId: String(created.id) }));
-      flash(`Category “${created.name}” added.`);
+      flash(t('owner.flash.categoryAdded', { name: created.name }));
     } catch (err) {
-      setError(friendlyError(err, 'We couldn’t add that category.'));
+      setError(friendlyError(t, err, t('owner.err.addCategory')));
     }
   };
 
@@ -511,14 +529,14 @@ export default function SalonOwnerDashboard() {
     try {
       setBusy(true);
       await api.delete(`/api/service-offerings/${pendingDeleteServiceId}`);
-      flash('Service removed.');
+      flash(t('owner.flash.serviceRemoved'));
       if (editingServiceId === pendingDeleteServiceId) {
         setEditingServiceId(null);
         setServiceForm(emptyServiceForm);
       }
       loadSalonData(selectedSalonId);
     } catch (err) {
-      setError(friendlyError(err, 'We couldn’t remove that service.'));
+      setError(friendlyError(t, err, t('owner.err.removeService')));
     } finally {
       setBusy(false);
       setPendingDeleteServiceId(null);
@@ -531,19 +549,19 @@ export default function SalonOwnerDashboard() {
       setBookings((prev) => prev.map((b) => (b.id === booking.id ? { ...b, status } : b)));
       flash(
         status === 'CONFIRMED'
-          ? `Accepted ${booking.customerName || 'the'} booking. They’ve been notified.`
+          ? t('owner.flash.accepted', { name: booking.customerName || t('chat.client') })
           : status === 'COMPLETED'
-            ? 'Marked as completed.'
-            : 'Booking cancelled. The client has been notified.'
+            ? t('owner.flash.completed')
+            : t('owner.flash.cancelled')
       );
       loadInsights(selectedSalonId);
     } catch (err) {
-      setError(friendlyError(err, 'We couldn’t update that booking.'));
+      setError(friendlyError(t, err, t('owner.err.updateBooking')));
     }
   };
 
   /* ---------------- render */
-  if (loading) return <PageLoader label="Loading your workspace" />;
+  if (loading) return <PageLoader label={t('owner.loading')} />;
 
   const messages = (
     <div className="space-y-3">
@@ -559,20 +577,18 @@ export default function SalonOwnerDashboard() {
   if (creating || !salons.length) {
     return (
       <div className="page max-w-4xl">
-        <p className="eyebrow">{salons.length ? 'New location' : 'Welcome'}</p>
+        <p className="eyebrow">{salons.length ? t('owner.setup.newLocation') : t('owner.setup.welcome')}</p>
         <h1 className="display mt-3 text-[48px] text-ink sm:text-[60px]">
-          {salons.length ? 'Add another salon' : 'Let’s set up your salon.'}
+          {salons.length ? t('owner.addAnother') : t('owner.setup.title')}
         </h1>
-        <p className="lede mt-3 max-w-xl">
-          A few details and you’ll have a public page clients can book from. You can change any of this later.
-        </p>
+        <p className="lede mt-3 max-w-xl">{t('owner.setup.body')}</p>
         <div className="mt-8">{messages}</div>
         <div className="mt-6">
           <SalonForm
             value={createForm}
             onChange={setCreateForm}
             onSubmit={createSalon}
-            submitLabel="Publish salon"
+            submitLabel={t('owner.setup.publish')}
             busy={busy}
             onUseLocation={() => fillLocation('create')}
             locating={locating}
@@ -580,7 +596,7 @@ export default function SalonOwnerDashboard() {
         </div>
         {salons.length > 0 && (
           <button type="button" className="btn-ghost mt-4" onClick={() => setCreating(false)}>
-            Back to workspace
+            {t('owner.setup.back')}
           </button>
         )}
       </div>
@@ -600,7 +616,7 @@ export default function SalonOwnerDashboard() {
       {/* Sidebar */}
       <aside className="min-w-0 lg:sticky lg:top-24 lg:self-start">
         <label htmlFor="salon-switch" className="eyebrow">
-          Salon
+          {t('chat.salon')}
         </label>
         {salons.length > 1 ? (
           <select
@@ -620,11 +636,11 @@ export default function SalonOwnerDashboard() {
         )}
         {selectedSalon && (
           <Link to={`/salon/${selectedSalon.id}`} className="mt-2 inline-flex items-center gap-1 text-[13px] text-ink-3 hover:text-ink">
-            View public page <ArrowUpRight size={13} />
+            {t('owner.viewPublic')} <ArrowUpRight size={13} />
           </Link>
         )}
 
-        <nav className="mt-8 flex gap-1 overflow-x-auto lg:flex-col" aria-label="Workspace">
+        <nav className="mt-8 flex gap-1 overflow-x-auto lg:flex-col" aria-label={t('nav.workspace')}>
           {NAV.map(([key, label]) => (
             <button
               key={key}
@@ -635,7 +651,7 @@ export default function SalonOwnerDashboard() {
               }`}
               aria-current={section === key ? 'page' : undefined}
             >
-              {label}
+              {t(label)}
               {key === 'bookings' && groups.requests.length > 0 && (
                 <span
                   className={`num ml-3 rounded-full px-1.5 text-[11px] font-semibold ${
@@ -650,7 +666,7 @@ export default function SalonOwnerDashboard() {
         </nav>
 
         <button type="button" className="btn-ghost btn-sm mt-6 hidden lg:inline-flex" onClick={() => setCreating(true)}>
-          <Plus size={14} /> Add another salon
+          <Plus size={14} /> {t('owner.addAnother')}
         </button>
       </aside>
 
@@ -658,33 +674,43 @@ export default function SalonOwnerDashboard() {
       <main className="min-w-0">
         {section === 'overview' && (
           <div className="animate-fade">
-            <p className="eyebrow">Overview</p>
+            <p className="eyebrow">{t('nav.overview')}</p>
             <h1 className="display mt-3 text-[44px] text-ink sm:text-[54px]">
-              {greeting()}, {(user?.fullName || user?.name || '').split(' ')[0] || 'there'}.
+              {t(greetingKey(), { name: (user?.fullName || user?.name || '').split(' ')[0] || t('owner.there') })}
             </h1>
             <p className="lede mt-2">
               {groups.requests.length
-                ? `You have ${groups.requests.length} booking ${groups.requests.length === 1 ? 'request' : 'requests'} waiting for a reply.`
+                ? t('owner.summaryRequests', { count: groups.requests.length })
                 : groups.upcoming.length
-                  ? `${groups.upcoming.length} confirmed ${groups.upcoming.length === 1 ? 'appointment' : 'appointments'} coming up.`
-                  : 'Your calendar is clear. A good time to polish your menu.'}
+                  ? t('owner.summaryUpcoming', { count: groups.upcoming.length })
+                  : t('owner.summaryClear')}
             </p>
 
             <div className="mt-6">{messages}</div>
 
             <div className="mt-10 grid grid-cols-2 gap-y-8 border-y border-line py-8 lg:grid-cols-4 lg:divide-x lg:divide-line">
-              <Stat label="Requests" value={groups.requests.length} note="Awaiting your reply" className="lg:pr-6" />
-              <Stat label="Upcoming" value={insights?.upcomingBookings ?? groups.upcoming.length} note="Confirmed & pending" className="lg:px-6" />
               <Stat
-                label="Earned"
-                value={money(insights?.completedRevenue)}
-                note={`${money(insights?.projectedRevenue)} booked ahead`}
+                label={t('owner.requests')}
+                value={formatNumber(groups.requests.length)}
+                note={t('owner.awaiting')}
+                className="lg:pr-6"
+              />
+              <Stat
+                label={t('bookings.tabUpcoming')}
+                value={formatNumber(insights?.upcomingBookings ?? groups.upcoming.length)}
+                note={t('owner.confirmedPending')}
                 className="lg:px-6"
               />
               <Stat
-                label="Rating"
+                label={t('owner.earned')}
+                value={statMoney(insights?.completedRevenue)}
+                note={t('owner.bookedAhead', { amount: money(insights?.projectedRevenue) })}
+                className="lg:px-6"
+              />
+              <Stat
+                label={t('salon.review.rating')}
                 value={insights?.reviewCount ? Number(insights.averageRating).toFixed(1) : '—'}
-                note={`${insights?.reviewCount || 0} reviews`}
+                note={t('salon.reviewCount', { count: insights?.reviewCount || 0 })}
                 className="lg:pl-6"
               />
             </div>
@@ -692,7 +718,7 @@ export default function SalonOwnerDashboard() {
             <div className="mt-12 grid gap-12 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
               <section>
                 <div className="mb-4 flex items-baseline justify-between">
-                  <h2 className="text-[17px] font-semibold text-ink">Needs a reply</h2>
+                  <h2 className="text-[17px] font-semibold text-ink">{t('owner.needsReply')}</h2>
                   {groups.requests.length > 0 && (
                     <button
                       type="button"
@@ -702,13 +728,13 @@ export default function SalonOwnerDashboard() {
                         setBookingFilter('requests');
                       }}
                     >
-                      See all
+                      {t('owner.seeAll')}
                     </button>
                   )}
                 </div>
                 {groups.requests.length === 0 ? (
                   <p className="rounded-md border border-dashed border-line-strong px-5 py-8 text-sm text-ink-3">
-                    No new requests. New bookings land here for you to accept.
+                    {t('owner.noRequests')}
                   </p>
                 ) : (
                   <ul className="divide-y divide-line border-y border-line">
@@ -717,9 +743,11 @@ export default function SalonOwnerDashboard() {
                       return (
                         <li key={b.id} className="flex flex-wrap items-center gap-4 py-4">
                           <div className="min-w-0 flex-1">
-                            <p className="font-medium text-ink">{b.customerName || `Client #${b.customerId}`}</p>
+                            <p className="font-medium text-ink">
+                              {b.customerName || t('owner.clientFallback', { id: b.customerId })}
+                            </p>
                             <p className="mt-0.5 truncate text-sm text-ink-3">
-                              {w.day} · {w.time} · {(b.serviceNames || []).join(', ') || 'Services'}
+                              {w.day} · {w.time} · {(b.serviceNames || []).join(', ') || t('salon.servicesGroup')}
                             </p>
                           </div>
                           <span className="num text-sm font-medium">{money(b.totalPrice)}</span>
@@ -738,9 +766,9 @@ export default function SalonOwnerDashboard() {
               </section>
 
               <section>
-                <h2 className="mb-4 text-[17px] font-semibold text-ink">Most booked</h2>
+                <h2 className="mb-4 text-[17px] font-semibold text-ink">{t('owner.mostBooked')}</h2>
                 {(insights?.popularServices || []).length === 0 ? (
-                  <p className="text-sm text-ink-3">Once clients book, your most popular services show here.</p>
+                  <p className="text-sm text-ink-3">{t('owner.mostBookedEmpty')}</p>
                 ) : (
                   <ol className="divide-y divide-line border-y border-line">
                     {insights.popularServices.slice(0, 5).map((s, i) => (
@@ -759,16 +787,16 @@ export default function SalonOwnerDashboard() {
 
         {section === 'bookings' && (
           <div className="animate-fade">
-            <p className="eyebrow">Bookings</p>
-            <h1 className="display mt-3 text-[44px] text-ink sm:text-[54px]">Calendar</h1>
+            <p className="eyebrow">{t('admin.bookings')}</p>
+            <h1 className="display mt-3 text-[44px] text-ink sm:text-[54px]">{t('owner.calendar')}</h1>
             <div className="mt-6">{messages}</div>
 
             <div className="tabs mt-6" role="tablist">
               {[
-                ['requests', 'Requests'],
-                ['upcoming', 'Upcoming'],
-                ['past', 'Past'],
-                ['cancelled', 'Cancelled'],
+                ['requests', t('owner.requests')],
+                ['upcoming', t('bookings.tabUpcoming')],
+                ['past', t('owner.past')],
+                ['cancelled', t('status.CANCELLED')],
               ].map(([key, label]) => (
                 <button
                   key={key}
@@ -786,25 +814,21 @@ export default function SalonOwnerDashboard() {
             {bookingRows.length === 0 ? (
               <EmptyState
                 className="mt-8"
-                title="Nothing here."
-                description={
-                  bookingFilter === 'requests'
-                    ? 'New booking requests from clients will appear here.'
-                    : 'Bookings in this category will appear here.'
-                }
+                title={t('owner.nothingHere')}
+                description={bookingFilter === 'requests' ? t('owner.requestsEmpty') : t('owner.categoryEmpty')}
               />
             ) : (
               <div className="mt-2 overflow-x-auto">
                 <table className="data-table min-w-[720px]">
                   <thead>
                     <tr>
-                      <th className="pt-4">When</th>
-                      <th className="pt-4">Client</th>
-                      <th className="pt-4">Services</th>
-                      <th className="pt-4 text-right">Total</th>
-                      <th className="pt-4">Status</th>
+                      <th className="pt-4">{t('owner.col.when')}</th>
+                      <th className="pt-4">{t('chat.client')}</th>
+                      <th className="pt-4">{t('salon.servicesGroup')}</th>
+                      <th className="pt-4 text-right">{t('salon.book.total')}</th>
+                      <th className="pt-4">{t('owner.col.status')}</th>
                       <th className="pt-4">
-                        <span className="sr-only">Actions</span>
+                        <span className="sr-only">{t('owner.col.actions')}</span>
                       </th>
                     </tr>
                   </thead>
@@ -817,7 +841,7 @@ export default function SalonOwnerDashboard() {
                             <p className="font-medium text-ink">{w.day}</p>
                             <p className="text-[13px] text-ink-3">{w.time}</p>
                           </td>
-                          <td className="text-ink">{b.customerName || `Client #${b.customerId}`}</td>
+                          <td className="text-ink">{b.customerName || t('owner.clientFallback', { id: b.customerId })}</td>
                           <td className="max-w-[220px] truncate text-ink-2">{(b.serviceNames || []).join(', ') || '—'}</td>
                           <td className="num text-right font-medium">{money(b.totalPrice)}</td>
                           <td>
@@ -844,26 +868,28 @@ export default function SalonOwnerDashboard() {
 
         {section === 'menu' && (
           <div className="animate-fade">
-            <p className="eyebrow">Menu</p>
-            <h1 className="display mt-3 text-[44px] text-ink sm:text-[54px]">Services & prices</h1>
+            <p className="eyebrow">{t('salon.menu')}</p>
+            <h1 className="display mt-3 text-[44px] text-ink sm:text-[54px]">{t('owner.menuTitle')}</h1>
             <div className="mt-6">{messages}</div>
 
             <div className="mt-8 grid gap-12 xl:grid-cols-[minmax(0,1fr)_360px]">
               <div className="min-w-0">
                 {categories.length === 0 ? (
                   <EmptyState
-                    title="Start with a category."
-                    description="Group your services — Hair, Colour, Nails — then add services to each."
+                    title={t('owner.startCategory')}
+                    description={t('owner.startCategoryBody')}
                   />
                 ) : (
                   menuGroups.map((group) => (
                     <section key={group.id} className="mb-10">
                       <div className="flex items-baseline justify-between border-b border-line pb-2">
                         <p className="eyebrow">{group.name}</p>
-                        <span className="text-[12px] text-ink-3">{group.items.length} services</span>
+                        <span className="text-[12px] text-ink-3">
+                          {t('salons.serviceCount', { count: group.items.length })}
+                        </span>
                       </div>
                       {group.items.length === 0 ? (
-                        <p className="py-4 text-sm text-ink-3">No services in this category yet.</p>
+                        <p className="py-4 text-sm text-ink-3">{t('owner.categoryNoServices')}</p>
                       ) : (
                         <ul>
                           {group.items.map((s) => (
@@ -876,14 +902,14 @@ export default function SalonOwnerDashboard() {
                               <div className="min-w-0 flex-1">
                                 <p className="font-medium text-ink">{s.name}</p>
                                 {s.description && <p className="mt-0.5 text-sm text-ink-2">{s.description}</p>}
-                                <p className="mt-1 text-[13px] text-ink-3">{formatDurationLabel(s.duration)}</p>
+                                <p className="mt-1 text-[13px] text-ink-3">{formatDurationLabel(s.duration, t)}</p>
                               </div>
                               <span className="num pt-0.5 font-medium">{money(s.price)}</span>
                               <div className="flex">
                                 <button
                                   type="button"
                                   className="icon-btn"
-                                  aria-label={`Edit ${s.name}`}
+                                  aria-label={t('owner.editService', { name: s.name })}
                                   onClick={() => {
                                     setEditingServiceId(s.id);
                                     setServiceForm({
@@ -900,7 +926,7 @@ export default function SalonOwnerDashboard() {
                                 <button
                                   type="button"
                                   className="icon-btn hover:!text-danger"
-                                  aria-label={`Delete ${s.name}`}
+                                  aria-label={t('owner.deleteService', { name: s.name })}
                                   onClick={() => setPendingDeleteServiceId(s.id)}
                                 >
                                   <Trash2 size={15} />
@@ -917,9 +943,9 @@ export default function SalonOwnerDashboard() {
 
               <aside className="xl:sticky xl:top-24 xl:self-start">
                 <form onSubmit={saveService} className="rounded-lg border border-line bg-surface p-5">
-                  <p className="font-semibold text-ink">{editingServiceId ? 'Edit service' : 'Add a service'}</p>
+                  <p className="font-semibold text-ink">{editingServiceId ? t('owner.svc.edit') : t('owner.svc.add')}</p>
                   <div className="mt-5 space-y-4">
-                    <Field label="Name" htmlFor="svc-name">
+                    <Field label={t('owner.svc.name')} htmlFor="svc-name">
                       <input
                         id="svc-name"
                         className="field"
@@ -927,7 +953,7 @@ export default function SalonOwnerDashboard() {
                         onChange={(e) => setServiceForm((f) => ({ ...f, name: e.target.value }))}
                       />
                     </Field>
-                    <Field label="Description" htmlFor="svc-desc" hint="One line on what’s included.">
+                    <Field label={t('owner.svc.description')} htmlFor="svc-desc" hint={t('owner.svc.descriptionHint')}>
                       <textarea
                         id="svc-desc"
                         rows={2}
@@ -938,18 +964,20 @@ export default function SalonOwnerDashboard() {
                       />
                     </Field>
                     <div className="grid grid-cols-2 gap-3">
-                      <Field label="Price ($)" htmlFor="svc-price">
+                      <Field label={t('owner.svc.price')} htmlFor="svc-price">
                         <input
                           id="svc-price"
                           type="number"
+                          inputMode="decimal"
                           min="1"
-                          step="0.5"
+                          step="1"
+                          placeholder="499"
                           className="field"
                           value={serviceForm.price}
                           onChange={(e) => setServiceForm((f) => ({ ...f, price: e.target.value }))}
                         />
                       </Field>
-                      <Field label="Minutes" htmlFor="svc-dur">
+                      <Field label={t('owner.svc.minutes')} htmlFor="svc-dur">
                         <input
                           id="svc-dur"
                           type="number"
@@ -962,7 +990,7 @@ export default function SalonOwnerDashboard() {
                         />
                       </Field>
                     </div>
-                    <Field label="Category" htmlFor="svc-cat">
+                    <Field label={t('owner.svc.category')} htmlFor="svc-cat">
                       <select
                         id="svc-cat"
                         className="field"
@@ -970,7 +998,7 @@ export default function SalonOwnerDashboard() {
                         onChange={(e) => setServiceForm((f) => ({ ...f, categoryId: e.target.value }))}
                         disabled={!categories.length}
                       >
-                        {!categories.length && <option value="">Add a category below</option>}
+                        {!categories.length && <option value="">{t('owner.svc.addCategoryBelow')}</option>}
                         {categories.map((c) => (
                           <option key={c.id} value={c.id}>
                             {categoryName[String(c.id)]}
@@ -981,7 +1009,7 @@ export default function SalonOwnerDashboard() {
                   </div>
                   <div className="mt-5 flex gap-2">
                     <button type="submit" className="btn-dark flex-1" disabled={busy || !categories.length}>
-                      {editingServiceId ? 'Save changes' : 'Add to menu'}
+                      {editingServiceId ? t('profile.saveChanges') : t('owner.svc.addToMenu')}
                     </button>
                     {editingServiceId && (
                       <button
@@ -992,18 +1020,18 @@ export default function SalonOwnerDashboard() {
                           setServiceForm((f) => ({ ...emptyServiceForm, categoryId: f.categoryId }));
                         }}
                       >
-                        Cancel
+                        {t('common.cancel')}
                       </button>
                     )}
                   </div>
                 </form>
 
                 <div className="mt-4 rounded-lg border border-line p-5">
-                  <p className="text-sm font-medium text-ink">New category</p>
+                  <p className="text-sm font-medium text-ink">{t('owner.newCategory')}</p>
                   <div className="mt-3 flex gap-2">
                     <input
                       className="field h-10"
-                      placeholder="e.g. Colour"
+                      placeholder={t('owner.newCategoryPlaceholder')}
                       value={newCategoryName}
                       onChange={(e) => setNewCategoryName(e.target.value)}
                       onKeyDown={(e) => {
@@ -1012,10 +1040,10 @@ export default function SalonOwnerDashboard() {
                           addCategory();
                         }
                       }}
-                      aria-label="New category name"
+                      aria-label={t('owner.newCategory')}
                     />
                     <button type="button" className="btn-secondary" onClick={addCategory} disabled={!newCategoryName.trim()}>
-                      Add
+                      {t('salon.add')}
                     </button>
                   </div>
                 </div>
@@ -1026,15 +1054,15 @@ export default function SalonOwnerDashboard() {
 
         {section === 'profile' && profileDraft && (
           <div className="animate-fade">
-            <p className="eyebrow">Salon profile</p>
-            <h1 className="display mt-3 text-[44px] text-ink sm:text-[54px]">{profileDraft.name || 'Your salon'}</h1>
+            <p className="eyebrow">{t('owner.salonProfile')}</p>
+            <h1 className="display mt-3 text-[44px] text-ink sm:text-[54px]">{profileDraft.name || t('owner.yourSalon')}</h1>
             <div className="mt-6">{messages}</div>
             <div className="mt-4">
               <SalonForm
                 value={profileDraft}
                 onChange={setProfileDraft}
                 onSubmit={saveProfile}
-                submitLabel="Save profile"
+                submitLabel={t('owner.saveProfile')}
                 busy={busy}
                 onUseLocation={() => fillLocation('profile')}
                 locating={locating}
@@ -1046,20 +1074,20 @@ export default function SalonOwnerDashboard() {
 
       <ConfirmDialog
         open={pendingDeleteServiceId != null}
-        title="Remove this service?"
-        description="Clients won’t be able to book it anymore. Existing bookings stay as they are."
-        confirmLabel="Remove service"
-        cancelLabel="Keep it"
+        title={t('owner.removeTitle')}
+        description={t('owner.removeBody')}
+        confirmLabel={t('owner.removeConfirm')}
+        cancelLabel={t('bookings.keep')}
         busy={busy}
         onConfirm={deleteService}
         onCancel={() => setPendingDeleteServiceId(null)}
       />
       <ConfirmDialog
         open={pendingCancelBooking != null}
-        title={pendingCancelBooking?.status === 'PENDING' ? 'Decline this request?' : 'Cancel this booking?'}
-        description={`${pendingCancelBooking?.customerName || 'The client'} will be notified and the slot freed up.`}
-        confirmLabel={pendingCancelBooking?.status === 'PENDING' ? 'Decline' : 'Cancel booking'}
-        cancelLabel="Go back"
+        title={pendingCancelBooking?.status === 'PENDING' ? t('owner.declineTitle') : t('owner.cancelTitle')}
+        description={t('owner.cancelBody', { name: pendingCancelBooking?.customerName || t('chat.client') })}
+        confirmLabel={pendingCancelBooking?.status === 'PENDING' ? t('owner.decline') : t('owner.cancelConfirm')}
+        cancelLabel={t('owner.goBack')}
         onConfirm={async () => {
           const b = pendingCancelBooking;
           setPendingCancelBooking(null);

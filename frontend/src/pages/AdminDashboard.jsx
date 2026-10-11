@@ -8,31 +8,39 @@ import { Link } from 'react-router-dom';
 import api from '../config/api';
 import { Notice, PageHeader, PageLoader, Stat, money } from '../components/ui';
 import RevenueChart from '../components/RevenueChart';
+import { useT } from '../i18n';
+import { formatNumber, statMoney } from '../i18n/format';
 
 const STATUS_META = [
-  ['CONFIRMED', 'Confirmed', 'bg-success'],
-  ['PENDING', 'Pending', 'bg-gold'],
-  ['COMPLETED', 'Completed', 'bg-ink'],
-  ['CANCELLED', 'Cancelled', 'bg-danger/70'],
+  ['CONFIRMED', 'bg-success'],
+  ['PENDING', 'bg-gold'],
+  ['COMPLETED', 'bg-ink'],
+  ['CANCELLED', 'bg-danger/70'],
 ];
 
 function Pipeline({ byStatus }) {
+  const t = useT();
   const total = Object.values(byStatus).reduce((s, n) => s + n, 0);
   return (
     <div>
       <div className="flex h-3 overflow-hidden rounded-full bg-sunken">
-        {STATUS_META.map(([key, , color]) =>
+        {STATUS_META.map(([key, color]) =>
           byStatus[key] ? (
-            <div key={key} className={color} style={{ width: `${(byStatus[key] / total) * 100}%` }} title={`${key}: ${byStatus[key]}`} />
+            <div
+              key={key}
+              className={color}
+              style={{ width: `${(byStatus[key] / total) * 100}%` }}
+              title={`${t(`status.${key}`)}: ${byStatus[key]}`}
+            />
           ) : null
         )}
       </div>
       <dl className="mt-6 grid grid-cols-2 gap-x-6 gap-y-4">
-        {STATUS_META.map(([key, label, color]) => (
+        {STATUS_META.map(([key, color]) => (
           <div key={key} className="flex items-baseline justify-between border-b border-line pb-3">
             <dt className="flex items-center gap-2 text-sm text-ink-2">
               <span className={`h-2 w-2 rounded-full ${color}`} />
-              {label}
+              {t(`status.${key}`)}
             </dt>
             <dd className="num text-sm font-semibold text-ink">
               {byStatus[key] || 0}
@@ -52,6 +60,7 @@ export default function AdminDashboard() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const t = useT();
 
   useEffect(() => {
     let active = true;
@@ -64,7 +73,7 @@ export default function AdminDashboard() {
         setError('');
       })
       .catch((err) => {
-        if (active) setError(err?.response?.data?.error || 'We couldn’t load platform analytics.');
+        if (active) setError(err?.response?.data?.error || t('admin.err.load'));
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -72,6 +81,7 @@ export default function AdminDashboard() {
     return () => {
       active = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [days]);
 
   const windowTotals = useMemo(() => {
@@ -82,18 +92,18 @@ export default function AdminDashboard() {
     };
   }, [data]);
 
-  if (loading && !data) return <PageLoader label="Loading analytics" />;
+  if (loading && !data) return <PageLoader label={t('admin.loading')} />;
 
   const popularMax = Math.max(1, ...(data?.popularServices || []).map((s) => s.count));
 
   return (
     <div className="page">
       <PageHeader
-        eyebrow="Administration"
-        title="Platform overview"
-        description="How the marketplace is doing — demand, revenue and the salons and services driving it."
+        eyebrow={t('admin.eyebrow')}
+        title={t('title.admin')}
+        description={t('admin.description')}
         actions={
-          <div className="inline-flex rounded-md border border-line-strong p-1" role="radiogroup" aria-label="Time window">
+          <div className="inline-flex rounded-md border border-line-strong p-1" role="radiogroup" aria-label={t('admin.window')}>
             {[7, 30, 90].map((d) => (
               <button
                 key={d}
@@ -105,7 +115,7 @@ export default function AdminDashboard() {
                   days === d ? 'bg-ink text-paper' : 'text-ink-2 hover:text-ink'
                 }`}
               >
-                {d} days
+                {t('admin.days', { count: d })}
               </button>
             ))}
           </div>
@@ -121,18 +131,31 @@ export default function AdminDashboard() {
       {data && (
         <div className={loading ? 'opacity-60 transition-opacity' : 'transition-opacity'}>
           <div className="mt-10 grid grid-cols-2 gap-y-8 border-b border-line pb-10 lg:grid-cols-4 lg:divide-x lg:divide-line">
-            <Stat label="Salons" value={data.totalSalons} note="Published profiles" className="lg:pr-8" />
-            <Stat label="Clients" value={data.totalCustomers} note="Customer accounts" className="lg:px-8" />
             <Stat
-              label="Bookings"
-              value={data.totalBookings}
-              note={`${windowTotals.bookings} in the last ${days} days`}
+              label={t('nav.salons')}
+              value={formatNumber(data.totalSalons)}
+              note={t('admin.publishedProfiles')}
+              className="lg:pr-8"
+            />
+            <Stat
+              label={t('admin.clients')}
+              value={formatNumber(data.totalCustomers)}
+              note={t('admin.customerAccounts')}
               className="lg:px-8"
             />
             <Stat
-              label="Booked value"
-              value={money(data.totalRevenue)}
-              note={`${money(data.completedRevenue)} completed · ${Number(data.repeatCustomerRate || 0).toFixed(0)}% repeat clients`}
+              label={t('admin.bookings')}
+              value={formatNumber(data.totalBookings)}
+              note={t('admin.inLastDays', { n: windowTotals.bookings, days })}
+              className="lg:px-8"
+            />
+            <Stat
+              label={t('admin.bookedValue')}
+              value={statMoney(data.totalRevenue)}
+              note={t('admin.valueNote', {
+                completed: money(data.completedRevenue),
+                rate: Number(data.repeatCustomerRate || 0).toFixed(0),
+              })}
               className="lg:pl-8"
             />
           </div>
@@ -140,9 +163,9 @@ export default function AdminDashboard() {
           <div className="mt-12 grid gap-12 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
             <section>
               <div className="flex items-baseline justify-between">
-                <h2 className="text-[17px] font-semibold text-ink">Booked value</h2>
+                <h2 className="text-[17px] font-semibold text-ink">{t('admin.bookedValue')}</h2>
                 <p className="num text-sm text-ink-3">
-                  {money(windowTotals.revenue)} · last {days} days
+                  {t('admin.windowValue', { amount: money(windowTotals.revenue), days })}
                 </p>
               </div>
               <div className="mt-6">
@@ -151,7 +174,7 @@ export default function AdminDashboard() {
             </section>
 
             <section>
-              <h2 className="text-[17px] font-semibold text-ink">Booking pipeline</h2>
+              <h2 className="text-[17px] font-semibold text-ink">{t('admin.pipeline')}</h2>
               <div className="mt-6">
                 <Pipeline byStatus={data.bookingsByStatus || {}} />
               </div>
@@ -160,16 +183,16 @@ export default function AdminDashboard() {
 
           <div className="mt-16 grid gap-12 lg:grid-cols-2">
             <section>
-              <h2 className="mb-5 text-[17px] font-semibold text-ink">Top salons</h2>
+              <h2 className="mb-5 text-[17px] font-semibold text-ink">{t('admin.topSalons')}</h2>
               {(data.topSalons || []).length === 0 ? (
-                <p className="text-sm text-ink-3">No bookings yet.</p>
+                <p className="text-sm text-ink-3">{t('admin.noBookings')}</p>
               ) : (
                 <table className="data-table">
                   <thead>
                     <tr>
-                      <th>Salon</th>
-                      <th className="text-right">Bookings</th>
-                      <th className="text-right">Value</th>
+                      <th>{t('chat.salon')}</th>
+                      <th className="text-right">{t('admin.bookings')}</th>
+                      <th className="text-right">{t('admin.value')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -192,9 +215,9 @@ export default function AdminDashboard() {
             </section>
 
             <section>
-              <h2 className="mb-5 text-[17px] font-semibold text-ink">Most booked services</h2>
+              <h2 className="mb-5 text-[17px] font-semibold text-ink">{t('admin.popular')}</h2>
               {(data.popularServices || []).length === 0 ? (
-                <p className="text-sm text-ink-3">No services booked yet.</p>
+                <p className="text-sm text-ink-3">{t('admin.noServices')}</p>
               ) : (
                 <ul className="space-y-4">
                   {data.popularServices.map((s) => (

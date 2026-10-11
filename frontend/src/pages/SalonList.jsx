@@ -11,24 +11,26 @@ import { MAPBOX_ACCESS_TOKEN } from '../config/mapbox';
 import NearbySalonsMap from '../components/maps/NearbySalonsMap';
 import { openState } from '../utils/time';
 import { EmptyState, Notice, PageHeader } from '../components/ui';
+import { useT } from '../i18n';
 
-const getBrowserLocation = () =>
+const getBrowserLocation = (t) =>
   new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
-      reject(new Error('Your browser doesn’t support location.'));
+      reject(new Error(t('salons.err.noGeo')));
       return;
     }
     navigator.geolocation.getCurrentPosition(
       (p) => resolve({ latitude: p.coords.latitude, longitude: p.coords.longitude }),
-      () => reject(new Error('Location access was denied. Enable it in your browser to sort by distance.')),
+      () => reject(new Error(t('salons.err.geoDenied'))),
       { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 }
     );
   });
 
 function SalonCard({ salon }) {
+  const t = useT();
   const image = (salon.images || [])[0];
   const rating = Number(salon.averageRating || 0);
-  const state = openState(salon.openTime, salon.closeTime);
+  const state = openState(salon.openTime, salon.closeTime, new Date(), t);
   const distance = Number(salon.distanceKm);
 
   return (
@@ -48,7 +50,9 @@ function SalonCard({ salon }) {
         )}
         {Number.isFinite(distance) && salon.distanceKm != null && (
           <span className="num absolute left-3 top-3 rounded-full bg-surface/95 px-2.5 py-1 text-[12px] font-semibold text-ink">
-            {distance < 1 ? `${Math.round(distance * 1000)} m` : `${distance.toFixed(1)} km`}
+            {distance < 1
+              ? t('salons.metres', { n: Math.round(distance * 1000) })
+              : t('salons.km', { n: distance.toFixed(1) })}
           </span>
         )}
       </div>
@@ -64,7 +68,7 @@ function SalonCard({ salon }) {
             <span className="font-normal text-ink-3">({salon.reviewCount})</span>
           </span>
         ) : (
-          <span className="shrink-0 text-[13px] text-ink-3">New</span>
+          <span className="shrink-0 text-[13px] text-ink-3">{t('salons.new')}</span>
         )}
       </div>
       <p className="mt-1 truncate text-sm text-ink-2">{[salon.address, salon.city].filter(Boolean).join(', ')}</p>
@@ -76,9 +80,7 @@ function SalonCard({ salon }) {
           </span>
         )}
         <span aria-hidden="true">·</span>
-        <span>
-          {salon.serviceCount || 0} service{salon.serviceCount === 1 ? '' : 's'}
-        </span>
+        <span>{t('salons.serviceCount', { count: salon.serviceCount || 0 })}</span>
       </p>
     </Link>
   );
@@ -95,6 +97,7 @@ function CardSkeleton() {
 }
 
 export default function SalonList() {
+  const t = useT();
   const [salons, setSalons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -116,7 +119,7 @@ export default function SalonList() {
       const data = await api.get('/api/salons');
       setSalons(Array.isArray(data) ? data : []);
     } catch (err) {
-      setError(err?.response?.data?.error || 'We couldn’t load salons right now. Please try again.');
+      setError(err?.response?.data?.error || t('salons.err.load'));
     } finally {
       setLoading(false);
     }
@@ -132,7 +135,7 @@ export default function SalonList() {
       setSalons(Array.isArray(data) ? data : []);
       setSortBy('distance');
     } catch (err) {
-      setError(err?.response?.data?.error || 'We couldn’t load nearby salons.');
+      setError(err?.response?.data?.error || t('salons.err.nearby'));
     } finally {
       setLoading(false);
     }
@@ -140,13 +143,14 @@ export default function SalonList() {
 
   useEffect(() => {
     loadAll();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const useMyLocation = async () => {
     try {
       setLocating(true);
       setError('');
-      const coords = await getBrowserLocation();
+      const coords = await getBrowserLocation(t);
       setLocation(coords);
       await loadNearby(coords, radiusKm);
     } catch (err) {
@@ -188,9 +192,9 @@ export default function SalonList() {
   return (
     <div className="page">
       <PageHeader
-        eyebrow="Discover"
-        title={location ? 'Salons near you' : 'Find your salon'}
-        description="Compare menus, prices, opening hours and reviews — then book a time that suits you."
+        eyebrow={t('nav.discover')}
+        title={location ? t('salons.titleNear') : t('salons.title')}
+        description={t('salons.description')}
       />
 
       <div className="mt-8 flex flex-col gap-3 lg:flex-row lg:items-center">
@@ -198,25 +202,25 @@ export default function SalonList() {
           <Search size={17} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-3" />
           <input
             className="field pl-10"
-            placeholder="Search by salon, street or city"
+            placeholder={t('salons.searchPlaceholder')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            aria-label="Search salons"
+            aria-label={t('salons.searchLabel')}
           />
         </div>
         <div className="flex flex-wrap gap-2">
-          <select className="field w-auto min-w-[9rem]" value={city} onChange={(e) => setCity(e.target.value)} aria-label="City">
-            <option value="">All cities</option>
+          <select className="field w-auto min-w-[9rem]" value={city} onChange={(e) => setCity(e.target.value)} aria-label={t('salons.city')}>
+            <option value="">{t('salons.allCities')}</option>
             {cities.map((c) => (
               <option key={c} value={c}>
                 {c}
               </option>
             ))}
           </select>
-          <select className="field w-auto" value={sortBy} onChange={(e) => setSortBy(e.target.value)} aria-label="Sort by">
-            <option value="rating">Top rated</option>
-            {location && <option value="distance">Nearest</option>}
-            <option value="name">A–Z</option>
+          <select className="field w-auto" value={sortBy} onChange={(e) => setSortBy(e.target.value)} aria-label={t('salons.sortBy')}>
+            <option value="rating">{t('salons.sortRating')}</option>
+            {location && <option value="distance">{t('salons.sortDistance')}</option>}
+            <option value="name">{t('salons.sortName')}</option>
           </select>
           <button
             type="button"
@@ -224,20 +228,20 @@ export default function SalonList() {
             className={`btn ${openOnly ? 'bg-ink text-paper' : 'border border-line-strong bg-surface text-ink hover:border-ink/40'}`}
             aria-pressed={openOnly}
           >
-            Open now
+            {t('salons.openNow')}
           </button>
           {location ? (
             <button type="button" className="btn-secondary" onClick={clearLocation}>
-              <X size={15} /> Near me
+              <X size={15} /> {t('salons.nearMe')}
             </button>
           ) : (
             <button type="button" className="btn-secondary" onClick={useMyLocation} disabled={locating}>
-              <LocateFixed size={15} /> {locating ? 'Locating…' : 'Near me'}
+              <LocateFixed size={15} /> {locating ? t('salons.locating') : t('salons.nearMe')}
             </button>
           )}
           {MAPBOX_ACCESS_TOKEN && (
             <button type="button" className="btn-secondary" onClick={() => setShowMap((v) => !v)} aria-pressed={showMap}>
-              <MapIcon size={15} /> {showMap ? 'Hide map' : 'Map'}
+              <MapIcon size={15} /> {showMap ? t('salons.hideMap') : t('salons.map')}
             </button>
           )}
         </div>
@@ -245,7 +249,7 @@ export default function SalonList() {
 
       {location && (
         <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-ink-2">
-          <span>Within</span>
+          <span>{t('salons.within')}</span>
           {[5, 15, 30, 60].map((r) => (
             <button
               key={r}
@@ -258,7 +262,7 @@ export default function SalonList() {
                 radiusKm === r ? 'border-ink bg-ink text-paper' : 'border-line-strong hover:border-ink/40'
               }`}
             >
-              {r} km
+              {t('salons.km', { n: r })}
             </button>
           ))}
         </div>
@@ -286,7 +290,7 @@ export default function SalonList() {
 
       <div className="mt-10 flex items-baseline justify-between border-b border-line pb-3">
         <p className="text-sm text-ink-2">
-          {loading ? 'Loading salons…' : `${visible.length} ${visible.length === 1 ? 'salon' : 'salons'}`}
+          {loading ? t('salons.loading') : t('salons.count', { count: visible.length })}
         </p>
         {filtersActive && (
           <button
@@ -298,7 +302,7 @@ export default function SalonList() {
               setOpenOnly(false);
             }}
           >
-            Clear filters
+            {t('salons.clearFilters')}
           </button>
         )}
       </div>
@@ -312,12 +316,8 @@ export default function SalonList() {
       ) : visible.length === 0 ? (
         <EmptyState
           className="mt-8"
-          title={salons.length ? 'Nothing matches that.' : 'No salons yet.'}
-          description={
-            salons.length
-              ? 'Try a different name or city, or widen your search radius.'
-              : 'Salons will appear here as soon as owners publish their profiles.'
-          }
+          title={salons.length ? t('salons.emptyFiltered') : t('salons.empty')}
+          description={salons.length ? t('salons.emptyFilteredBody') : t('salons.emptyBody')}
         />
       ) : (
         <div className="mt-8 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">

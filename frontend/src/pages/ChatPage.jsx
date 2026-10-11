@@ -10,6 +10,8 @@ import api from '../config/api';
 import { useAuth } from '../context/AuthContext';
 import { useChat } from '../context/ChatContext';
 import { Avatar } from '../components/ui';
+import { useT } from '../i18n';
+import { formatDate, formatTime, intlLocale } from '../i18n/format';
 
 const byCreatedAt = (a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
 const keyOf = (m) => (m.id ? `id-${m.id}` : `cid-${m.clientMessageId}`);
@@ -19,24 +21,25 @@ const dayLabel = (iso) => {
   const d = new Date(iso);
   const today = new Date();
   const yesterday = new Date(Date.now() - 86400000);
-  if (d.toDateString() === today.toDateString()) return 'Today';
-  if (d.toDateString() === yesterday.toDateString()) return 'Yesterday';
-  return d.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' });
+  const offset = d.toDateString() === today.toDateString() ? 0 : d.toDateString() === yesterday.toDateString() ? -1 : null;
+  if (offset == null) return formatDate(d, { weekday: 'long', day: 'numeric', month: 'long' });
+  const text = new Intl.RelativeTimeFormat(intlLocale(), { numeric: 'auto' }).format(offset, 'day');
+  return text.charAt(0).toLocaleUpperCase(intlLocale()) + text.slice(1);
 };
-const clock = (iso) => new Date(iso || Date.now()).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+const clock = (iso) => formatTime(iso || Date.now());
 const shortWhen = (iso) => {
   if (!iso) return '';
   const d = new Date(iso);
-  return d.toDateString() === new Date().toDateString()
-    ? clock(iso)
-    : d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+  return d.toDateString() === new Date().toDateString() ? clock(iso) : formatDate(d, { day: 'numeric', month: 'short' });
 };
+const STATUS_KEY = { SENDING: 'chat.sending', READ: 'chat.read', DELIVERED: 'chat.delivered' };
 
 export default function ChatPage() {
   const { participantId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { connected, subscribeToConversation, sendMessage, markConversationRead } = useChat();
+  const t = useT();
 
   const [conversations, setConversations] = useState([]);
   const [conversation, setConversation] = useState(null);
@@ -51,9 +54,9 @@ export default function ChatPage() {
   const otherOf = useCallback(
     (c) =>
       c && Number(c.customerId) === Number(user?.id)
-        ? { id: c.salonOwnerId, name: c.salonOwnerName || 'Salon' }
-        : { id: c?.customerId, name: c?.customerName || 'Client' },
-    [user?.id]
+        ? { id: c.salonOwnerId, name: c.salonOwnerName || t('chat.salon') }
+        : { id: c?.customerId, name: c?.customerName || t('chat.client') },
+    [user?.id, t]
   );
 
   const loadConversations = useCallback(async () => {
@@ -64,8 +67,9 @@ export default function ChatPage() {
   useEffect(() => {
     if (!user?.id) return;
     loadConversations()
-      .catch(() => setError('We couldn’t load your conversations.'))
+      .catch(() => setError(t('chat.err.list')))
       .finally(() => setLoadingList(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, loadConversations]);
 
   useEffect(() => {
@@ -92,7 +96,7 @@ export default function ChatPage() {
         markConversationRead(convo.id).catch(() => {});
         loadConversations().catch(() => {});
       } catch (err) {
-        if (active) setError(err?.response?.data?.error || 'We couldn’t open this conversation.');
+        if (active) setError(err?.response?.data?.error || t('chat.err.open'));
       } finally {
         if (active) setLoadingThread(false);
       }
@@ -100,6 +104,7 @@ export default function ChatPage() {
     return () => {
       active = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [participantId, user?.id, navigate, markConversationRead, loadConversations]);
 
   useEffect(() => {
@@ -152,7 +157,7 @@ export default function ChatPage() {
     } catch (err) {
       setMessages((prev) => prev.filter((m) => m.clientMessageId !== clientMessageId));
       setText(content);
-      setError('You’re offline — the message wasn’t sent. Try again in a moment.');
+      setError(t('chat.err.offline'));
     }
     inputRef.current?.focus();
   };
@@ -169,7 +174,8 @@ export default function ChatPage() {
       out.push(m);
     });
     return out;
-  }, [messages]);
+    // dayLabel reads the active language; regroup when it changes.
+  }, [messages, t]);
 
   const showThreadOnMobile = Boolean(participantId);
 
@@ -179,7 +185,7 @@ export default function ChatPage() {
         {/* Conversation list */}
         <aside className={`flex min-h-0 flex-col border-r border-line ${showThreadOnMobile ? 'hidden md:flex' : 'flex'}`}>
           <div className="border-b border-line px-5 py-5">
-            <h1 className="display text-[34px] leading-none text-ink">Messages</h1>
+            <h1 className="display text-[34px] leading-none text-ink">{t('nav.messages')}</h1>
           </div>
           <div className="flex-1 overflow-y-auto scrollbar-thin">
             {loadingList ? (
@@ -196,12 +202,8 @@ export default function ChatPage() {
               </div>
             ) : conversations.length === 0 ? (
               <div className="px-5 py-12 text-sm leading-relaxed text-ink-2">
-                <p className="font-semibold text-ink">No conversations yet.</p>
-                <p className="mt-1">
-                  {user?.role === 'SALON_OWNER'
-                    ? 'Message a client from any booking in your workspace.'
-                    : 'Message a salon from its page or from one of your appointments.'}
-                </p>
+                <p className="font-semibold text-ink">{t('chat.empty')}</p>
+                <p className="mt-1">{user?.role === 'SALON_OWNER' ? t('chat.emptyOwner') : t('chat.emptyCustomer')}</p>
               </div>
             ) : (
               conversations.map((c) => {
@@ -229,10 +231,12 @@ export default function ChatPage() {
                       <span className="mt-0.5 flex items-center gap-2">
                         <span className={`truncate text-[13px] ${unread ? 'text-ink' : 'text-ink-3'}`}>
                           {c.lastMessage
-                            ? `${Number(c.lastMessage.senderId) === Number(user?.id) ? 'You: ' : ''}${c.lastMessage.content}`
-                            : 'No messages yet'}
+                            ? Number(c.lastMessage.senderId) === Number(user?.id)
+                              ? t('chat.youPrefix', { text: c.lastMessage.content })
+                              : c.lastMessage.content
+                            : t('chat.noMessages')}
                         </span>
-                        {unread && <span className="h-2 w-2 shrink-0 rounded-full bg-accent" aria-label="Unread" />}
+                        {unread && <span className="h-2 w-2 shrink-0 rounded-full bg-accent" aria-label={t('chat.unread')} />}
                       </span>
                     </span>
                   </button>
@@ -246,24 +250,24 @@ export default function ChatPage() {
         <section className={`min-h-0 flex-col ${showThreadOnMobile ? 'flex' : 'hidden md:flex'}`}>
           {!conversation && !loadingThread ? (
             <div className="flex flex-1 flex-col items-center justify-center px-8 text-center">
-              <p className="display text-[34px] text-ink">Pick a conversation.</p>
+              <p className="display text-[34px] text-ink">{t('chat.pick')}</p>
               <p className="mt-2 max-w-xs text-sm text-ink-2">
-                Your conversations with {user?.role === 'SALON_OWNER' ? 'clients' : 'salons'} will open here.
+                {user?.role === 'SALON_OWNER' ? t('chat.pickOwner') : t('chat.pickCustomer')}
               </p>
               {error && <p className="mt-4 text-sm text-danger">{error}</p>}
             </div>
           ) : (
             <>
               <header className="flex items-center gap-3 border-b border-line px-5 py-3.5">
-                <Link to="/chat" className="icon-btn -ml-2 md:hidden" aria-label="Back to conversations">
+                <Link to="/chat" className="icon-btn -ml-2 md:hidden" aria-label={t('chat.back')}>
                   <ArrowLeft size={18} />
                 </Link>
                 {conversation && <Avatar name={other.name} size={36} />}
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-semibold text-ink">{conversation ? other.name : 'Loading…'}</p>
+                  <p className="truncate font-semibold text-ink">{conversation ? other.name : `${t('common.loading')}…`}</p>
                   <p className="flex items-center gap-1.5 text-[12px] text-ink-3">
                     <span className={`h-1.5 w-1.5 rounded-full ${connected ? 'bg-success' : 'bg-warning'}`} />
-                    {connected ? 'Live' : 'Reconnecting…'}
+                    {connected ? t('chat.live') : t('chat.reconnecting')}
                   </p>
                 </div>
               </header>
@@ -274,7 +278,7 @@ export default function ChatPage() {
                     <span className="spinner" />
                   </div>
                 ) : messages.length === 0 ? (
-                  <p className="mt-10 text-center text-sm text-ink-3">Say hello — this is the start of your conversation.</p>
+                  <p className="mt-10 text-center text-sm text-ink-3">{t('chat.start')}</p>
                 ) : (
                   <div className="mx-auto max-w-2xl space-y-1.5">
                     {grouped.map((item, i) => {
@@ -303,7 +307,7 @@ export default function ChatPage() {
                             <span className="mt-1 px-1 text-[11px] text-ink-3">
                               {clock(item.createdAt)}
                               {mine &&
-                                ` · ${item.status === 'SENDING' ? 'Sending' : item.status === 'READ' ? 'Read' : item.status === 'DELIVERED' ? 'Delivered' : 'Sent'}`}
+                                ` · ${t(STATUS_KEY[item.status] || 'chat.sent')}`}
                             </span>
                           )}
                         </div>
@@ -334,22 +338,22 @@ export default function ChatPage() {
                         send();
                       }
                     }}
-                    placeholder={connected ? `Message ${other.name}` : 'Connecting…'}
+                    placeholder={connected ? t('chat.placeholder', { name: other.name }) : t('chat.connecting')}
                     className="max-h-[140px] flex-1 resize-none bg-transparent px-2 py-1.5 text-[14.5px] text-ink placeholder:text-ink-3 focus:outline-none"
-                    aria-label="Message"
+                    aria-label={t('salon.message')}
                     disabled={!conversation}
                   />
                   <button
                     type="submit"
                     className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-ink text-paper transition hover:bg-ink/85 disabled:opacity-30"
                     disabled={!text.trim() || !connected}
-                    aria-label="Send message"
+                    aria-label={t('chat.send')}
                   >
                     <ArrowUp size={17} />
                   </button>
                 </div>
                 <p className="mx-auto mt-1.5 hidden max-w-2xl px-1 text-[11px] text-ink-3 sm:block">
-                  Enter to send · Shift + Enter for a new line
+                  {t('chat.hint')}
                 </p>
               </form>
             </>
