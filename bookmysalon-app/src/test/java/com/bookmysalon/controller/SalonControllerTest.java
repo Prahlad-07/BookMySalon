@@ -2,6 +2,7 @@ package com.bookmysalon.controller;
 
 import com.bookmysalon.dto.SalonDto;
 import com.bookmysalon.dto.response.ApiResponse;
+import com.bookmysalon.exception.UnauthorizedException;
 import com.bookmysalon.security.CustomUserPrincipal;
 import com.bookmysalon.service.SalonService;
 import org.junit.jupiter.api.AfterEach;
@@ -18,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -87,9 +89,9 @@ class SalonControllerTest {
                 new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities())
         );
 
-        ResponseEntity<ApiResponse<List<SalonDto>>> response = salonController.getCurrentOwnerSalons();
-
-        assertEquals(403, response.getStatusCode().value());
+        // A customer hitting an owner-only endpoint is rejected before the service is touched.
+        // GlobalExceptionHandler maps UnauthorizedException to HTTP 403.
+        assertThrows(UnauthorizedException.class, () -> salonController.getCurrentOwnerSalons());
         verify(salonService, never()).getSalonsByOwnerId(userId);
     }
 }

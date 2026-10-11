@@ -1,22 +1,15 @@
 /**
  * @author Prahlad Yadav
- * @version 1.0
+ * @version 2.0
  * @since 2026-02-13
  */
 package com.bookmysalon.service;
 
 import com.bookmysalon.dto.UserDto;
-import com.bookmysalon.dto.SignupDto;
-import com.bookmysalon.dto.LoginDto;
-import com.bookmysalon.dto.response.AuthResponse;
-import com.bookmysalon.dto.response.UserInfoResponse;
 
 public interface UserService {
-    UserDto createUser(SignupDto signupDto);
     UserDto getUserById(Long id);
-    UserDto getUserByEmail(String email);
     UserDto updateUser(Long id, UserDto userDto);
     void deleteUser(Long id);
-    AuthResponse login(LoginDto loginDto);
-    UserInfoResponse getUserInfo(Long userId);
+    void changePassword(Long id, String currentPassword, String newPassword);
 }

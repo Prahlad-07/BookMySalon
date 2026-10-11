@@ -1,417 +1,320 @@
 /**
  * @author Prahlad Yadav
- * @version 1.0
+ * @version 3.0
  * @since 2026-02-16
  */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
-import {
-  Bell,
-  LogOut,
-  Menu,
-  MessageCircle,
-  Moon,
-  Sparkles,
-  Sun,
-  X,
-} from 'lucide-react';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { Bell, LogOut, Menu, Moon, Sun, UserRound, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
-import brandLogo from '../assets/brand-logo.png';
+import api from '../config/api';
+import { Avatar, Wordmark } from './ui';
 
-const getRoleLinks = (role) => {
+const ROLE_LABEL = { CUSTOMER: 'Customer', SALON_OWNER: 'Salon owner', ADMIN: 'Administrator' };
+
+const linksFor = (role) => {
   if (role === 'SALON_OWNER') {
-    return [{ to: '/salon/dashboard', label: 'Owner Console' }];
+    return [
+      { to: '/salon/dashboard', label: 'Workspace' },
+      { to: '/salons', label: 'Marketplace' },
+      { to: '/chat', label: 'Messages' },
+    ];
   }
-
   if (role === 'ADMIN') {
-    return [{ to: '/admin/dashboard', label: 'Admin Dashboard' }];
+    return [
+      { to: '/admin/dashboard', label: 'Overview' },
+      { to: '/salons', label: 'Salons' },
+    ];
   }
-
   return [
-    { to: '/customer/dashboard', label: 'Customer Dashboard' },
-    { to: '/salons', label: 'Find Salons' },
-    { to: '/bookings', label: 'My Bookings' },
+    { to: '/salons', label: 'Discover' },
+    { to: '/bookings', label: 'Appointments' },
+    { to: '/chat', label: 'Messages' },
   ];
 };
 
-const desktopLinkClass = ({ isActive }) =>
-  `inline-flex items-center px-3 py-2 rounded-xl text-sm font-semibold transition ${
-    isActive
-      ? 'text-primary-700 bg-primary-50 border border-primary-100 shadow-sm'
-      : 'text-slate-700 hover:text-primary-700 hover:bg-white/70 border border-transparent'
-  }`;
+const relativeTime = (iso) => {
+  const t = new Date(iso).getTime();
+  if (Number.isNaN(t)) return '';
+  const diff = Math.round((Date.now() - t) / 60000);
+  if (diff < 1) return 'just now';
+  if (diff < 60) return `${diff}m ago`;
+  if (diff < 1440) return `${Math.round(diff / 60)}h ago`;
+  return `${Math.round(diff / 1440)}d ago`;
+};
 
-const mobileLinkClass = ({ isActive }) =>
-  `block px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
-    isActive
-      ? 'text-primary-700 bg-primary-50 border border-primary-100'
-      : 'text-slate-700 hover:text-primary-700 hover:bg-slate-100/70 border border-transparent'
-  }`;
+const NOTIFICATION_COPY = {
+  NEW_MESSAGE: 'New message',
+  BOOKING_CONFIRMATION: 'Booking confirmed',
+  BOOKING_CANCELLATION: 'Booking cancelled',
+};
 
-const normalizeNotificationType = (type) =>
-  String(type || 'NOTIFICATION').replaceAll('_', ' ');
+function useDismiss(ref, open, onClose) {
+  useEffect(() => {
+    if (!open) return undefined;
+    const onDown = (event) => {
+      if (ref.current && !ref.current.contains(event.target)) onClose();
+    };
+    const onKey = (event) => {
+      if (event.key === 'Escape') onClose();
+    };
+    document.addEventListener('mousedown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [ref, open, onClose]);
+}
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [notifications, setNotifications] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [isScrolled, setIsScrolled] = useState(false);
-
   const { user, logout } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
-  const notificationRef = useRef(null);
+  const { pathname } = useLocation();
 
-  const roleLinks = user ? getRoleLinks(user.role) : [];
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [bellOpen, setBellOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
+  const [unreadMessages, setUnreadMessages] = useState(0);
 
-  const handleLogout = () => {
-    logout();
-    setIsOpen(false);
-    setShowNotifications(false);
-    navigate('/');
-  };
+  const bellRef = useRef(null);
+  const menuRef = useRef(null);
+  const closeBell = useCallback(() => setBellOpen(false), []);
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
+  useDismiss(bellRef, bellOpen, closeBell);
+  useDismiss(menuRef, menuOpen, closeMenu);
 
-  const loadNotifications = useCallback(async () => {
+  useEffect(() => {
+    setMobileOpen(false);
+    setBellOpen(false);
+    setMenuOpen(false);
+  }, [pathname]);
+
+  const load = useCallback(async () => {
     if (!user) return;
-
     try {
       const [counts, list] = await Promise.all([
         api.get('/api/chat/unread-count'),
-        api.get('/api/chat/notifications?limit=10'),
+        api.get('/api/chat/notifications?limit=12'),
       ]);
-
-      const unreadMessages = Number(counts?.unreadMessages || 0);
-      const unreadNotifications = Number(counts?.unreadNotifications || 0);
-      setUnreadCount(unreadMessages + unreadNotifications);
+      setUnreadMessages(Number(counts?.unreadMessages || 0));
+      setUnreadNotifications(Number(counts?.unreadNotifications || 0));
       setNotifications(Array.isArray(list) ? list : []);
     } catch (_) {
-      // Swallow transient polling errors; navbar remains usable.
+      // Navigation must keep working when the counter endpoint is briefly unavailable.
     }
   }, [user]);
-
-  const markNotificationRead = async (notificationId) => {
-    try {
-      await api.put(`/api/chat/notifications/${notificationId}/read`);
-      setNotifications((previous) =>
-        previous.map((item) =>
-          item.id === notificationId
-            ? {
-                ...item,
-                wasRead: true,
-              }
-            : item
-        )
-      );
-      setUnreadCount((previous) => Math.max(previous - 1, 0));
-    } catch (_) {
-      // Notification read failures should not block navigation.
-    }
-  };
 
   useEffect(() => {
     if (!user) {
       setNotifications([]);
-      setUnreadCount(0);
-      return;
+      setUnreadMessages(0);
+      setUnreadNotifications(0);
+      return undefined;
     }
+    load();
+    const id = setInterval(load, 30000);
+    return () => clearInterval(id);
+  }, [user, load]);
 
-    loadNotifications();
-    const intervalId = setInterval(loadNotifications, 30000);
-    return () => clearInterval(intervalId);
-  }, [user, loadNotifications]);
+  const openNotification = async (item) => {
+    setBellOpen(false);
+    if (!item.wasRead) {
+      setNotifications((prev) => prev.map((n) => (n.id === item.id ? { ...n, wasRead: true } : n)));
+      setUnreadNotifications((n) => Math.max(0, n - 1));
+      api.put(`/api/chat/notifications/${item.id}/read`).catch(() => {});
+    }
+    if (item.conversationId) navigate('/chat');
+    else if (item.bookingId) navigate(user?.role === 'SALON_OWNER' ? '/salon/dashboard' : '/bookings');
+  };
 
-  useEffect(() => {
-    const onClickOutside = (event) => {
-      if (!notificationRef.current) return;
-      if (!notificationRef.current.contains(event.target)) {
-        setShowNotifications(false);
-      }
-    };
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
-    document.addEventListener('mousedown', onClickOutside);
-    return () => document.removeEventListener('mousedown', onClickOutside);
-  }, []);
+  const links = user ? linksFor(user.role) : [];
 
-  useEffect(() => {
-    const onScroll = () => {
-      setIsScrolled(window.scrollY > 8);
-    };
-
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+  const linkClass = ({ isActive }) =>
+    `relative py-1 text-[14px] font-medium transition-colors ${
+      isActive
+        ? 'text-ink after:absolute after:-bottom-[21px] after:left-0 after:right-0 after:h-[2px] after:bg-ink'
+        : 'text-ink-2 hover:text-ink'
+    }`;
 
   return (
-    <nav
-      className={`sticky top-0 z-50 nav-surface ${isScrolled ? 'nav-surface-scrolled' : ''}`}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="h-[4.6rem] flex items-center justify-between gap-3">
-          <Link
-            to="/"
-            className="flex items-center gap-3 min-w-0"
-            aria-label="BookMySalon home"
-          >
-            <img
-              src={brandLogo}
-              alt="BookMySalon"
-              className="brand-logo-main"
-            />
-            <span className="hidden sm:flex flex-col leading-tight">
-              <span className="text-[0.95rem] font-semibold text-slate-900">
-                BookMySalon
-              </span>
-              <span className="text-[0.68rem] uppercase tracking-[0.14em] text-slate-500">
-                Smart booking platform
-              </span>
-            </span>
-          </Link>
-
-          <div className="hidden lg:flex items-center gap-2 min-w-0">
-            <NavLink to="/" className={desktopLinkClass}>
-              Home
-            </NavLink>
-
-            {user &&
-              roleLinks.map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  className={desktopLinkClass}
-                >
+    <header className="sticky top-0 z-50 border-b border-line bg-paper/90 backdrop-blur-md">
+      <div className="shell flex h-16 items-center justify-between gap-6">
+        <div className="flex items-center gap-10">
+          <Wordmark />
+          {user && (
+            <nav aria-label="Primary" className="hidden items-center gap-7 md:flex">
+              {links.map((item) => (
+                <NavLink key={item.to} to={item.to} className={linkClass}>
                   {item.label}
+                  {item.to === '/chat' && unreadMessages > 0 && (
+                    <span className="num ml-1.5 inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-accent px-1 text-[10.5px] font-semibold text-accent-ink">
+                      {unreadMessages > 9 ? '9+' : unreadMessages}
+                    </span>
+                  )}
                 </NavLink>
               ))}
-
-            {user && (
-              <NavLink to="/chat" className={desktopLinkClass}>
-                <span className="inline-flex items-center gap-1.5">
-                  <MessageCircle size={15} /> Chat
-                </span>
-              </NavLink>
-            )}
-
-            {!user && (
-              <>
-                <NavLink to="/login" className={desktopLinkClass}>
-                  Sign In
-                </NavLink>
-                <NavLink to="/signup" className="btn-primary !px-4 !py-2.5">
-                  Sign Up
-                </NavLink>
-              </>
-            )}
-          </div>
-
-          <div className="hidden lg:flex items-center gap-2">
-            {user && (
-              <>
-                <div className="relative" ref={notificationRef}>
-                  <button
-                    type="button"
-                    className="relative inline-flex items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:border-primary-200 hover:text-primary-700 hover:bg-white/80"
-                    onClick={() => {
-                      setShowNotifications((previous) => !previous);
-                      loadNotifications();
-                    }}
-                  >
-                    <Bell size={15} />
-                    Alerts
-                    {unreadCount > 0 && (
-                      <span className="absolute -right-1.5 -top-1.5 min-w-[1.1rem] rounded-full bg-red-500 px-1.5 py-[2px] text-[10px] font-bold leading-none text-white text-center">
-                        {unreadCount > 99 ? '99+' : unreadCount}
-                      </span>
-                    )}
-                  </button>
-
-                  <AnimatePresence>
-                    {showNotifications && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 8, scale: 0.98 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 8, scale: 0.98 }}
-                        transition={{ duration: 0.18 }}
-                        className="absolute right-0 mt-2 w-80 max-w-[90vw] rounded-2xl surface-card p-2 z-50"
-                      >
-                        <p className="px-2 pt-1 pb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                          Recent alerts
-                        </p>
-                        <div className="space-y-1 max-h-80 overflow-auto pr-1">
-                          {notifications.length === 0 && (
-                            <p className="px-2 py-4 text-sm text-slate-500">
-                              No alerts yet.
-                            </p>
-                          )}
-
-                          {notifications.map((item) => {
-                            const isRead = Boolean(item.wasRead);
-                            return (
-                              <button
-                                key={item.id}
-                                type="button"
-                                onClick={() => {
-                                  if (!isRead) {
-                                    markNotificationRead(item.id);
-                                  }
-                                  setShowNotifications(false);
-                                  if (item.conversationId) {
-                                    navigate('/chat');
-                                  }
-                                }}
-                                className={`w-full text-left p-2.5 rounded-lg border transition ${
-                                  isRead
-                                    ? 'surface-muted border-slate-200'
-                                    : 'bg-primary-50 border-primary-200'
-                                }`}
-                              >
-                                <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-700">
-                                  {normalizeNotificationType(item.type)}
-                                </p>
-                                <p className="text-xs text-slate-600 mt-1 line-clamp-2">
-                                  {item.description}
-                                </p>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-
-                <NavLink to="/profile" className={desktopLinkClass}>
-                  Profile
-                </NavLink>
-
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="btn-primary !px-4 !py-2.5 inline-flex items-center gap-1.5"
-                >
-                  <LogOut size={15} />
-                  Logout
-                </button>
-              </>
-            )}
-
-            <button
-              type="button"
-              onClick={toggleTheme}
-              className="theme-toggle-btn"
-              aria-label="Toggle theme"
-              title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-            >
-              {isDark ? <Sun size={16} /> : <Moon size={16} />}
-            </button>
-          </div>
-
-          <div className="lg:hidden flex items-center gap-2">
-            {user && unreadCount > 0 && (
-              <span className="status-pill status-danger inline-flex items-center gap-1.5">
-                <Sparkles size={12} />
-                {unreadCount}
-              </span>
-            )}
-            <button
-              type="button"
-              onClick={toggleTheme}
-              className="theme-toggle-btn"
-              aria-label="Toggle theme"
-              title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-            >
-              {isDark ? <Sun size={16} /> : <Moon size={16} />}
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsOpen((previous) => !previous)}
-              className="p-2 rounded-xl text-slate-700 hover:bg-slate-100 border border-slate-200"
-              aria-label="Toggle menu"
-            >
-              {isOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
-          </div>
+            </nav>
+          )}
         </div>
 
-        <AnimatePresence>
-          {isOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.2 }}
-              className="lg:hidden py-3 border-t border-slate-200 space-y-1"
-            >
-              <NavLink
-                to="/"
-                className={mobileLinkClass}
-                onClick={() => setIsOpen(false)}
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            className="icon-btn"
+            onClick={toggleTheme}
+            aria-label={isDark ? 'Switch to light theme' : 'Switch to dark theme'}
+          >
+            {isDark ? <Sun size={17} strokeWidth={1.75} /> : <Moon size={17} strokeWidth={1.75} />}
+          </button>
+
+          {user ? (
+            <>
+              <div className="relative" ref={bellRef}>
+                <button
+                  type="button"
+                  className="icon-btn relative"
+                  onClick={() => {
+                    setBellOpen((v) => !v);
+                    setMenuOpen(false);
+                    if (!bellOpen) load();
+                  }}
+                  aria-label={`Notifications${unreadNotifications ? `, ${unreadNotifications} unread` : ''}`}
+                  aria-expanded={bellOpen}
+                >
+                  <Bell size={17} strokeWidth={1.75} />
+                  {unreadNotifications > 0 && (
+                    <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-accent ring-2 ring-paper" />
+                  )}
+                </button>
+
+                {bellOpen && (
+                  <div className="animate-fade absolute right-0 top-11 w-[340px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-lg border border-line bg-surface shadow-pop">
+                    <div className="flex items-center justify-between border-b border-line px-4 py-3">
+                      <p className="text-sm font-semibold">Notifications</p>
+                      {unreadNotifications > 0 && <span className="text-xs text-ink-3">{unreadNotifications} unread</span>}
+                    </div>
+                    <div className="max-h-[360px] overflow-auto scrollbar-thin">
+                      {notifications.length === 0 ? (
+                        <p className="px-4 py-10 text-center text-sm text-ink-3">You’re all caught up.</p>
+                      ) : (
+                        notifications.map((item) => (
+                          <button
+                            key={item.id}
+                            type="button"
+                            onClick={() => openNotification(item)}
+                            className="flex w-full gap-3 border-b border-line px-4 py-3 text-left last:border-0 hover:bg-sunken"
+                          >
+                            <span
+                              className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${item.wasRead ? 'bg-transparent' : 'bg-accent'}`}
+                              aria-hidden="true"
+                            />
+                            <span className="min-w-0 flex-1">
+                              <span className="flex items-baseline justify-between gap-2">
+                                <span className="text-[13px] font-semibold text-ink">
+                                  {NOTIFICATION_COPY[item.type] || 'Update'}
+                                </span>
+                                <span className="shrink-0 text-[11.5px] text-ink-3">{relativeTime(item.createdAt)}</span>
+                              </span>
+                              <span className="mt-0.5 block truncate text-[13px] text-ink-2">{item.description}</span>
+                            </span>
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="relative ml-1" ref={menuRef}>
+                <button
+                  type="button"
+                  className="flex items-center rounded-full p-0.5 transition hover:ring-2 hover:ring-line"
+                  onClick={() => {
+                    setMenuOpen((v) => !v);
+                    setBellOpen(false);
+                  }}
+                  aria-label="Account menu"
+                  aria-expanded={menuOpen}
+                >
+                  <Avatar name={user.fullName || user.name || user.email} size={32} />
+                </button>
+
+                {menuOpen && (
+                  <div className="animate-fade absolute right-0 top-11 w-64 overflow-hidden rounded-lg border border-line bg-surface shadow-pop">
+                    <div className="border-b border-line px-4 py-3.5">
+                      <p className="truncate text-sm font-semibold">{user.fullName || user.name}</p>
+                      <p className="truncate text-[13px] text-ink-3">{user.email}</p>
+                      <p className="eyebrow mt-2 !text-[10px]">{ROLE_LABEL[user.role] || 'Member'}</p>
+                    </div>
+                    <div className="p-1.5">
+                      <Link to="/profile" className="flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-ink-2 hover:bg-sunken hover:text-ink">
+                        <UserRound size={16} strokeWidth={1.75} /> Account settings
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-ink-2 hover:bg-sunken hover:text-ink"
+                      >
+                        <LogOut size={16} strokeWidth={1.75} /> Sign out
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <button
+                type="button"
+                className="icon-btn ml-1 md:hidden"
+                onClick={() => setMobileOpen((v) => !v)}
+                aria-label="Open menu"
+                aria-expanded={mobileOpen}
               >
-                Home
-              </NavLink>
-
-              {user &&
-                roleLinks.map((item) => (
-                  <NavLink
-                    key={item.to}
-                    to={item.to}
-                    className={mobileLinkClass}
-                    onClick={() => setIsOpen(false)}
-                  >
-                    {item.label}
-                  </NavLink>
-                ))}
-
-              {user ? (
-                <>
-                  <NavLink
-                    to="/chat"
-                    className={mobileLinkClass}
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Chat
-                  </NavLink>
-                  <NavLink
-                    to="/profile"
-                    className={mobileLinkClass}
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Profile
-                  </NavLink>
-                  <button
-                    type="button"
-                    onClick={handleLogout}
-                    className="btn-primary w-full mt-2"
-                  >
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <>
-                  <NavLink
-                    to="/login"
-                    className={mobileLinkClass}
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Sign In
-                  </NavLink>
-                  <NavLink
-                    to="/signup"
-                    className="btn-primary w-full block text-center mt-2"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Sign Up
-                  </NavLink>
-                </>
-              )}
-            </motion.div>
+                {mobileOpen ? <X size={19} /> : <Menu size={19} />}
+              </button>
+            </>
+          ) : (
+            <div className="ml-2 flex items-center gap-2">
+              <Link to="/login" className="btn-ghost btn-sm hidden sm:inline-flex">
+                Sign in
+              </Link>
+              <Link to="/signup" className="btn-dark btn-sm">
+                Get started
+              </Link>
+            </div>
           )}
-        </AnimatePresence>
+        </div>
       </div>
-    </nav>
+
+      {user && mobileOpen && (
+        <nav aria-label="Mobile" className="animate-fade border-t border-line bg-paper md:hidden">
+          <div className="shell flex flex-col py-2">
+            {links.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) =>
+                  `flex items-center justify-between border-b border-line py-3.5 text-[15px] last:border-0 ${
+                    isActive ? 'font-semibold text-ink' : 'text-ink-2'
+                  }`
+                }
+              >
+                {item.label}
+                {item.to === '/chat' && unreadMessages > 0 && <span className="tag-accent">{unreadMessages}</span>}
+              </NavLink>
+            ))}
+          </div>
+        </nav>
+      )}
+    </header>
   );
 }

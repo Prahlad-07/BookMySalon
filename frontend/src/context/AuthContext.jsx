@@ -5,6 +5,11 @@
  */
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import api from '../config/api';
+import {
+  clearAuthSession,
+  getAccessToken,
+  persistAuthSession,
+} from '../utils/authSession';
 
 const AuthContext = createContext();
 
@@ -125,14 +130,14 @@ export const AuthProvider = ({ children }) => {
       const normalizedProfile = normalizeUser(profile);
       setUser(normalizedProfile);
       if (normalizedProfile.id) {
-        localStorage.setItem('userId', String(normalizedProfile.id));
+        persistAuthSession({ id: normalizedProfile.id });
       }
       return normalizedProfile;
     } catch (_) {
       const normalizedFallback = normalizeUser(fallbackUser);
       setUser(normalizedFallback);
       if (normalizedFallback.id) {
-        localStorage.setItem('userId', String(normalizedFallback.id));
+        persistAuthSession({ id: normalizedFallback.id });
       }
       return normalizedFallback;
     }
@@ -143,7 +148,7 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     }, 12000);
 
-    const token = localStorage.getItem('accessToken');
+    const token = getAccessToken();
     if (token) {
       fetchUserProfile();
     } else {
@@ -158,9 +163,7 @@ export const AuthProvider = ({ children }) => {
       const response = await api.get('/api/user/me');
       setUser(normalizeUser(response));
     } catch (err) {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('userId');
+      clearAuthSession();
       setUser(null);
     } finally {
       setLoading(false);
@@ -183,10 +186,7 @@ export const AuthProvider = ({ children }) => {
         password,
       });
 
-      const { token, refreshToken, id } = response || {};
-      if (token) localStorage.setItem('accessToken', token);
-      if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
-      if (id) localStorage.setItem('userId', id);
+      persistAuthSession(response);
       return await hydrateAuthenticatedUser(response);
     } catch (err) {
       const errorMessage = extractErrorMessage(err, 'Login failed. Please try again.');
@@ -223,10 +223,7 @@ export const AuthProvider = ({ children }) => {
 
       const response = await api.post('/api/auth/register', signupPayload);
 
-      const { token, refreshToken, id } = response || {};
-      if (token) localStorage.setItem('accessToken', token);
-      if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
-      if (id) localStorage.setItem('userId', id);
+      persistAuthSession(response);
       const normalized = await hydrateAuthenticatedUser(response);
       return { ok: true, user: normalized };
     } catch (err) {
@@ -292,10 +289,7 @@ export const AuthProvider = ({ children }) => {
         msg91AccessToken,
       });
 
-      const { token, refreshToken, id } = response || {};
-      if (token) localStorage.setItem('accessToken', token);
-      if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
-      if (id) localStorage.setItem('userId', id);
+      persistAuthSession(response);
       await hydrateAuthenticatedUser(response);
       return true;
     } catch (err) {
@@ -305,10 +299,16 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const acceptExternalSession = async (session) => {
+    if (!session?.token) {
+      throw new Error('Authentication response did not include an access token');
+    }
+    persistAuthSession(session);
+    return hydrateAuthenticatedUser(session);
+  };
+
   const logout = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('userId');
+    clearAuthSession();
     setUser(null);
   };
 
@@ -323,8 +323,10 @@ export const AuthProvider = ({ children }) => {
         initiateSignupOtp,
         resendSignupOtp,
         verifySignupOtp,
+        acceptExternalSession,
         logout,
         setUser,
+        clearError: () => setError(null),
       }}
     >
       {children}

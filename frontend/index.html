@@ -2,16 +2,19 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <meta name="theme-color" content="#F5F1EA" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Book My Salon - Find and book your favorite salon services easily" />
-    <title>Book My Salon - Premium Salon Booking Platform</title>
+    <meta name="description" content="Find a salon you will love and book it in under a minute. BookMySalon brings discovery, scheduling and salon operations together." />
+    <title>BookMySalon</title>
     <script>
       (function () {
         try {
           var saved = localStorage.getItem('bookmysalon_theme');
           var systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-          var theme = saved === 'light' || saved === 'dark' ? saved : (systemDark ? 'dark' : 'light');
+          var theme = saved === 'light' || saved === 'dark' ? saved : 'light';
           document.documentElement.setAttribute('data-theme', theme);
         } catch (e) {
           document.documentElement.setAttribute('data-theme', 'light');

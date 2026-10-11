@@ -1,13 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MAPBOX_DEFAULT_CENTER, MAPBOX_STYLE_URL, formatCoordinate } from '../../config/mapbox';
 import { loadMapboxGl } from '../../utils/loadMapboxGl';
-
-const getInitialCoordinates = (value) => {
-  if (value && Number.isFinite(value.latitude) && Number.isFinite(value.longitude)) {
-    return value;
-  }
-  return MAPBOX_DEFAULT_CENTER;
-};
 
 export default function MapboxLocationPicker({
   accessToken,
@@ -25,9 +18,17 @@ export default function MapboxLocationPicker({
   const [mapError, setMapError] = useState('');
   const [isInitializing, setIsInitializing] = useState(true);
 
-  const initialCoordinates = getInitialCoordinates(value);
+  const valueLatitude = value?.latitude;
+  const valueLongitude = value?.longitude;
+  const initialCoordinates = useMemo(
+    () =>
+      Number.isFinite(valueLatitude) && Number.isFinite(valueLongitude)
+        ? { latitude: valueLatitude, longitude: valueLongitude }
+        : MAPBOX_DEFAULT_CENTER,
+    [valueLatitude, valueLongitude]
+  );
 
-  const setMarkerPosition = (latitude, longitude, flyToPosition = true) => {
+  const setMarkerPosition = useCallback((latitude, longitude, flyToPosition = true) => {
     if (!markerRef.current) return;
 
     markerRef.current.setLngLat([longitude, latitude]);
@@ -43,7 +44,7 @@ export default function MapboxLocationPicker({
     if (onChangeRef.current) {
       onChangeRef.current({ latitude, longitude });
     }
-  };
+  }, [zoom]);
 
   const centerOnMarker = () => {
     if (!mapRef.current || !markerRef.current) return;
@@ -141,15 +142,22 @@ export default function MapboxLocationPicker({
       }
       markerRef.current = null;
     };
-  }, [accessToken, readOnly, zoom]);
+  }, [
+    accessToken,
+    initialCoordinates.latitude,
+    initialCoordinates.longitude,
+    readOnly,
+    setMarkerPosition,
+    zoom,
+  ]);
 
   useEffect(() => {
     if (!mapRef.current || !markerRef.current) return;
-    if (!value || !Number.isFinite(value.latitude) || !Number.isFinite(value.longitude)) return;
+    if (!Number.isFinite(valueLatitude) || !Number.isFinite(valueLongitude)) return;
 
-    const nextPosition = [value.longitude, value.latitude];
+    const nextPosition = [valueLongitude, valueLatitude];
     markerRef.current.setLngLat(nextPosition);
-  }, [value?.latitude, value?.longitude]);
+  }, [valueLatitude, valueLongitude]);
 
   if (!accessToken) {
     return (
@@ -165,22 +173,22 @@ export default function MapboxLocationPicker({
         <div ref={containerRef} className="h-80 w-full" />
         {isInitializing && (
           <div className="map-loading-overlay">
-            <div className="card-base rounded-xl px-4 py-3 text-sm text-slate-700">Loading map...</div>
+            <div className="flex items-center gap-2 rounded-md border border-line bg-surface px-4 py-2.5 text-sm text-ink-2">Loading map...</div>
           </div>
         )}
       </div>
 
-      <div className="mt-2 text-sm text-slate-600 flex flex-wrap items-center gap-3">
+      <div className="num mt-2 flex flex-wrap items-center gap-3 text-[13px] text-ink-3">
         <span>Lat: {formatCoordinate(value?.latitude)}</span>
         <span>Lng: {formatCoordinate(value?.longitude)}</span>
       </div>
 
       <div className="map-control-row">
-        <button type="button" onClick={centerOnMarker} className="btn-outline px-3 py-1.5 text-xs">
+        <button type="button" onClick={centerOnMarker} className="btn-secondary btn-sm">
           Center on Pin
         </button>
         {!readOnly && (
-          <button type="button" onClick={resetToDefaultLocation} className="btn-outline px-3 py-1.5 text-xs">
+          <button type="button" onClick={resetToDefaultLocation} className="btn-secondary btn-sm">
             Reset to Default
           </button>
         )}

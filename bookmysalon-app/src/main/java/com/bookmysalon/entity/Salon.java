@@ -9,6 +9,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -36,6 +37,7 @@ public class Salon {
     @ElementCollection
     @CollectionTable(name = "salon_images", joinColumns = @JoinColumn(name = "salon_id"))
     @Column(name = "image_url")
+    @BatchSize(size = 100)
     private List<String> images;
 
     @Column(nullable = false)

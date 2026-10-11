@@ -1,6 +1,6 @@
 /**
  * @author Prahlad Yadav
- * @version 1.0
+ * @version 2.0
  * @since 2026-02-13
  */
 package com.bookmysalon.service.impl;
@@ -8,10 +8,15 @@ package com.bookmysalon.service.impl;
 import com.bookmysalon.dto.ReviewDto;
 import com.bookmysalon.dto.ReviewRequestDto;
 import com.bookmysalon.entity.Review;
+import com.bookmysalon.entity.User;
+import com.bookmysalon.exception.ConflictException;
+import com.bookmysalon.exception.ResourceNotFoundException;
 import com.bookmysalon.exception.ReviewNotFoundException;
 import com.bookmysalon.repository.ReviewRepository;
+import com.bookmysalon.repository.SalonRepository;
 import com.bookmysalon.service.ReviewService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +29,7 @@ import java.util.stream.Collectors;
 public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
+    private final SalonRepository salonRepository;
 
     @Override
     public ReviewDto createReview(ReviewRequestDto reviewRequestDto, Long userId) {
@@ -39,24 +45,38 @@ public class ReviewServiceImpl implements ReviewService {
         if (reviewRequestDto.getRating() == null || reviewRequestDto.getRating() < 1 || reviewRequestDto.getRating() > 5) {
             throw new IllegalArgumentException("Rating must be between 1 and 5");
         }
-        if (reviewRequestDto.getText() == null || reviewRequestDto.getText().trim().isEmpty()) {
+        String text = reviewRequestDto.getText() == null ? "" : reviewRequestDto.getText().trim();
+        if (text.isEmpty()) {
             throw new IllegalArgumentException("Review text cannot be empty");
         }
-        if (reviewRequestDto.getText().trim().length() < 10) {
+        if (text.length() < 10) {
             throw new IllegalArgumentException("Review text must be at least 10 characters long");
+        }
+        if (text.length() > 1000) {
+            throw new IllegalArgumentException("Review text must be 1000 characters or fewer");
+        }
+        if (!salonRepository.existsById(reviewRequestDto.getSalonId())) {
+            throw new ResourceNotFoundException("Salon not found with id: " + reviewRequestDto.getSalonId());
+        }
+        if (reviewRepository.existsByUserIdAndSalonId(userId, reviewRequestDto.getSalonId())) {
+            throw new ConflictException("You have already reviewed this salon. Edit your existing review instead.");
         }
 
         Review review = new Review();
-        review.setText(reviewRequestDto.getText().trim());
+        review.setText(text);
         review.setRating(reviewRequestDto.getRating());
         review.setSalonId(reviewRequestDto.getSalonId());
         review.setUserId(userId);
 
-        Review savedReview = reviewRepository.save(review);
-        return mapToDto(savedReview);
+        try {
+            return mapToDto(reviewRepository.save(review));
+        } catch (DataIntegrityViolationException ex) {
+            throw new ConflictException("You have already reviewed this salon. Edit your existing review instead.");
+        }
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ReviewDto getReviewById(Long id) {
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new ReviewNotFoundException("Review not found with id: " + id));
@@ -64,24 +84,23 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ReviewDto> getAllReviews() {
-        return reviewRepository.findAll().stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+        return reviewRepository.findAll().stream().map(this::mapToDto).collect(Collectors.toList());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ReviewDto> getReviewsBySalonId(Long salonId) {
-        return reviewRepository.findBySalonId(salonId).stream()
+        return reviewRepository.findBySalonIdWithAuthor(salonId).stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ReviewDto> getReviewsByUserId(Long userId) {
-        return reviewRepository.findByUserId(userId).stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+        return reviewRepository.findByUserId(userId).stream().map(this::mapToDto).collect(Collectors.toList());
     }
 
     @Override
@@ -94,6 +113,9 @@ public class ReviewServiceImpl implements ReviewService {
             if (text.length() < 10) {
                 throw new IllegalArgumentException("Review text must be at least 10 characters long");
             }
+            if (text.length() > 1000) {
+                throw new IllegalArgumentException("Review text must be 1000 characters or fewer");
+            }
             review.setText(text);
         }
         if (reviewRequestDto.getRating() != null) {
@@ -103,8 +125,7 @@ public class ReviewServiceImpl implements ReviewService {
             review.setRating(reviewRequestDto.getRating());
         }
 
-        Review updatedReview = reviewRepository.save(review);
-        return mapToDto(updatedReview);
+        return mapToDto(reviewRepository.save(review));
     }
 
     @Override
@@ -116,24 +137,22 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Double getAverageRating(Long salonId) {
-        List<Review> reviews = reviewRepository.findBySalonId(salonId);
-        if (reviews.isEmpty()) {
-            return 0.0;
-        }
-        return reviews.stream()
-                .mapToDouble(Review::getRating)
-                .average()
-                .orElse(0.0);
+        return reviewRepository.averageRatingForSalon(salonId);
     }
 
     private ReviewDto mapToDto(Review review) {
+        User author = review.getUser();
         return ReviewDto.builder()
                 .id(review.getId())
                 .text(review.getText())
                 .rating(review.getRating())
                 .salonId(review.getSalonId())
                 .userId(review.getUserId())
+                .reviewerName(author != null && author.getFullName() != null && !author.getFullName().isBlank()
+                        ? author.getFullName()
+                        : "Guest")
                 .createdAt(review.getCreatedAt())
                 .build();
     }

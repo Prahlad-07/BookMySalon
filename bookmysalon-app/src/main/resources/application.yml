@@ -3,13 +3,17 @@ server:
   port: ${PORT:8080}
 
 spring:
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    time-zone: UTC
   config:
     import: optional:file:.env.local[.properties]
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/bookmysalon?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
-    username: ${SPRING_DATASOURCE_USERNAME:root}
-    password: ${SPRING_DATASOURCE_PASSWORD:kzIBaSdDDPcrbYYKlmIiSsPpcjeFVAKx}
-    driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME:com.mysql.cj.jdbc.Driver}
+    url: ${SPRING_DATASOURCE_URL:jdbc:h2:mem:bookmysalon_dev;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}
+    username: ${SPRING_DATASOURCE_USERNAME:sa}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
+    driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME:org.h2.Driver}
     hikari:
       minimum-idle: ${SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE:2}
       maximum-pool-size: ${SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE:12}
@@ -59,14 +63,27 @@ security:
 stripe:
   api:
     key: ${STRIPE_API_KEY:}
+  webhook:
+    secret: ${STRIPE_WEBHOOK_SECRET:}
+  success-url: ${STRIPE_SUCCESS_URL:${APP_FRONTEND_BASE_URL:http://localhost:3000}/payment/success}
+  cancel-url: ${STRIPE_CANCEL_URL:${APP_FRONTEND_BASE_URL:http://localhost:3000}/payment/cancel}
+  currency: ${STRIPE_CURRENCY:usd}
 
 app:
+  frontend:
+    base-url: ${APP_FRONTEND_BASE_URL:http://localhost:3000}
+  demo:
+    seed-users: ${APP_DEMO_SEED_USERS:false}
   oauth2:
     enabled: ${APP_OAUTH2_ENABLED:false}
     redirect-uri: ${APP_OAUTH2_REDIRECT_URI:http://localhost:5173/oauth/callback}
     failure-uri: ${APP_OAUTH2_FAILURE_URI:http://localhost:5173/login}
   cors:
     allowed-origin-patterns: ${APP_CORS_ALLOWED_ORIGIN_PATTERNS:http://localhost:3000,http://localhost:5173,https://*.vercel.app}
+  rate-limit:
+    enabled: ${APP_RATE_LIMIT_ENABLED:true}
+    max-requests: ${APP_RATE_LIMIT_MAX_REQUESTS:10}
+    window-seconds: ${APP_RATE_LIMIT_WINDOW_SECONDS:60}
   otp:
     dev-mode: ${APP_OTP_DEV_MODE:false}
     email:

@@ -5,7 +5,7 @@
  */
 package com.bookmysalon.exception;
 
-public class ReviewNotFoundException extends RuntimeException {
+public class ReviewNotFoundException extends ResourceNotFoundException {
     public ReviewNotFoundException(String message) {
         super(message);
     }

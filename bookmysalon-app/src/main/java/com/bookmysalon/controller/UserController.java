@@ -78,6 +78,12 @@ public class UserController {
                 .build());
     }
 
+    @PutMapping("/me/password")
+    public ResponseEntity<ApiResponse<Void>> changePassword(@RequestBody java.util.Map<String, String> body) {
+        userService.changePassword(SecurityUtils.currentUserId(), body.get("currentPassword"), body.get("newPassword"));
+        return ResponseEntity.ok(ApiResponse.message("Password updated"));
+    }
+
     @DeleteMapping("/me")
     public ResponseEntity<ApiResponse<Void>> deleteCurrentUser() {
         userService.deleteUser(SecurityUtils.currentUserId());

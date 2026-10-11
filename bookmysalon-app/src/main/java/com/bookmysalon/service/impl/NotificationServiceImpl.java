@@ -8,7 +8,7 @@ package com.bookmysalon.service.impl;
 import com.bookmysalon.dto.NotificationDto;
 import com.bookmysalon.entity.Notification;
 import com.bookmysalon.entity.NotificationType;
-import com.bookmysalon.exception.UserNotFoundException;
+import com.bookmysalon.exception.ResourceNotFoundException;
 import com.bookmysalon.repository.NotificationRepository;
 import com.bookmysalon.service.NotificationService;
 import lombok.RequiredArgsConstructor;
@@ -82,7 +82,15 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public NotificationDto getNotificationById(Long id) {
         Notification notification = notificationRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("Notification not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Notification not found with id: " + id));
+        return mapToDto(notification);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public NotificationDto getNotificationForUser(Long id, Long userId) {
+        Notification notification = notificationRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Notification not found with id: " + id));
         return mapToDto(notification);
     }
 
@@ -123,7 +131,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public NotificationDto markAsRead(Long id) {
         Notification notification = notificationRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("Notification not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Notification not found with id: " + id));
         notification.setWasRead(true);
         Notification updatedNotification = notificationRepository.save(notification);
         return mapToDto(updatedNotification);
@@ -132,7 +140,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public NotificationDto markAsRead(Long id, Long userId) {
         Notification notification = notificationRepository.findByIdAndUserId(id, userId)
-                .orElseThrow(() -> new UserNotFoundException("Notification not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Notification not found with id: " + id));
         notification.setWasRead(true);
         return mapToDto(notificationRepository.save(notification));
     }
@@ -140,9 +148,16 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public void deleteNotification(Long id) {
         if (!notificationRepository.existsById(id)) {
-            throw new UserNotFoundException("Notification not found with id: " + id);
+            throw new ResourceNotFoundException("Notification not found with id: " + id);
         }
         notificationRepository.deleteById(id);
+    }
+
+    @Override
+    public void deleteNotificationForUser(Long id, Long userId) {
+        Notification notification = notificationRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Notification not found with id: " + id));
+        notificationRepository.delete(notification);
     }
 
     private NotificationDto mapToDto(Notification notification) {

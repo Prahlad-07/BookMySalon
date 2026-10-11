@@ -1,131 +1,261 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { User, Mail, Phone, LogOut } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+/**
+ * @author Prahlad Yadav
+ * @version 3.0
+ * @since 2026-02-13
+ */
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../config/api';
+import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
+import ConfirmDialog from '../components/ConfirmDialog';
+import { Avatar, Field, Notice, PageHeader } from '../components/ui';
+
+const ROLE_LABEL = { CUSTOMER: 'Customer', SALON_OWNER: 'Salon owner', ADMIN: 'Administrator' };
+const errorOf = (err, fallback) => err?.response?.data?.error || fallback;
+
+function Section({ title, description, children }) {
+  return (
+    <section className="grid gap-6 border-b border-line py-10 last:border-0 md:grid-cols-[260px_minmax(0,1fr)] md:gap-12">
+      <div>
+        <h2 className="text-[17px] font-semibold text-ink">{title}</h2>
+        {description && <p className="mt-1.5 text-sm leading-relaxed text-ink-3">{description}</p>}
+      </div>
+      <div className="max-w-xl">{children}</div>
+    </section>
+  );
+}
 
 export default function Profile() {
-  const { user, logout } = useAuth();
+  const { user, setUser, logout, login } = useAuth();
+  const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
+  const [details, setDetails] = useState({ fullName: '', phone: '' });
+  const [savingDetails, setSavingDetails] = useState(false);
+  const [detailsMsg, setDetailsMsg] = useState({ tone: '', text: '' });
+
+  const [pw, setPw] = useState({ current: '', next: '', confirm: '' });
+  const [savingPw, setSavingPw] = useState(false);
+  const [pwMsg, setPwMsg] = useState({ tone: '', text: '' });
+
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
+
+  useEffect(() => {
+    setDetails({ fullName: user?.fullName || user?.name || '', phone: user?.phone || '' });
+  }, [user]);
+
+  if (!user) return null;
+
+  const dirty = details.fullName.trim() !== (user.fullName || user.name || '') || details.phone.trim() !== (user.phone || '');
+
+  const saveDetails = async (event) => {
+    event.preventDefault();
+    if (!details.fullName.trim()) return setDetailsMsg({ tone: 'error', text: 'Your name can’t be empty.' });
+    try {
+      setSavingDetails(true);
+      const updated = await api.put('/api/user/me', { fullName: details.fullName.trim(), phone: details.phone.trim() });
+      setUser((current) => ({
+        ...current,
+        name: updated.fullName,
+        fullName: updated.fullName,
+        phone: updated.phone || '',
+      }));
+      setDetailsMsg({ tone: 'success', text: 'Saved.' });
+    } catch (err) {
+      setDetailsMsg({ tone: 'error', text: errorOf(err, 'We couldn’t save your details.') });
+    } finally {
+      setSavingDetails(false);
+    }
+    return undefined;
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+  const savePassword = async (event) => {
+    event.preventDefault();
+    if (pw.next.length < 8) return setPwMsg({ tone: 'error', text: 'Use at least 8 characters.' });
+    if (pw.next !== pw.confirm) return setPwMsg({ tone: 'error', text: 'The new passwords don’t match.' });
+    try {
+      setSavingPw(true);
+      await api.put('/api/user/me/password', { currentPassword: pw.current, newPassword: pw.next });
+      // Other sessions were revoked server-side; refresh this one with the new password.
+      await login(user.email, pw.next);
+      setPw({ current: '', next: '', confirm: '' });
+      setPwMsg({ tone: 'success', text: 'Password updated. You’ve been signed out on other devices.' });
+    } catch (err) {
+      setPwMsg({ tone: 'error', text: errorOf(err, 'We couldn’t update your password.') });
+    } finally {
+      setSavingPw(false);
+    }
+    return undefined;
   };
 
-  if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-secondary-600">Please login to view your profile</p>
-      </div>
-    );
-  }
+  const deleteAccount = async () => {
+    try {
+      setDeleting(true);
+      setDeleteError('');
+      await api.delete('/api/user/me');
+      logout();
+      navigate('/', { replace: true });
+    } catch (err) {
+      setDeleteError(errorOf(err, 'We couldn’t close your account.'));
+      setConfirmDelete(false);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const msg = (m) =>
+    m.text ? <p className={`text-sm ${m.tone === 'error' ? 'text-danger' : 'text-success'}`}>{m.text}</p> : null;
 
   return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl mx-auto">
-        {/* Header */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="mb-12"
-        >
-          <h1 className="text-4xl font-bold text-secondary-900 mb-4">
-            My <span className="gradient-text">Profile</span>
-          </h1>
-        </motion.div>
+    <div className="page">
+      <PageHeader eyebrow="Account" title="Settings" />
 
-        {/* Profile Card */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="bg-white rounded-2xl shadow-lg p-8"
-        >
-          {/* Avatar */}
-          <div className="flex justify-center mb-8">
-            <div className="w-24 h-24 bg-gradient-to-r from-primary-600 to-pink-600 rounded-full flex items-center justify-center">
-              <span className="text-5xl">👤</span>
-            </div>
-          </div>
-
-          {/* Profile Info */}
-          <div className="space-y-6">
-            {/* Name */}
-            <div>
-              <label className="block text-sm font-medium text-secondary-700 mb-2">
-                Full Name
-              </label>
-              <div className="flex items-center gap-3 p-4 bg-secondary-50 rounded-lg">
-                <User className="text-secondary-400" size={20} />
-                <p className="text-lg text-secondary-900">
-                  {user.firstName} {user.lastName}
-                </p>
-              </div>
-            </div>
-
-            {/* Email */}
-            <div>
-              <label className="block text-sm font-medium text-secondary-700 mb-2">
-                Email Address
-              </label>
-              <div className="flex items-center gap-3 p-4 bg-secondary-50 rounded-lg">
-                <Mail className="text-secondary-400" size={20} />
-                <p className="text-lg text-secondary-900">{user.email}</p>
-              </div>
-            </div>
-
-            {/* Phone */}
-            <div>
-              <label className="block text-sm font-medium text-secondary-700 mb-2">
-                Phone Number
-              </label>
-              <div className="flex items-center gap-3 p-4 bg-secondary-50 rounded-lg">
-                <Phone className="text-secondary-400" size={20} />
-                <p className="text-lg text-secondary-900">{user.phone || 'Not provided'}</p>
-              </div>
-            </div>
-
-            {/* Role */}
-            <div>
-              <label className="block text-sm font-medium text-secondary-700 mb-2">
-                Account Type
-              </label>
-              <div className="p-4 bg-primary-50 rounded-lg border border-primary-200">
-                <p className="text-lg font-semibold text-primary-700">
-                  {user.role === 'SALON_OWNER' ? '💼 Salon Owner' : '👤 Customer'}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="mt-12 space-y-3">
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="btn-secondary w-full"
-            >
-              Edit Profile
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={handleLogout}
-              className="btn-primary w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700"
-            >
-              <LogOut size={20} />
-              Logout
-            </motion.button>
-          </div>
-        </motion.div>
+      <div className="mt-10 flex items-center gap-4">
+        <Avatar name={user.fullName || user.name} size={56} />
+        <div>
+          <p className="text-[17px] font-semibold text-ink">{user.fullName || user.name}</p>
+          <p className="text-sm text-ink-3">
+            {user.email} · {ROLE_LABEL[user.role] || 'Member'}
+          </p>
+        </div>
       </div>
+
+      <div className="mt-6">
+        <Section title="Personal details" description="Salons see your name and phone number on your appointments.">
+          <form onSubmit={saveDetails} className="space-y-5">
+            <Field label="Full name" htmlFor="pf-name">
+              <input
+                id="pf-name"
+                className="field"
+                value={details.fullName}
+                maxLength={120}
+                autoComplete="name"
+                onChange={(e) => {
+                  setDetails((d) => ({ ...d, fullName: e.target.value }));
+                  setDetailsMsg({ tone: '', text: '' });
+                }}
+              />
+            </Field>
+            <Field label="Phone" htmlFor="pf-phone" hint="Optional — used by salons to reach you about a booking.">
+              <input
+                id="pf-phone"
+                type="tel"
+                className="field"
+                value={details.phone}
+                autoComplete="tel"
+                onChange={(e) => {
+                  setDetails((d) => ({ ...d, phone: e.target.value }));
+                  setDetailsMsg({ tone: '', text: '' });
+                }}
+              />
+            </Field>
+            <Field label="Email" htmlFor="pf-email" hint="Your sign-in email can’t be changed here.">
+              <input id="pf-email" className="field" value={user.email} disabled />
+            </Field>
+            <div className="flex items-center gap-4">
+              <button type="submit" className="btn-dark" disabled={!dirty || savingDetails}>
+                {savingDetails ? 'Saving…' : 'Save changes'}
+              </button>
+              {msg(detailsMsg)}
+            </div>
+          </form>
+        </Section>
+
+        <Section title="Password" description="Changing your password signs you out everywhere else.">
+          <form onSubmit={savePassword} className="space-y-5">
+            <Field label="Current password" htmlFor="pf-cur">
+              <input
+                id="pf-cur"
+                type="password"
+                className="field"
+                autoComplete="current-password"
+                value={pw.current}
+                onChange={(e) => setPw((p) => ({ ...p, current: e.target.value }))}
+              />
+            </Field>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Field label="New password" htmlFor="pf-new">
+                <input
+                  id="pf-new"
+                  type="password"
+                  className="field"
+                  autoComplete="new-password"
+                  value={pw.next}
+                  onChange={(e) => setPw((p) => ({ ...p, next: e.target.value }))}
+                />
+              </Field>
+              <Field label="Confirm new password" htmlFor="pf-confirm">
+                <input
+                  id="pf-confirm"
+                  type="password"
+                  className="field"
+                  autoComplete="new-password"
+                  value={pw.confirm}
+                  onChange={(e) => setPw((p) => ({ ...p, confirm: e.target.value }))}
+                />
+              </Field>
+            </div>
+            <div className="flex items-center gap-4">
+              <button type="submit" className="btn-dark" disabled={savingPw || !pw.current || !pw.next}>
+                {savingPw ? 'Updating…' : 'Update password'}
+              </button>
+              {msg(pwMsg)}
+            </div>
+          </form>
+        </Section>
+
+        <Section title="Appearance" description="Choose how BookMySalon looks on this device.">
+          <div className="inline-flex rounded-md border border-line-strong p-1" role="radiogroup" aria-label="Theme">
+            {[
+              ['light', 'Light'],
+              ['dark', 'Dark'],
+            ].map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                role="radio"
+                aria-checked={theme === value}
+                onClick={() => setTheme(value)}
+                className={`h-8 rounded px-4 text-sm font-medium transition ${
+                  theme === value ? 'bg-ink text-paper' : 'text-ink-2 hover:text-ink'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </Section>
+
+        <Section title="Close account" description="Permanently delete your account and sign-in details.">
+          {deleteError && (
+            <div className="mb-4">
+              <Notice tone="error">{deleteError}</Notice>
+            </div>
+          )}
+          <p className="text-sm leading-relaxed text-ink-2">
+            {user.role === 'SALON_OWNER'
+              ? 'Delete or transfer your salon profile first. Closing your account can’t be undone.'
+              : 'Your upcoming appointments should be cancelled first. This can’t be undone.'}
+          </p>
+          <button type="button" className="btn-danger mt-4" onClick={() => setConfirmDelete(true)}>
+            Close my account
+          </button>
+        </Section>
+      </div>
+
+      <ConfirmDialog
+        open={confirmDelete}
+        title="Close your account?"
+        description="Your profile and sign-in details will be deleted. This can’t be undone."
+        confirmLabel="Close account"
+        cancelLabel="Keep account"
+        busy={deleting}
+        onConfirm={deleteAccount}
+        onCancel={() => setConfirmDelete(false)}
+      />
     </div>
   );
 }

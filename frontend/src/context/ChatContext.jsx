@@ -3,15 +3,16 @@
  * @version 1.0
  * @since 2026-02-13
  */
-import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import api from '../config/api';
+import { buildWebSocketUrl } from '../config/apiBaseUrl';
+import { getAccessToken } from '../utils/authSession';
 import { useAuth } from './AuthContext';
 
 const ChatContext = createContext(null);
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://bookmysalon-5.onrender.com';
 const SockJsCtor = SockJS?.default || SockJS;
 
 export function ChatProvider({ children }) {
@@ -23,7 +24,7 @@ export function ChatProvider({ children }) {
   const clientRef = useRef(null);
   const notificationSubscriptionRef = useRef(null);
 
-  const refreshUnreadCounts = async () => {
+  const refreshUnreadCounts = useCallback(async () => {
     if (!user?.id) return;
     try {
       const counts = await api.get('/api/chat/unread-count');
@@ -31,21 +32,23 @@ export function ChatProvider({ children }) {
         unreadMessages: counts?.unreadMessages || 0,
         unreadNotifications: counts?.unreadNotifications || 0,
       });
-    } catch (_) {
+    } catch (error) {
+      console.warn('Unable to refresh unread chat counts', error);
     }
-  };
+  }, [user?.id]);
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     if (!user?.id) return;
     try {
       const data = await api.get('/api/chat/notifications?limit=20');
       setNotifications(Array.isArray(data) ? data : []);
-    } catch (_) {
+    } catch (error) {
+      console.warn('Unable to fetch chat notifications', error);
     }
-  };
+  }, [user?.id]);
 
   useEffect(() => {
-    const token = localStorage.getItem('accessToken');
+    const token = getAccessToken();
 
     if (!token || !user?.id) {
       setConnected(false);
@@ -63,7 +66,7 @@ export function ChatProvider({ children }) {
         if (!SockJsCtor) {
           throw new Error('SockJS client not available');
         }
-        return new SockJsCtor(`${API_BASE_URL}/ws/chat?token=${encodeURIComponent(token)}`);
+        return new SockJsCtor(buildWebSocketUrl('/ws/chat', { token }));
       },
       connectHeaders: {
         Authorization: `Bearer ${token}`,
@@ -103,7 +106,8 @@ export function ChatProvider({ children }) {
     try {
       client.activate();
       clientRef.current = client;
-    } catch (_) {
+    } catch (error) {
+      console.warn('Unable to activate chat WebSocket', error);
       setConnected(false);
       clientRef.current = null;
       return () => {};
@@ -116,9 +120,9 @@ export function ChatProvider({ children }) {
       client.deactivate();
       setConnected(false);
     };
-  }, [user?.id]);
+  }, [fetchNotifications, refreshUnreadCounts, user?.id]);
 
-  const subscribeToConversation = (conversationId, onMessage) => {
+  const subscribeToConversation = useCallback((conversationId, onMessage) => {
     if (!clientRef.current?.connected) {
       return () => {};
     }
@@ -129,9 +133,9 @@ export function ChatProvider({ children }) {
     });
 
     return () => subscription.unsubscribe();
-  };
+  }, []);
 
-  const sendMessage = (payload) => {
+  const sendMessage = useCallback((payload) => {
     if (!clientRef.current?.connected) {
       throw new Error('WebSocket is not connected');
     }
@@ -140,21 +144,21 @@ export function ChatProvider({ children }) {
       destination: '/app/chat.send',
       body: JSON.stringify(payload),
     });
-  };
+  }, []);
 
-  const markConversationRead = async (conversationId) => {
+  const markConversationRead = useCallback(async (conversationId) => {
     await api.put(`/api/chat/conversations/${conversationId}/read`);
     await refreshUnreadCounts();
-  };
+  }, [refreshUnreadCounts]);
 
-  const markNotificationRead = async (notificationId) => {
+  const markNotificationRead = useCallback(async (notificationId) => {
     await api.put(`/api/chat/notifications/${notificationId}/read`);
     setNotifications((prev) => prev.map((item) => (item.id === notificationId ? { ...item, wasRead: true } : item)));
     setUnread((prev) => ({
       unreadMessages: prev.unreadMessages,
       unreadNotifications: Math.max(0, prev.unreadNotifications - 1),
     }));
-  };
+  }, []);
 
   const value = useMemo(
     () => ({
@@ -168,7 +172,17 @@ export function ChatProvider({ children }) {
       markConversationRead,
       markNotificationRead,
     }),
-    [connected, unread, notifications]
+    [
+      connected,
+      unread,
+      notifications,
+      refreshUnreadCounts,
+      fetchNotifications,
+      subscribeToConversation,
+      sendMessage,
+      markConversationRead,
+      markNotificationRead,
+    ]
   );
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;

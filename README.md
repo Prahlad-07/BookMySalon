@@ -34,30 +34,33 @@ These folders are present but not active runtime services in the current repo st
 - JWT access + refresh token flow
 - Register/login with email and password
 - OTP-based signup (`initiate`, `resend`, `verify`)
-- Forgot/reset password flow
+- Forgot/reset password flow (emails a reset link)
+- Change password from account settings (signs out other sessions)
+- Rate limiting on login, signup and password-reset endpoints
 - Optional Google OAuth2 handoff
 - Role-aware routes and dashboards (`CUSTOMER`, `SALON_OWNER`, `ADMIN`)
 
 ### Customer Features
 
-- Browse/search salons by name and city
-- Nearby salons with geolocation and Mapbox
-- View salon details, services, reviews, and working hours
-- Create, reschedule, and cancel bookings
-- Submit reviews with validation
-- Chat with salon owners from booking context
+- Discover salons with search, city filter, "open now", ratings and nearby search (geolocation + Mapbox)
+- Salon pages with a categorised menu, opening hours, rating breakdown and reviews
+- Book with a day strip and time-slot picker generated from the salon's hours
+- Upcoming / past appointments; reschedule, cancel (with confirmation), book again, leave a review
+- Optional Stripe Checkout payments (auto-disabled when no key is set)
+- Chat with salons in real time
 
 ### Salon Owner Features
 
-- Create and manage salon profile (`/api/salons/me`)
-- Manage categories and service offerings
-- Track bookings and update booking status
+- Workspace with an overview of requests needing a reply, upcoming bookings, earnings and rating
+- Accept / decline / complete bookings (status changes follow a server-side state machine)
+- Menu editor for categories and services
+- Salon profile with hours, contact details and map location
 - Chat with customers
 
 ### Admin Features
 
-- Admin dashboard for salon/booking/service stats
-- Protected endpoint: `GET /api/admin/dashboard`
+- Platform overview: salons, clients, bookings, booked value, revenue chart, booking pipeline,
+  top salons and most-booked services (`GET /api/analytics/admin/overview`)
 
 ### Realtime Messaging
 
@@ -79,12 +82,11 @@ These folders are present but not active runtime services in the current repo st
 
 ### Frontend
 
-- React 18
-- React Router 6
-- Vite 7
-- Tailwind CSS
+- React 19
+- React Router 7
+- Vite
+- Tailwind CSS (design tokens as CSS variables; light + dark themes)
 - Axios
-- Framer Motion
 - Mapbox GL JS
 - STOMP/SockJS clients
 
@@ -137,7 +139,32 @@ SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/bookmysalon?createDatabaseIfNo
 SPRING_DATASOURCE_USERNAME=<your-db-user>
 SPRING_DATASOURCE_PASSWORD=<your-db-password>
 SECURITY_JWT_SECRET=<base64-secret>
+APP_FRONTEND_BASE_URL=http://localhost:3000
 ```
+
+Optional variables:
+
+```env
+# Auth abuse protection (defaults shown)
+APP_RATE_LIMIT_ENABLED=true
+APP_RATE_LIMIT_MAX_REQUESTS=10
+APP_RATE_LIMIT_WINDOW_SECONDS=60
+
+# Password-reset / OTP email delivery (falls back to server logs when unset)
+OTP_EMAIL_ENABLED=true
+SPRING_MAIL_HOST=smtp.gmail.com
+SPRING_MAIL_USERNAME=<smtp-user>
+SPRING_MAIL_PASSWORD=<smtp-app-password>
+OTP_EMAIL_FROM=<from-address>
+
+# Stripe payments (feature auto-disables when STRIPE_API_KEY is empty)
+STRIPE_API_KEY=sk_test_xxx
+STRIPE_WEBHOOK_SECRET=whsec_xxx
+STRIPE_CURRENCY=usd
+```
+
+`APP_FRONTEND_BASE_URL` is used to build password-reset links and Stripe
+success/cancel URLs. Point it at your deployed frontend in production.
 
 Generate JWT secret:
 
@@ -188,6 +215,9 @@ Seeded accounts (`DemoUserSeeder`):
 
 - `customer.test@gmail.com` / `Test@12345`
 - `owner.test@gmail.com` / `Test@12345`
+- `admin.test@gmail.com` / `Test@12345`
+
+The sign-in page shows one-click demo buttons; hide them in production with `VITE_SHOW_DEMO_ACCOUNTS=false`.
 
 ## API Highlights
 
@@ -211,16 +241,21 @@ Seeded accounts (`DemoUserSeeder`):
 - Bookings: `/api/bookings/*`
 - Services: `/api/service-offerings/*`
 - Categories: `/api/categories/*`
-- Reviews: `/api/reviews/*`
-- Notifications: `/api/notifications/*`, `/api/chat/notifications`
-- Payments: `/api/payments/*`
+- Reviews: `/api/reviews/*` (one review per customer per salon)
+- Notifications: `/api/chat/notifications` (preferred), `/api/notifications/*` (all scoped to the caller)
+- Payments (Stripe Checkout):
+  - `GET /api/payments/config` — whether online payments are enabled
+  - `POST /api/payments/checkout/{bookingId}` — start a hosted checkout for your own booking
+  - `POST /api/payments/webhook` — signature-verified Stripe callback (the only path that confirms payment)
+  - `GET /api/payments/{id}`, `/user/{userId}`, `/booking/{bookingId}` — ownership-checked reads
 
 ### Analytics & Intelligence APIs
 
-- `/api/analytics/*`
-- `/api/pricing/estimate`
-- `/api/recommendations/salons`
-- `/api/retention/*`
+- `GET /api/analytics/admin/overview?days=` — platform KPIs, revenue trend, top salons (ADMIN)
+- `GET /api/analytics/salon/{salonId}/overview?days=` — per-salon insights (salon owner or ADMIN)
+- `GET /api/pricing/estimate?serviceOfferingId=&slot=` — dynamic price estimate
+- `GET /api/recommendations/salons?limit=` — personalised salon suggestions for the caller
+- `GET /api/retention/coupons/me` — the caller's coupons; `POST /api/retention/coupons`, `GET /api/retention/churn-score` (ADMIN)
 
 ## Deployment
 
@@ -230,11 +265,17 @@ Seeded accounts (`DemoUserSeeder`):
 - Render config in `render.yaml`
 - Health endpoint: `/api/auth/health`
 - Configure secrets in Render environment variables
+- Set `APP_FRONTEND_BASE_URL` to the deployed frontend URL so reset links / payment redirects resolve
+- To enable payments, add `STRIPE_API_KEY` + `STRIPE_WEBHOOK_SECRET` and register a Stripe
+  webhook endpoint pointing at `https://<backend>/api/payments/webhook`
+  (events: `checkout.session.completed`, `checkout.session.expired`)
 
 ### Frontend (Vercel)
 
 - SPA rewrites in `frontend/vercel.json`
 - Set production `VITE_API_URL` to backend URL
+- Add `https://<your-vercel-domain>` to `APP_CORS_ALLOWED_ORIGIN_PATTERNS` on the backend
+  (the same value also governs WebSocket origins)
 
 ## Testing & Quality Checks
 

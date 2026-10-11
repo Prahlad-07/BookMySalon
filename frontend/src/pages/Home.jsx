@@ -1,421 +1,235 @@
+/**
+ * @author Prahlad Yadav
+ * @version 3.0
+ * @since 2026-02-16
+ */
 import React from 'react';
-import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import {
-  Sparkles,
-  Heart,
-  Calendar,
-  Users,
-  Star,
-  ArrowRight,
-  CheckCircle,
-  Zap,
-  Shield,
-} from 'lucide-react';
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { getDashboardPathByRole } from '../utils/roleRouting';
+import heroImage from '../assets/hero-salon.jpg';
+import craftImage from '../assets/detail-tools.jpg';
+import studioImage from '../assets/owner-studio.jpg';
+
+const steps = [
+  {
+    n: '01',
+    title: 'Find your place',
+    body: 'Browse salons near you with real menus, honest prices, opening hours and reviews from people who sat in the chair.',
+  },
+  {
+    n: '02',
+    title: 'Pick a time that works',
+    body: 'Choose your services and a slot. We check the salon’s calendar as you book, so you never land on a double booking.',
+  },
+  {
+    n: '03',
+    title: 'Show up, or shift it',
+    body: 'Your appointment lives in one place. Reschedule, cancel or message the salon without a single phone call.',
+  },
+];
+
+const ownerPoints = [
+  ['A menu clients can read', 'Publish services by category with prices and durations that stay in sync everywhere.'],
+  ['A calendar that protects you', 'Overlapping requests are blocked at the source, and hours are enforced automatically.'],
+  ['Conversations in context', 'Message clients from the booking itself — no more scrolling through personal chats.'],
+  ['Numbers that mean something', 'See upcoming demand, completed revenue and your most-booked services at a glance.'],
+];
+
+function AppointmentTicket() {
+  return (
+    <div className="w-[300px] rounded-lg border border-line bg-surface p-5 shadow-pop">
+      <div className="flex items-baseline justify-between">
+        <p className="eyebrow">Appointment</p>
+        <span className="tag-success">
+          <span className="dot" /> Confirmed
+        </span>
+      </div>
+      <p className="display mt-4 text-[40px] leading-none text-ink">
+        Fri, <span className="italic">3:30</span>
+      </p>
+      <p className="mt-1 text-sm text-ink-2">Studio North · Connaught Place</p>
+      <div className="mt-5 space-y-2 border-t border-dashed border-line-strong pt-4 text-sm">
+        <div className="flex justify-between">
+          <span className="text-ink-2">Signature haircut</span>
+          <span className="num">$45.00</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-ink-2">Beard trim &amp; shape</span>
+          <span className="num">$20.00</span>
+        </div>
+      </div>
+      <div className="mt-4 flex justify-between border-t border-line pt-3 text-sm font-semibold">
+        <span>Total · 65 min</span>
+        <span className="num">$65.00</span>
+      </div>
+    </div>
+  );
+}
 
 export default function Home() {
   const { user } = useAuth();
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1, delayChildren: 0.2 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }
-    },
-  };
-
-  const features = [
-    {
-      icon: Calendar,
-      title: 'Smart Booking',
-      description: 'Book your salon appointments in just a few clicks',
-      gradient: 'from-blue-500 to-cyan-500',
-    },
-    {
-      icon: Users,
-      title: 'Expert Stylists',
-      description: 'Connect with professional and verified stylists',
-      gradient: 'from-purple-500 to-pink-500',
-    },
-    {
-      icon: Star,
-      title: 'Verified Reviews',
-      description: 'Read honest reviews from real customers',
-      gradient: 'from-yellow-500 to-orange-500',
-    },
-    {
-      icon: Shield,
-      title: 'Secure Payments',
-      description: 'Safe and secure payment processing',
-      gradient: 'from-emerald-500 to-teal-500',
-    },
-  ];
-
-  const testimonials = [
-    {
-      name: 'Sarah Johnson',
-      role: 'Customer',
-      image: '👩‍🦰',
-      text: 'BookMySalon made finding and booking my favorite salon incredible. The interface is stunning!',
-      rating: 5,
-    },
-    {
-      name: 'Mike Chen',
-      role: 'Salon Owner',
-      image: '👨‍💼',
-      text: 'This platform completely transformed how I manage bookings. Highly recommended for all salon owners!',
-      rating: 5,
-    },
-    {
-      name: 'Emma Davis',
-      role: 'Customer',
-      image: '👩‍🦱',
-      text: 'The booking process is seamless and the design is absolutely beautiful. Best salon app I\'ve used!',
-      rating: 5,
-    },
-  ];
-
-  const steps = [
-    { step: '1', title: 'Search', description: 'Find salons near you', icon: '🔍' },
-    { step: '2', title: 'Browse', description: 'Check services & reviews', icon: '📋' },
-    { step: '3', title: 'Book', description: 'Select date and time', icon: '📅' },
-    { step: '4', title: 'Enjoy', description: 'Get professional services', icon: '✨' },
-  ];
+  const workspacePath = user ? getDashboardPathByRole(user.role) : '/signup';
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
-      {/* Animated Background Elements */}
-      <motion.div
-        animate={{ y: [0, 40, 0], x: [0, 20, 0] }}
-        transition={{ duration: 15, repeat: Infinity }}
-        className="fixed top-0 left-0 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl -z-10"
-      />
-      <motion.div
-        animate={{ y: [0, -40, 0], x: [0, -20, 0] }}
-        transition={{ duration: 20, repeat: Infinity }}
-        className="fixed bottom-0 right-0 w-96 h-96 bg-pink-600/10 rounded-full blur-3xl -z-10"
-      />
+    <div>
+      {/* Hero */}
+      <section className="shell grid items-center gap-14 pb-20 pt-14 lg:grid-cols-[1.05fr_1fr] lg:gap-20 lg:pb-28 lg:pt-20">
+        <div className="animate-fade">
+          <p className="eyebrow">Salon booking, reconsidered</p>
+          <h1 className="display mt-6 text-[56px] text-ink sm:text-[76px] lg:text-[88px]">
+            The appointment you’ve been <span className="italic text-accent">meaning</span> to make.
+          </h1>
+          <p className="lede mt-7 max-w-[30rem]">
+            Discover salons worth returning to, see what everything costs, and book a real slot in under a minute —
+            no calls, no waiting on a reply.
+          </p>
+          <div className="mt-9 flex flex-wrap gap-3">
+            <Link to={user ? '/salons' : '/signup'} className="btn-primary btn-lg">
+              Find a salon <ArrowRight size={17} />
+            </Link>
+            <Link to={user ? workspacePath : '/signup'} className="btn-secondary btn-lg">
+              {user ? 'Open your workspace' : 'List your salon'}
+            </Link>
+          </div>
 
-      {/* Hero Section */}
-      <motion.section
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="relative py-32 px-4 sm:px-6 lg:px-8 overflow-hidden"
-      >
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            {/* Left Side */}
-            <motion.div variants={itemVariants}>
-              <motion.span 
-                className="inline-block px-5 py-2 bg-gradient-to-r from-violet-500/20 to-pink-500/20 text-violet-300 rounded-full text-sm font-semibold mb-6 border border-violet-500/30"
-                whileHover={{ scale: 1.05 }}
-              >
-                ✨ Premium Salon Booking Platform
-              </motion.span>
-
-              <h1 className="text-6xl sm:text-7xl font-bold mb-8 leading-tight">
-                <span className="bg-gradient-to-r from-violet-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                  Find & Book Your
-                </span>
-                <br />
-                <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-violet-400 bg-clip-text text-transparent">
-                  Perfect Salon
-                </span>
-              </h1>
-
-              <p className="text-xl text-slate-300 mb-10 leading-relaxed max-w-xl">
-                Discover, connect, and book appointments with the best salons in your area. Verified reviews, expert stylists, and instant confirmation.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 mb-12">
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Link 
-                    to={user ? (user.role === 'CUSTOMER' ? '/salons' : '/salon/dashboard') : '/signup'} 
-                    className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-violet-600 to-pink-600 text-white font-semibold rounded-xl hover:shadow-2xl hover:shadow-violet-500/50 transition-all"
-                  >
-                    {user ? (user.role === 'CUSTOMER' ? 'Find Salons' : 'Go to Dashboard') : 'Get Started'}
-                    <ArrowRight size={20} />
-                  </Link>
-                </motion.div>
-
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <a 
-                    href="#features" 
-                    className="inline-flex items-center gap-2 px-8 py-4 bg-white/10 border border-white/20 text-white font-semibold rounded-xl hover:bg-white/20 hover:border-white/30 transition-all backdrop-blur-sm"
-                  >
-                    Learn More
-                    <Sparkles size={20} />
-                  </a>
-                </motion.div>
+          <dl className="mt-14 grid max-w-lg grid-cols-3 divide-x divide-line border-y border-line">
+            {[
+              ['Live', 'availability'],
+              ['Clear', 'pricing upfront'],
+              ['Direct', 'line to the salon'],
+            ].map(([a, b]) => (
+              <div key={a} className="py-4 pl-4 first:pl-0">
+                <dt className="font-display text-[22px] leading-none text-ink">{a}</dt>
+                <dd className="mt-1.5 text-[13px] text-ink-3">{b}</dd>
               </div>
-
-              {/* Stats */}
-              <div className="grid grid-cols-3 gap-6">
-                {[
-                  { label: 'Salons', value: '500+', icon: '🏢' },
-                  { label: 'Bookings', value: '10k+', icon: '📅' },
-                  { label: 'Customers', value: '50k+', icon: '👥' },
-                ].map((stat, index) => (
-                  <motion.div
-                    key={index}
-                    variants={itemVariants}
-                    className="p-4 bg-white/5 border border-white/10 rounded-xl backdrop-blur-sm"
-                  >
-                    <p className="text-3xl mb-1">{stat.icon}</p>
-                    <p className="text-2xl font-bold text-violet-400">{stat.value}</p>
-                    <p className="text-slate-400 text-sm">{stat.label}</p>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Right Side - Hero Image */}
-            <motion.div variants={itemVariants} className="relative hidden lg:flex items-center justify-center">
-              <motion.div
-                animate={{ y: [0, 20, 0] }}
-                transition={{ duration: 4, repeat: Infinity }}
-                className="relative"
-              >
-                <div className="w-96 h-96 bg-gradient-to-br from-violet-600/30 via-purple-600/30 to-pink-600/30 rounded-3xl overflow-hidden shadow-2xl border border-white/10 backdrop-blur-sm flex items-center justify-center text-9xl glow-effect">
-                  💇‍♀️
-                </div>
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                  className="absolute top-8 -right-8 w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full flex items-center justify-center text-5xl shadow-lg glow-effect"
-                >
-                  ⭐
-                </motion.div>
-                <motion.div
-                  animate={{ rotate: -360 }}
-                  transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                  className="absolute -bottom-8 left-8 w-20 h-20 bg-gradient-to-br from-pink-400 to-rose-400 rounded-full flex items-center justify-center text-3xl shadow-lg glow-effect"
-                >
-                  💕
-                </motion.div>
-              </motion.div>
-            </motion.div>
-          </div>
-        </div>
-      </motion.section>
-
-      {/* Features Section */}
-      <motion.section
-        id="features"
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-100px" }}
-        className="py-24 px-4 sm:px-6 lg:px-8 relative"
-      >
-        <div className="max-w-7xl mx-auto">
-          <motion.div variants={itemVariants} className="text-center mb-20">
-            <h2 className="text-5xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">
-                Why Choose BookMySalon?
-              </span>
-            </h2>
-            <p className="text-xl text-slate-300 max-w-2xl mx-auto">
-              We've made booking salon appointments as easy and beautiful as it gets
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <motion.div
-                  key={index}
-                  custom={index}
-                  variants={itemVariants}
-                  whileHover={{ y: -10, scale: 1.02 }}
-                  className="group p-8 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm hover:bg-white/10 hover:border-white/20 transition-all"
-                >
-                  <div className={`w-14 h-14 bg-gradient-to-r ${feature.gradient} rounded-xl flex items-center justify-center mb-6 shadow-lg group-hover:shadow-2xl transition-all`}>
-                    <Icon className="text-white" size={28} />
-                  </div>
-                  <h3 className="text-xl font-bold text-white mb-3">
-                    {feature.title}
-                  </h3>
-                  <p className="text-slate-300 group-hover:text-slate-200 transition">
-                    {feature.description}
-                  </p>
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
-      </motion.section>
-
-      {/* How It Works Section */}
-      <motion.section
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-100px" }}
-        className="py-24 px-4 sm:px-6 lg:px-8 relative"
-      >
-        <div className="max-w-7xl mx-auto">
-          <motion.div variants={itemVariants} className="text-center mb-20">
-            <h2 className="text-5xl font-bold">
-              <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-violet-400 bg-clip-text text-transparent">
-                How It Works
-              </span>
-            </h2>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {steps.map((item, index) => (
-              <motion.div
-                key={index}
-                custom={index}
-                variants={itemVariants}
-                whileHover={{ scale: 1.05 }}
-                className="relative group"
-              >
-                {/* Connector line */}
-                {index < steps.length - 1 && (
-                  <div className="hidden lg:block absolute top-8 -right-[2rem] w-[calc(100%+2rem)] h-1 bg-gradient-to-r from-violet-500 to-transparent" />
-                )}
-
-                <div className="text-center">
-                  <motion.div 
-                    animate={{ y: [0, -10, 0] }}
-                    transition={{ duration: 3, repeat: Infinity, delay: index * 0.2 }}
-                    className="w-20 h-20 bg-gradient-to-br from-violet-600 to-pink-600 text-white rounded-2xl flex items-center justify-center text-2xl font-bold mx-auto mb-6 shadow-xl shadow-violet-500/30 group-hover:shadow-2xl transition-all"
-                  >
-                    {item.step}
-                  </motion.div>
-                  <p className="text-4xl mb-4">{item.icon}</p>
-                  <h3 className="text-2xl font-bold text-white mb-3">
-                    {item.title}
-                  </h3>
-                  <p className="text-slate-300">
-                    {item.description}
-                  </p>
-                </div>
-              </motion.div>
             ))}
+          </dl>
+        </div>
+
+        <div className="relative animate-fade" style={{ animationDelay: '90ms' }}>
+          <div className="overflow-hidden rounded-lg">
+            <img
+              src={heroImage}
+              alt="A bright, modern salon floor with styling chairs and round mirrors"
+              className="aspect-[4/5] w-full object-cover lg:aspect-[5/6]"
+            />
+          </div>
+          <div className="absolute -bottom-10 -left-4 hidden sm:block lg:-left-14">
+            <AppointmentTicket />
           </div>
         </div>
-      </motion.section>
+      </section>
 
-      {/* Testimonials Section */}
-      <motion.section
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-100px" }}
-        className="py-24 px-4 sm:px-6 lg:px-8 relative"
-      >
-        <div className="max-w-7xl mx-auto">
-          <motion.div variants={itemVariants} className="text-center mb-20">
-            <h2 className="text-5xl font-bold mb-6 text-white">
-              Loved by Customers & Salon Owners
+      {/* How it works */}
+      <section className="border-y border-line bg-surface">
+        <div className="shell py-20 lg:py-24">
+          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+            <h2 className="display max-w-xl text-[44px] text-ink sm:text-[52px]">
+              Three steps between you and a <span className="italic">good hair day.</span>
             </h2>
-            <p className="text-xl text-slate-300">
-              See what people are saying about BookMySalon
+            <p className="max-w-sm text-ink-2">
+              Everything you need to decide is on the page before you book. Everything after is in one place.
             </p>
-          </motion.div>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <motion.div
-                key={index}
-                custom={index}
-                variants={itemVariants}
-                whileHover={{ y: -10 }}
-                className="p-8 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm hover:bg-white/10 hover:border-white/20 transition-all"
-              >
-                <div className="flex items-center gap-4 mb-6">
-                  <span className="text-5xl">{testimonial.image}</span>
-                  <div>
-                    <h3 className="font-bold text-white text-lg">{testimonial.name}</h3>
-                    <p className="text-slate-400 text-sm">{testimonial.role}</p>
-                  </div>
-                </div>
-                <div className="flex gap-1 mb-6">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <motion.span 
-                      key={i} 
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: i * 0.1 }}
-                      className="text-2xl"
-                    >
-                      ⭐
-                    </motion.span>
-                  ))}
-                </div>
-                <p className="text-slate-300 italic">"{testimonial.text}"</p>
-              </motion.div>
+          <ol className="mt-14 grid gap-10 md:grid-cols-3 md:gap-0 md:divide-x md:divide-line">
+            {steps.map((step) => (
+              <li key={step.n} className="md:px-8 md:first:pl-0 md:last:pr-0">
+                <span className="num font-mono text-[13px] text-accent">{step.n}</span>
+                <h3 className="mt-4 text-[20px] font-semibold text-ink">{step.title}</h3>
+                <p className="mt-3 leading-relaxed text-ink-2">{step.body}</p>
+              </li>
             ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* Craft band */}
+      <section className="shell py-20 lg:py-28">
+        <div className="grid items-center gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
+          <img
+            src={craftImage}
+            alt="A barber shaping a client's fade with comb and clippers"
+            className="aspect-[4/5] w-full rounded-lg object-cover"
+            loading="lazy"
+          />
+          <div>
+            <p className="eyebrow">Why we built it</p>
+            <p className="display mt-6 text-[40px] text-ink sm:text-[54px]">
+              “Great salons are built in the chair. The admin should never get in the way of the{' '}
+              <span className="italic text-accent">craft.</span>”
+            </p>
+            <p className="mt-8 max-w-md leading-relaxed text-ink-2">
+              BookMySalon takes the back-and-forth out of booking for clients, and gives salons a calm, single place
+              to run their menu, calendar and conversations.
+            </p>
+            <Link to={user ? '/salons' : '/signup'} className="link mt-8 inline-flex items-center gap-1.5">
+              Start exploring <ArrowUpRight size={15} />
+            </Link>
           </div>
         </div>
-      </motion.section>
+      </section>
 
-      {/* CTA Section */}
-      <motion.section
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-100px" }}
-        className="py-24 px-4 sm:px-6 lg:px-8"
-      >
-        <div className="max-w-4xl mx-auto">
-          <motion.div
-            variants={itemVariants}
-            className="relative overflow-hidden rounded-3xl p-16 text-center border border-white/10"
-          >
-            {/* Gradient Background */}
-            <div className="absolute inset-0 bg-gradient-to-r from-violet-600/50 via-purple-600/50 to-pink-600/50 blur-xl -z-10" />
-            <div className="absolute inset-0 bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 -z-10" />
+      {/* For owners */}
+      <section className="bg-ink text-paper">
+        <div className="shell grid gap-14 py-20 lg:grid-cols-2 lg:gap-20 lg:py-28">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-label text-paper/50">For salon owners</p>
+            <h2 className="display mt-6 text-[46px] sm:text-[58px]">
+              Run the floor. <span className="italic text-[rgb(222_146_124)]">We’ll</span> run the book.
+            </h2>
+            <p className="mt-6 max-w-md text-[17px] leading-relaxed text-paper/70">
+              A workspace that keeps your menu, calendar and clients in step — so the next free chair is always the
+              one that gets booked.
+            </p>
+            <div className="mt-9 flex flex-wrap gap-3">
+              <Link
+                to={user ? workspacePath : '/signup'}
+                className="btn btn-lg bg-paper text-ink hover:bg-paper/90"
+              >
+                {user ? 'Go to workspace' : 'List your salon'} <ArrowRight size={17} />
+              </Link>
+            </div>
+            <img
+              src={studioImage}
+              alt="A minimalist salon with black walls and round mirrors"
+              className="mt-14 hidden aspect-[16/10] w-full rounded-lg object-cover opacity-90 lg:block"
+              loading="lazy"
+            />
+          </div>
 
-            <motion.h2 variants={itemVariants} className="text-5xl font-bold mb-6 text-white">
-              Ready to book your next appointment?
-            </motion.h2>
-            <motion.p variants={itemVariants} className="text-xl mb-10 text-slate-100 max-w-2xl mx-auto">
-              Join thousands of satisfied customers using BookMySalon for their beauty needs
-            </motion.p>
-            <motion.div
-              variants={itemVariants}
-              className="flex flex-col sm:flex-row gap-4 justify-center"
-            >
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Link
-                  to={user ? (user.role === 'CUSTOMER' ? '/salons' : '/salon/dashboard') : '/signup'}
-                  className="inline-flex items-center gap-2 bg-white text-violet-600 font-bold py-4 px-10 rounded-xl hover:bg-slate-50 transition-all shadow-xl"
-                >
-                  Get Started Today
-                  <ArrowRight size={20} />
-                </Link>
-              </motion.div>
-              {!user && (
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Link
-                    to="/login"
-                    className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white font-bold py-4 px-10 rounded-xl transition-all backdrop-blur-sm border border-white/20"
-                  >
-                    Sign In
-                    <ArrowRight size={20} />
-                  </Link>
-                </motion.div>
-              )}
-            </motion.div>
-          </motion.div>
+          <ul className="self-center border-t border-paper/15">
+            {ownerPoints.map(([title, body], index) => (
+              <li key={title} className="grid grid-cols-[3rem_1fr] gap-4 border-b border-paper/15 py-7">
+                <span className="num pt-1 font-mono text-[13px] text-paper/40">0{index + 1}</span>
+                <div>
+                  <p className="text-[18px] font-semibold">{title}</p>
+                  <p className="mt-2 leading-relaxed text-paper/65">{body}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
-      </motion.section>
+      </section>
+
+      {/* Closing */}
+      <section className="shell py-24 text-center lg:py-32">
+        <h2 className="display mx-auto max-w-3xl text-[48px] text-ink sm:text-[68px]">
+          Your next appointment is a <span className="italic text-accent">minute</span> away.
+        </h2>
+        <div className="mt-10 flex flex-wrap justify-center gap-3">
+          <Link to={user ? '/salons' : '/signup'} className="btn-primary btn-lg">
+            {user ? 'Browse salons' : 'Create a free account'}
+          </Link>
+          {!user && (
+            <Link to="/login" className="btn-ghost btn-lg">
+              I already have an account
+            </Link>
+          )}
+        </div>
+      </section>
     </div>
   );
 }

@@ -41,7 +41,7 @@ export const getDashboardPathByRole = (role) => {
     return '/salon/dashboard';
   }
 
-  return '/customer/dashboard';
+  return '/salons';
 };
 
 export const canAccessCustomerRoute = (role) => {

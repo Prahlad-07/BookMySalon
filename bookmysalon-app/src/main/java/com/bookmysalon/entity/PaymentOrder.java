@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -19,7 +20,8 @@ import java.time.LocalDateTime;
         indexes = {
                 @Index(name = "idx_payment_orders_user_id", columnList = "user_id"),
                 @Index(name = "idx_payment_orders_booking_id", columnList = "booking_id"),
-                @Index(name = "idx_payment_orders_status", columnList = "status")
+                @Index(name = "idx_payment_orders_status", columnList = "status"),
+                @Index(name = "idx_payment_orders_link_id", columnList = "payment_link_id")
         }
 )
 @Data
@@ -33,14 +35,17 @@ public class PaymentOrder {
     @Column(nullable = false)
     private Double amount;
 
+    @Column(length = 8)
+    private String currency;
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private PaymentStatus status = PaymentStatus.PENDING;
 
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
 
+    /** Stripe Checkout Session id backing this order. */
     @Column(name = "payment_link_id")
     private String paymentLinkId;
 
@@ -50,9 +55,16 @@ public class PaymentOrder {
     @Column(name = "booking_id", nullable = false)
     private Long bookingId;
 
+    @Column(name = "paid_at")
+    private LocalDateTime paidAt;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", insertable = false, updatable = false)

@@ -86,3 +86,15 @@ export const formatDurationLabel = (minutesValue) => {
   const remainingMinutes = totalMinutes % 60;
   return remainingMinutes === 0 ? `${hours}h` : `${hours}h ${remainingMinutes}m`;
 };
+
+/** Live open/closed state for a salon's daily hours. */
+export const openState = (openTime, closeTime, now = new Date()) => {
+  const open = toMinuteOfDay(openTime);
+  const close = toMinuteOfDay(closeTime);
+  if (open == null || close == null) return null;
+  const minute = now.getHours() * 60 + now.getMinutes();
+  if (minute >= open && minute < close) {
+    return { open: true, label: `Open · closes ${formatTimeLabel(closeTime)}` };
+  }
+  return { open: false, label: minute < open ? `Opens ${formatTimeLabel(openTime)}` : `Closed · opens ${formatTimeLabel(openTime)}` };
+};

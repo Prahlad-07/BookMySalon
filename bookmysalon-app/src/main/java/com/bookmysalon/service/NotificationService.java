@@ -19,6 +19,7 @@ public interface NotificationService {
                                               Long conversationId,
                                               Long messageId);
     NotificationDto getNotificationById(Long id);
+    NotificationDto getNotificationForUser(Long id, Long userId);
     List<NotificationDto> getAllNotifications();
     List<NotificationDto> getNotificationsByUserId(Long userId);
     List<NotificationDto> getNotificationsByUserId(Long userId, int limit);
@@ -27,4 +28,5 @@ public interface NotificationService {
     NotificationDto markAsRead(Long id);
     NotificationDto markAsRead(Long id, Long userId);
     void deleteNotification(Long id);
+    void deleteNotificationForUser(Long id, Long userId);
 }

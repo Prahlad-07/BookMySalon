@@ -1,21 +1,29 @@
 /**
  * @author Prahlad Yadav
- * @version 1.0
+ * @version 2.0
  * @since 2026-02-13
  */
 package com.bookmysalon.service;
 
 import com.bookmysalon.dto.PaymentOrderDto;
 import com.bookmysalon.dto.response.PaymentLinkResponse;
+
 import java.util.List;
 
 public interface PaymentService {
-    PaymentOrderDto createPayment(Long bookingId, Long userId);
+
+    /** Whether online payments are configured on this deployment. */
+    boolean isEnabled();
+
+    /** Creates (or reuses) a Stripe Checkout Session for a booking the caller owns. */
+    PaymentLinkResponse createCheckoutSession(Long bookingId, Long callerUserId);
+
     PaymentOrderDto getPaymentById(Long id);
-    List<PaymentOrderDto> getAllPayments();
+
     List<PaymentOrderDto> getPaymentsByUserId(Long userId);
+
     List<PaymentOrderDto> getPaymentsByBookingId(Long bookingId);
-    PaymentLinkResponse createPaymentLink(Long bookingId, Long userId);
-    void handlePaymentSuccess(String paymentLinkId);
-    void handlePaymentFailure(String paymentLinkId);
+
+    /** Processes a verified Stripe webhook payload. */
+    void handleStripeWebhook(String payload, String signatureHeader);
 }

@@ -19,4 +19,20 @@ public class ApiResponse<T> {
     private String message;
     private T data;
     private String error;
+
+    public static <T> ApiResponse<T> ok(T data) {
+        return ApiResponse.<T>builder().success(true).data(data).build();
+    }
+
+    public static <T> ApiResponse<T> ok(T data, String message) {
+        return ApiResponse.<T>builder().success(true).data(data).message(message).build();
+    }
+
+    public static <T> ApiResponse<T> message(String message) {
+        return ApiResponse.<T>builder().success(true).message(message).build();
+    }
+
+    public static <T> ApiResponse<T> failure(String message, String error) {
+        return ApiResponse.<T>builder().success(false).message(message).error(error).build();
+    }
 }

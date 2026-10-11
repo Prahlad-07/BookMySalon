@@ -27,4 +27,10 @@ public class BookingDto {
     private Set<Long> serviceOfferingIds;
     private BookingStatus status;
     private Double totalPrice;
+    private String salonName;
+    private String salonCity;
+    private Long salonOwnerId;
+    private String customerName;
+    private java.util.List<String> serviceNames;
+    private LocalDateTime createdAt;
 }

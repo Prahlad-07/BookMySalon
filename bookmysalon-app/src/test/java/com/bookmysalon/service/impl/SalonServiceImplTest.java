@@ -2,7 +2,9 @@ package com.bookmysalon.service.impl;
 
 import com.bookmysalon.dto.SalonDto;
 import com.bookmysalon.entity.Salon;
+import com.bookmysalon.repository.ReviewRepository;
 import com.bookmysalon.repository.SalonRepository;
+import com.bookmysalon.repository.ServiceOfferingRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,12 +24,16 @@ class SalonServiceImplTest {
 
     @Mock
     private SalonRepository salonRepository;
+    @Mock
+    private ReviewRepository reviewRepository;
+    @Mock
+    private ServiceOfferingRepository serviceOfferingRepository;
 
     private SalonServiceImpl salonService;
 
     @BeforeEach
     void setUp() {
-        salonService = new SalonServiceImpl(salonRepository);
+        salonService = new SalonServiceImpl(salonRepository, reviewRepository, serviceOfferingRepository);
     }
 
     @Test

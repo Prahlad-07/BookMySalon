@@ -9,15 +9,15 @@ import com.bookmysalon.dto.auth.*;
 import com.bookmysalon.dto.response.AuthResponse;
 import com.bookmysalon.entity.*;
 import com.bookmysalon.exception.AuthException;
+import com.bookmysalon.exception.ConflictException;
 import com.bookmysalon.repository.*;
 import com.bookmysalon.security.CustomUserPrincipal;
 import com.bookmysalon.security.JwtService;
 import com.bookmysalon.service.auth.verification.VerificationDeliveryService;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,18 +26,13 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Base64;
-import java.util.HashSet;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -54,13 +49,8 @@ public class AuthServiceImpl implements AuthService {
     @Value("${app.otp.dev-mode:true}")
     private boolean otpDevMode;
 
-    @Value("${app.otp.msg91.enabled:false}")
-    private boolean msg91Enabled;
-
-    @Value("${app.otp.msg91.authkey:}")
-    private String msg91AuthKey;
-
-    private static final String MSG91_VERIFY_URL = "https://control.msg91.com/api/v5/widget/verifyAccessToken";
+    @Value("${app.frontend.base-url:http://localhost:3000}")
+    private String frontendBaseUrl;
 
     private final UserRepository userRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
@@ -71,8 +61,6 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
     private final VerificationDeliveryService verificationDeliveryService;
-    private final ObjectMapper objectMapper;
-    private final HttpClient httpClient = HttpClient.newHttpClient();
 
     @Override
     public AuthResponse register(RegisterRequest request) {
@@ -109,7 +97,7 @@ public class AuthServiceImpl implements AuthService {
         user.setRoles(roles);
         user.setRole(resolvePrimaryRole(roleNames));
 
-        User savedUser = userRepository.save(user);
+        User savedUser = persistNewUser(user);
         CustomUserPrincipal principal = buildPrincipal(savedUser);
         String accessToken = jwtService.generateAccessToken(principal);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(savedUser);
@@ -215,7 +203,7 @@ public class AuthServiceImpl implements AuthService {
         user.setRoles(roles);
         user.setRole(resolvePrimaryRole(roleNames));
 
-        User savedUser = userRepository.save(user);
+        User savedUser = persistNewUser(user);
         signupVerificationSessionRepository.delete(session);
 
         CustomUserPrincipal principal = buildPrincipal(savedUser);
@@ -289,7 +277,31 @@ public class AuthServiceImpl implements AuthService {
         token.setUsed(false);
         passwordResetTokenRepository.save(token);
 
-        log.info("Password reset token for {}: {}", user.getEmail(), token.getToken());
+        String resetLink = UriComponentsBuilder
+                .fromUriString(trimTrailingSlash(frontendBaseUrl) + "/reset-password")
+                .queryParam("token", token.getToken())
+                .build()
+                .toUriString();
+
+        try {
+            verificationDeliveryService.sendPasswordResetEmail(user.getEmail(), resetLink, RESET_TOKEN_MINUTES);
+        } catch (RuntimeException ex) {
+            // Do not surface mailer state to the caller (avoids account enumeration / info leak).
+            log.error("Unable to deliver password reset email for {}", user.getEmail(), ex);
+        }
+    }
+
+    private String trimTrailingSlash(String value) {
+        String base = value == null ? "" : value.trim();
+        return base.endsWith("/") ? base.substring(0, base.length() - 1) : base;
+    }
+
+    private User persistNewUser(User user) {
+        try {
+            return userRepository.save(user);
+        } catch (DataIntegrityViolationException ex) {
+            throw new ConflictException("An account with this email or username already exists");
+        }
     }
 
     @Override
@@ -535,133 +547,11 @@ public class AuthServiceImpl implements AuthService {
         return email.charAt(0) + "*****" + email.substring(atIndex - 1);
     }
 
-    private String maskPhone(String phone) {
-        if (phone.length() < 4) return "****";
-        return "******" + phone.substring(phone.length() - 4);
-    }
-
     private UserRole normalizeRole(UserRole role) {
         if (role == null || role == UserRole.USER) {
             return null;
         }
         return role;
-    }
-
-    private boolean isPhoneVerificationValid(VerifySignupOtpRequest request, SignupVerificationSession session) {
-        String msg91AccessToken = request.getMsg91AccessToken();
-        if (msg91Enabled && msg91AccessToken != null && !msg91AccessToken.isBlank()) {
-            return verifyPhoneWithMsg91(msg91AccessToken.trim(), session.getPhone());
-        }
-
-        String phoneOtp = request.getPhoneOtp();
-        if (phoneOtp == null || phoneOtp.isBlank()) {
-            return false;
-        }
-        return passwordEncoder.matches(phoneOtp.trim(), session.getPhoneOtpHash());
-    }
-
-    private boolean verifyPhoneWithMsg91(String accessToken, String sessionPhone) {
-        if (msg91AuthKey == null || msg91AuthKey.isBlank()) {
-            log.error("MSG91 is enabled but auth key is missing.");
-            throw new AuthException("Phone verification provider is not configured");
-        }
-
-        try {
-            String payload = objectMapper.writeValueAsString(Map.of(
-                    "authkey", msg91AuthKey.trim(),
-                    "access-token", accessToken
-            ));
-
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(MSG91_VERIFY_URL))
-                    .header("Content-Type", "application/json")
-                    .header("Accept", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(payload))
-                    .build();
-
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() < 200 || response.statusCode() >= 300) {
-                log.warn("MSG91 verification failed with status {}", response.statusCode());
-                return false;
-            }
-
-            JsonNode root = objectMapper.readTree(response.body());
-            if (!isMsg91Success(root)) {
-                return false;
-            }
-
-            String verifiedIdentifier = extractVerifiedIdentifier(root);
-            if (verifiedIdentifier == null || verifiedIdentifier.isBlank()) {
-                return true;
-            }
-            return phoneNumbersMatch(sessionPhone, verifiedIdentifier);
-        } catch (AuthException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            log.error("MSG91 verification request failed", ex);
-            return false;
-        }
-    }
-
-    private boolean isMsg91Success(JsonNode root) {
-        String type = root.path("type").asText("");
-        if ("success".equalsIgnoreCase(type)) {
-            return true;
-        }
-
-        String message = root.path("message").asText("");
-        if (message.toLowerCase().contains("success") || message.toLowerCase().contains("verified")) {
-            return true;
-        }
-
-        return root.path("success").asBoolean(false) || root.path("status").asBoolean(false);
-    }
-
-    private String extractVerifiedIdentifier(JsonNode root) {
-        String[] directKeys = {"mobile", "phone", "identifier", "mobile_number"};
-        for (String key : directKeys) {
-            String value = root.path(key).asText("");
-            if (!value.isBlank()) {
-                return value;
-            }
-        }
-
-        JsonNode data = root.path("data");
-        for (String key : directKeys) {
-            String value = data.path(key).asText("");
-            if (!value.isBlank()) {
-                return value;
-            }
-        }
-
-        return "";
-    }
-
-    private boolean phoneNumbersMatch(String expectedPhone, String verifiedPhone) {
-        String expected = digitsOnly(expectedPhone);
-        String actual = digitsOnly(verifiedPhone);
-        if (expected.isBlank() || actual.isBlank()) {
-            return false;
-        }
-
-        if (expected.equals(actual)) {
-            return true;
-        }
-
-        if (expected.length() >= 10 && actual.length() >= 10) {
-            String expectedLastTen = expected.substring(expected.length() - 10);
-            String actualLastTen = actual.substring(actual.length() - 10);
-            return expectedLastTen.equals(actualLastTen);
-        }
-
-        return false;
-    }
-
-    private String digitsOnly(String value) {
-        if (value == null) {
-            return "";
-        }
-        return value.replaceAll("\\D", "");
     }
 
     private void validatePhoneNumber(String phone) {

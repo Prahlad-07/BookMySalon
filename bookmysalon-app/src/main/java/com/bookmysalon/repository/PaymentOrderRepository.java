@@ -1,6 +1,6 @@
 /**
  * @author Prahlad Yadav
- * @version 1.0
+ * @version 2.0
  * @since 2026-02-13
  */
 package com.bookmysalon.repository;
@@ -19,4 +19,6 @@ public interface PaymentOrderRepository extends JpaRepository<PaymentOrder, Long
     List<PaymentOrder> findByBookingId(Long bookingId);
     Optional<PaymentOrder> findByPaymentLinkId(String paymentLinkId);
     List<PaymentOrder> findByStatus(PaymentStatus status);
+    boolean existsByBookingIdAndStatus(Long bookingId, PaymentStatus status);
+    Optional<PaymentOrder> findFirstByBookingIdAndStatusOrderByCreatedAtDesc(Long bookingId, PaymentStatus status);
 }

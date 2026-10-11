@@ -20,6 +20,8 @@ public class ConversationDto {
     private Long id;
     private Long customerId;
     private Long salonOwnerId;
+    private String customerName;
+    private String salonOwnerName;
     private MessageDto lastMessage;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

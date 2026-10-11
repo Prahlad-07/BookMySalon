@@ -1,336 +1,236 @@
 /**
  * @author Prahlad Yadav
- * @version 1.0
+ * @version 3.0
  * @since 2026-02-13
  */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import {
-  AlertCircle,
-  ArrowRight,
-  Eye,
-  EyeOff,
-  Lock,
-  Mail,
-  Sparkles,
-  User,
-} from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import brandLogo from '../assets/brand-logo.png';
+import { GOOGLE_AUTH_URL } from '../config/apiBaseUrl';
 import { getDashboardPathByRole } from '../utils/roleRouting';
+import AuthLayout from '../components/AuthLayout';
+import GoogleButton from '../components/GoogleButton';
+import { Field, Notice } from '../components/ui';
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL || 'https://bookmysalon-5.onrender.com';
-const GOOGLE_AUTH_URL = `${API_BASE_URL}/oauth2/authorization/google`;
 const ENABLE_GOOGLE_OAUTH = import.meta.env.VITE_ENABLE_GOOGLE_OAUTH === 'true';
 
-const ACCOUNT_ROLES = [
-  {
-    value: 'CUSTOMER',
-    label: 'Customer',
-    subtitle: 'Discover and book top-rated salons',
-  },
-  {
-    value: 'SALON_OWNER',
-    label: 'Salon Owner',
-    subtitle: 'Launch your salon and run bookings smoothly',
-  },
+const ROLES = [
+  { value: 'CUSTOMER', title: 'I’m booking appointments', body: 'Discover salons, book and manage visits.' },
+  { value: 'SALON_OWNER', title: 'I run a salon', body: 'Publish your menu and manage your calendar.' },
 ];
 
+const strengthOf = (password) => {
+  let score = 0;
+  if (password.length >= 8) score += 1;
+  if (password.length >= 12) score += 1;
+  if (/[A-Z]/.test(password) && /[a-z]/.test(password)) score += 1;
+  if (/\d/.test(password)) score += 1;
+  if (/[^A-Za-z0-9]/.test(password)) score += 1;
+  return Math.min(score, 4);
+};
+const STRENGTH_LABEL = ['Too short', 'Weak', 'Fair', 'Good', 'Strong'];
+
 export default function Signup() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    role: 'CUSTOMER',
-  });
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [localError, setLocalError] = useState('');
-
-  const { signup, error: authError, user, loading } = useAuth();
   const navigate = useNavigate();
+  const { signup, error: authError, user, loading, clearError } = useAuth();
 
-  const error = localError || authError;
+  const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '', role: 'CUSTOMER' });
+  const [showPassword, setShowPassword] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [localError, setLocalError] = useState('');
+  const [touched, setTouched] = useState({});
 
   useEffect(() => {
-    if (loading || !user) return;
-    navigate(getDashboardPathByRole(user.role), { replace: true });
+    clearError();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!loading && user) navigate(getDashboardPathByRole(user.role), { replace: true });
   }, [loading, user, navigate]);
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setFormData((previous) => ({
-      ...previous,
-      [name]: value,
-    }));
+  const strength = useMemo(() => strengthOf(form.password), [form.password]);
+
+  const fieldErrors = {
+    name: !form.name.trim() ? 'Tell us your name.' : '',
+    email: !/^\S+@\S+\.\S+$/.test(form.email.trim()) ? 'Enter a valid email address.' : '',
+    password: form.password.length < 8 ? 'Use at least 8 characters.' : '',
+    confirmPassword: form.confirmPassword !== form.password ? 'Passwords don’t match.' : '',
+  };
+  const hasErrors = Object.values(fieldErrors).some(Boolean);
+
+  const update = (key) => (event) => {
+    setForm((prev) => ({ ...prev, [key]: event.target.value }));
     setLocalError('');
   };
+  const blur = (key) => () => setTouched((prev) => ({ ...prev, [key]: true }));
+  const errorFor = (key) => (touched[key] ? fieldErrors[key] : '');
 
-  const handleRoleSelect = (role) => {
-    setFormData((previous) => ({
-      ...previous,
-      role,
-    }));
-    setLocalError('');
-  };
-
-  const handleSignup = async (event) => {
+  const submit = async (event) => {
     event.preventDefault();
-    setLocalError('');
+    setTouched({ name: true, email: true, password: true, confirmPassword: true });
+    if (hasErrors) return;
 
-    if (!['CUSTOMER', 'SALON_OWNER'].includes(formData.role)) {
-      setLocalError('Please select a valid account type.');
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setLocalError('Passwords do not match.');
-      return;
-    }
-
-    if (formData.password.trim().length < 8) {
-      setLocalError('Password must be at least 8 characters.');
-      return;
-    }
-
-    setIsLoading(true);
-    const result = await signup(formData);
-    setIsLoading(false);
+    setSubmitting(true);
+    const result = await signup(form);
+    setSubmitting(false);
 
     if (!result?.ok) {
       if (result?.code === 'EMAIL_EXISTS') {
-        const email = encodeURIComponent(formData.email.trim().toLowerCase());
-        const message = encodeURIComponent(
-          'Account already exists. Please sign in.'
-        );
+        const email = encodeURIComponent(form.email.trim().toLowerCase());
+        const message = encodeURIComponent('You already have an account with that email. Sign in instead.');
         navigate(`/login?email=${email}&error=${message}`);
+      } else {
+        setLocalError(result?.error || 'We couldn’t create your account. Please try again.');
       }
       return;
     }
-
     navigate(getDashboardPathByRole(result.user.role), { replace: true });
   };
 
+  const error = localError || authError;
+
   return (
-    <div className="auth-shell">
-      <div className="auth-card page-content card-base rounded-3xl p-8 sm:p-10">
-        <div className="flex items-start justify-between gap-4 mb-6">
-          <div>
-            <div className="login-brand-wrap mb-4">
-              <img
-                src={brandLogo}
-                alt="BookMySalon logo"
-                className="signup-brand-logo"
-              />
-            </div>
-            <h1 className="text-3xl font-bold text-slate-900">
-              Create Your Account
-            </h1>
-            <p className="text-slate-600 mt-2">
-              Pick your role, set your details, and launch in under a minute.
-            </p>
-          </div>
-          <div className="hidden sm:flex w-12 h-12 rounded-xl bg-primary-50 border border-primary-100 items-center justify-center text-primary-700">
-            <Sparkles size={20} />
-          </div>
+    <AuthLayout
+      eyebrow="Create your account"
+      title="Join BookMySalon"
+      description="One account for booking appointments or running your salon. It takes under a minute."
+      footer={
+        <>
+          Already have an account?{' '}
+          <Link to="/login" className="link">
+            Sign in
+          </Link>
+        </>
+      }
+    >
+      {error && (
+        <div className="mb-6">
+          <Notice tone="error">{error}</Notice>
         </div>
+      )}
 
-        {error && (
-          <div className="notice-box notice-error mb-5 flex items-center gap-2">
-            <AlertCircle size={16} /> {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSignup} className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {ACCOUNT_ROLES.map((roleOption) => {
-              const isSelected = formData.role === roleOption.value;
+      <form onSubmit={submit} className="space-y-5" noValidate>
+        <fieldset>
+          <legend className="label">How will you use BookMySalon?</legend>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {ROLES.map((role) => {
+              const active = form.role === role.value;
               return (
-                <button
-                  type="button"
-                  key={roleOption.value}
-                  onClick={() => handleRoleSelect(roleOption.value)}
-                  aria-pressed={isSelected}
-                  className={`role-option cursor-pointer rounded-xl px-3 py-3 transition ${
-                    isSelected ? 'role-option-active' : ''
+                <label
+                  key={role.value}
+                  className={`cursor-pointer rounded-md border p-3.5 transition ${
+                    active ? 'border-ink bg-surface ring-1 ring-ink' : 'border-line-strong hover:border-ink/40'
                   }`}
                 >
-                  <p className="text-sm font-semibold text-slate-900">
-                    {roleOption.label}
-                  </p>
-                  <p className="text-xs text-slate-600 mt-0.5">
-                    {roleOption.subtitle}
-                  </p>
-                </button>
+                  <input
+                    type="radio"
+                    name="role"
+                    value={role.value}
+                    checked={active}
+                    onChange={update('role')}
+                    className="sr-only"
+                  />
+                  <span className="block text-sm font-semibold text-ink">{role.title}</span>
+                  <span className="mt-0.5 block text-[12.5px] leading-snug text-ink-3">{role.body}</span>
+                </label>
               );
             })}
           </div>
+        </fieldset>
 
-          <div>
-            <label className="text-sm font-semibold text-slate-700">
-              Full Name
-            </label>
-            <div className="relative mt-1.5">
-              <User
-                size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-              />
-              <input
-                className="input-field input-with-icon"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="Enter full name"
-                required
-              />
-            </div>
-          </div>
+        <Field label="Full name" htmlFor="su-name" error={errorFor('name')}>
+          <input
+            id="su-name"
+            className="field"
+            value={form.name}
+            onChange={update('name')}
+            onBlur={blur('name')}
+            autoComplete="name"
+          />
+        </Field>
 
-          <div>
-            <label className="text-sm font-semibold text-slate-700">
-              Email
-            </label>
-            <div className="relative mt-1.5">
-              <Mail
-                size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-              />
-              <input
-                className="input-field input-with-icon"
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="you@example.com"
-                required
-              />
-            </div>
-          </div>
+        <Field label="Email" htmlFor="su-email" error={errorFor('email')}>
+          <input
+            id="su-email"
+            type="email"
+            className="field"
+            value={form.email}
+            onChange={update('email')}
+            onBlur={blur('email')}
+            autoComplete="email"
+          />
+        </Field>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm font-semibold text-slate-700">
-                Password
-              </label>
-              <div className="relative mt-1.5">
-                <Lock
-                  size={18}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                />
-                <input
-                  className="input-field input-with-icon pr-11"
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Minimum 8 characters"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((previous) => !previous)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label className="text-sm font-semibold text-slate-700">
-                Confirm Password
-              </label>
-              <div className="relative mt-1.5">
-                <Lock
-                  size={18}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                />
-                <input
-                  className="input-field input-with-icon pr-11"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  placeholder="Re-enter password"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() =>
-                    setShowConfirmPassword((previous) => !previous)
-                  }
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700"
-                  aria-label={
-                    showConfirmPassword ? 'Hide password' : 'Show password'
-                  }
-                >
-                  {showConfirmPassword ? (
-                    <EyeOff size={18} />
-                  ) : (
-                    <Eye size={18} />
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <button
-            className="btn-primary w-full inline-flex items-center justify-center gap-2"
-            disabled={isLoading}
-          >
-            {isLoading ? 'Creating account...' : 'Create My Account'}
-            {!isLoading && <ArrowRight size={16} />}
-          </button>
-        </form>
-
-        {ENABLE_GOOGLE_OAUTH && (
-          <div className="mt-5">
+        <div>
+          <label htmlFor="su-password" className="label">
+            Password
+          </label>
+          <div className="relative">
+            <input
+              id="su-password"
+              type={showPassword ? 'text' : 'password'}
+              className="field pr-11"
+              value={form.password}
+              onChange={update('password')}
+              onBlur={blur('password')}
+              autoComplete="new-password"
+            />
             <button
               type="button"
-              onClick={() => {
-                window.location.href = GOOGLE_AUTH_URL;
-              }}
-              className="w-full btn-secondary inline-flex items-center justify-center gap-2"
+              onClick={() => setShowPassword((v) => !v)}
+              className="icon-btn absolute right-1 top-1/2 -translate-y-1/2"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 48 48"
-                aria-hidden="true"
-              >
-                <path
-                  fill="#FFC107"
-                  d="M43.611 20.083H42V20H24v8h11.303C33.653 32.657 29.233 36 24 36c-6.627 0-12-5.373-12-12S17.373 12 24 12c3.059 0 5.849 1.154 7.971 3.029l5.657-5.657C34.053 6.053 29.279 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.651-.389-3.917z"
-                />
-                <path
-                  fill="#FF3D00"
-                  d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.849 1.154 7.971 3.029l5.657-5.657C34.053 6.053 29.279 4 24 4c-7.682 0-14.348 4.337-17.694 10.691z"
-                />
-                <path
-                  fill="#4CAF50"
-                  d="M24 44c5.176 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.141 35.091 26.715 36 24 36c-5.213 0-9.62-3.33-11.283-7.946l-6.522 5.025C9.5 39.556 16.227 44 24 44z"
-                />
-                <path
-                  fill="#1976D2"
-                  d="M43.611 20.083H42V20H24v8h11.303a12.048 12.048 0 01-4.084 5.57l.003-.002 6.19 5.238C36.971 39.206 44 34 44 24c0-1.341-.138-2.651-.389-3.917z"
-                />
-              </svg>
-              Continue with Google
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
-        )}
+          {form.password && (
+            <div className="mt-2 flex items-center gap-3">
+              <div className="flex flex-1 gap-1" aria-hidden="true">
+                {[0, 1, 2, 3].map((i) => (
+                  <span
+                    key={i}
+                    className={`h-1 flex-1 rounded-full ${
+                      i < strength ? (strength <= 1 ? 'bg-danger' : strength === 2 ? 'bg-warning' : 'bg-success') : 'bg-line'
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className="w-16 text-right text-[12px] text-ink-3">{STRENGTH_LABEL[strength]}</span>
+            </div>
+          )}
+          {errorFor('password') && <p className="field-error">{errorFor('password')}</p>}
+        </div>
 
-        <p className="text-slate-600 text-sm mt-6 text-center">
-          Already with us?{' '}
-          <Link to="/login" className="app-link">
-            Sign in
-          </Link>
-        </p>
-      </div>
-    </div>
+        <Field label="Confirm password" htmlFor="su-confirm" error={errorFor('confirmPassword')}>
+          <input
+            id="su-confirm"
+            type={showPassword ? 'text' : 'password'}
+            className="field"
+            value={form.confirmPassword}
+            onChange={update('confirmPassword')}
+            onBlur={blur('confirmPassword')}
+            autoComplete="new-password"
+          />
+        </Field>
+
+        <button type="submit" className="btn-dark btn-lg w-full" disabled={submitting}>
+          {submitting ? 'Creating your account…' : 'Create account'}
+        </button>
+      </form>
+
+      {ENABLE_GOOGLE_OAUTH && (
+        <>
+          <div className="my-6 flex items-center gap-4 text-xs text-ink-3">
+            <span className="h-px flex-1 bg-line" />
+            or
+            <span className="h-px flex-1 bg-line" />
+          </div>
+          <GoogleButton href={GOOGLE_AUTH_URL} label="Sign up with Google" />
+        </>
+      )}
+    </AuthLayout>
   );
 }

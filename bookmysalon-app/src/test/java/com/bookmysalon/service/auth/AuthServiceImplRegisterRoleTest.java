@@ -13,7 +13,6 @@ import com.bookmysalon.repository.UserRepository;
 import com.bookmysalon.security.CustomUserPrincipal;
 import com.bookmysalon.security.JwtService;
 import com.bookmysalon.service.auth.verification.VerificationDeliveryService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -68,8 +67,7 @@ class AuthServiceImplRegisterRoleTest {
                 authenticationManager,
                 jwtService,
                 refreshTokenService,
-                verificationDeliveryService,
-                new ObjectMapper()
+                verificationDeliveryService
         );
     }
 

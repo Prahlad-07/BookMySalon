@@ -1,6 +1,6 @@
 /**
  * @author Prahlad Yadav
- * @version 1.0
+ * @version 2.0
  * @since 2026-02-13
  */
 package com.bookmysalon.security;
@@ -15,8 +15,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -46,7 +48,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String jwt = authHeader.substring(BEARER_PREFIX.length());
+        String jwt = authHeader.substring(BEARER_PREFIX.length()).trim();
 
         try {
             String username = jwtService.extractUsername(jwt);
@@ -56,25 +58,35 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 if (jwtService.isTokenValid(jwt, userDetails)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.getAuthorities()
-                    );
+                            userDetails, null, userDetails.getAuthorities());
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
+                } else {
+                    unauthorized(response, "Invalid or expired JWT token");
+                    return;
                 }
             }
 
             filterChain.doFilter(request, response);
-        } catch (JwtException | IllegalArgumentException ex) {
+        } catch (JwtException | IllegalArgumentException | UsernameNotFoundException ex) {
             SecurityContextHolder.clearContext();
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            objectMapper.writeValue(response.getOutputStream(), Map.of(
-                    "success", false,
-                    "message", "Invalid or expired JWT token",
-                    "error", String.valueOf(ex.getMessage())
-            ));
+            unauthorized(response, "Invalid or expired JWT token");
+        } catch (AuthenticationException ex) {
+            SecurityContextHolder.clearContext();
+            unauthorized(response, "Authentication failed");
         }
+    }
+
+    private void unauthorized(HttpServletResponse response, String message) throws IOException {
+        if (response.isCommitted()) {
+            return;
+        }
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        objectMapper.writeValue(response.getOutputStream(), Map.of(
+                "success", false,
+                "message", "Unauthorized",
+                "error", message
+        ));
     }
 }

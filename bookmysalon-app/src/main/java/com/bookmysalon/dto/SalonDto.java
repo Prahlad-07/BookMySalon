@@ -31,4 +31,7 @@ public class SalonDto {
     private LocalTime openTime;
     private LocalTime closeTime;
     private Double distanceKm;
+    private Double averageRating;
+    private Long reviewCount;
+    private Long serviceCount;
 }

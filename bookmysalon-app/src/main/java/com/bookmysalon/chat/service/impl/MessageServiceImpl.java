@@ -27,6 +27,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.List;
 import java.util.Objects;
 
@@ -38,6 +42,7 @@ public class MessageServiceImpl implements MessageService {
     private final ConversationRepository conversationRepository;
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
+    private final com.bookmysalon.repository.SalonRepository salonRepository;
     private final PresenceService presenceService;
     private final NotificationService notificationService;
 
@@ -69,23 +74,55 @@ public class MessageServiceImpl implements MessageService {
                 .findByCustomerIdAndSalonOwnerId(customerId, salonOwnerId)
                 .orElseGet(() -> conversationRepository.save(buildConversation(customerId, salonOwnerId)));
 
-        return mapConversation(conversation, null);
+        Map<Long, String> names = resolveDisplayNames(List.of(conversation));
+        return withNames(mapConversation(conversation, null), names);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ConversationDto> getConversations(Long currentUserId) {
-        return conversationRepository.findAllForUser(currentUserId)
-                .stream()
+        List<Conversation> conversations = conversationRepository.findAllForUser(currentUserId);
+        Map<Long, String> names = resolveDisplayNames(conversations);
+        return conversations.stream()
                 .map(conversation -> {
                     Message latestMessage = messageRepository
                             .findByConversationIdOrderByCreatedAtDesc(conversation.getId(), PageRequest.of(0, 1))
                             .stream()
                             .findFirst()
                             .orElse(null);
-                    return mapConversation(conversation, latestMessage);
+                    return withNames(mapConversation(conversation, latestMessage), names);
                 })
+                .sorted(Comparator.comparing(
+                        (ConversationDto c) -> c.getLastMessage() == null ? c.getUpdatedAt() : c.getLastMessage().getCreatedAt(),
+                        Comparator.nullsLast(Comparator.reverseOrder())))
                 .toList();
+    }
+
+    /**
+     * Customers are shown by name; salon owners by their salon's name when they have one,
+     * since that is who the customer thinks they are talking to.
+     */
+    private Map<Long, String> resolveDisplayNames(List<Conversation> conversations) {
+        Set<Long> userIds = new HashSet<>();
+        Set<Long> ownerIds = new HashSet<>();
+        for (Conversation c : conversations) {
+            userIds.add(c.getCustomerId());
+            userIds.add(c.getSalonOwnerId());
+            ownerIds.add(c.getSalonOwnerId());
+        }
+        Map<Long, String> names = new HashMap<>();
+        userRepository.findAllById(userIds).forEach(u ->
+                names.put(u.getId(), u.getFullName() == null || u.getFullName().isBlank() ? u.getUsername() : u.getFullName()));
+        for (Long ownerId : ownerIds) {
+            salonRepository.findFirstByOwnerId(ownerId).ifPresent(salon -> names.put(ownerId, salon.getName()));
+        }
+        return names;
+    }
+
+    private ConversationDto withNames(ConversationDto dto, Map<Long, String> names) {
+        dto.setCustomerName(names.get(dto.getCustomerId()));
+        dto.setSalonOwnerName(names.get(dto.getSalonOwnerId()));
+        return dto;
     }
 
     @Override

@@ -17,7 +17,7 @@ const getInitialTheme = () => {
   if (savedTheme === 'light' || savedTheme === 'dark') {
     return savedTheme;
   }
-  return getSystemTheme();
+  return 'light';
 };
 
 export function ThemeProvider({ children }) {

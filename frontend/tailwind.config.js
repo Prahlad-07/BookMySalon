@@ -1,164 +1,90 @@
+/**
+ * Design tokens live as CSS variables in src/index.css so light/dark themes
+ * swap without class changes. Tailwind only maps names to those variables.
+ */
+const v = (name) => `rgb(var(--${name}) / <alpha-value>)`;
+
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,jsx}",
-  ],
+  content: ['./index.html', './src/**/*.{js,jsx}'],
   theme: {
     colors: {
       transparent: 'transparent',
       current: 'currentColor',
       white: '#ffffff',
       black: '#000000',
-      primary: {
-        50: 'color-mix(in srgb, var(--color-primary), white 85%)',
-        100: 'color-mix(in srgb, var(--color-primary), white 75%)',
-        200: 'color-mix(in srgb, var(--color-primary), white 60%)',
-        300: 'color-mix(in srgb, var(--color-primary), white 45%)',
-        400: 'color-mix(in srgb, var(--color-primary), white 30%)',
-        500: 'var(--color-primary)',
-        600: 'var(--color-primary)',
-        700: 'var(--color-primary-700)',
-        800: 'var(--color-primary-700)',
-        900: 'var(--color-primary-700)',
-      },
-      secondary: {
-        50: 'color-mix(in srgb, var(--color-secondary), white 88%)',
-        100: 'color-mix(in srgb, var(--color-secondary), white 78%)',
-        200: 'color-mix(in srgb, var(--color-secondary), white 65%)',
-        300: 'color-mix(in srgb, var(--color-secondary), white 50%)',
-        400: 'color-mix(in srgb, var(--color-secondary), white 35%)',
-        500: 'var(--color-secondary)',
-        600: 'var(--color-secondary)',
-        700: 'color-mix(in srgb, var(--color-secondary), black 20%)',
-        800: 'color-mix(in srgb, var(--color-secondary), black 35%)',
-        900: 'color-mix(in srgb, var(--color-secondary), black 50%)',
-        950: 'color-mix(in srgb, var(--color-secondary), black 60%)',
+
+      paper: v('paper'),
+      surface: v('surface'),
+      sunken: v('sunken'),
+      line: v('line'),
+      'line-strong': v('line-strong'),
+      ink: {
+        DEFAULT: v('ink'),
+        2: v('ink-2'),
+        3: v('ink-3'),
       },
       accent: {
-        50: 'color-mix(in srgb, var(--color-accent), white 85%)',
-        100: 'color-mix(in srgb, var(--color-accent), white 75%)',
-        200: 'color-mix(in srgb, var(--color-accent), white 60%)',
-        300: 'color-mix(in srgb, var(--color-accent), white 45%)',
-        400: 'color-mix(in srgb, var(--color-accent), white 30%)',
-        500: 'var(--color-accent)',
-        600: 'color-mix(in srgb, var(--color-accent), black 15%)',
-        700: 'color-mix(in srgb, var(--color-accent), black 30%)',
+        DEFAULT: v('accent'),
+        hover: v('accent-hover'),
+        soft: v('accent-soft'),
+        ink: v('accent-ink'),
       },
-      gray: {
-        50: 'var(--color-bg)',
-        100: 'var(--color-bg)',
-        200: 'var(--color-border)',
-        300: 'var(--color-border)',
-        400: 'var(--color-muted)',
-        500: 'var(--color-muted)',
-        600: 'var(--color-text)',
-        700: 'var(--color-text)',
-        800: 'var(--color-text)',
-        900: 'var(--color-text)',
-      },
+      sage: { DEFAULT: v('sage'), soft: v('sage-soft') },
+      gold: v('gold'),
+      success: { DEFAULT: v('success'), soft: v('success-soft') },
+      warning: { DEFAULT: v('warning'), soft: v('warning-soft') },
+      danger: { DEFAULT: v('danger'), soft: v('danger-soft') },
+
+      // Legacy aliases kept so map widgets and untouched markup stay on-palette.
       slate: {
-        50: 'var(--color-bg)',
-        100: 'var(--color-bg)',
-        200: 'var(--color-border)',
-        300: 'var(--color-border)',
-        400: 'var(--color-muted)',
-        500: 'var(--color-muted)',
-        600: 'var(--color-text)',
-        700: 'var(--color-text)',
-        800: 'var(--color-text)',
-        900: 'var(--color-text)',
+        50: v('sunken'), 100: v('sunken'), 200: v('line'), 300: v('line-strong'),
+        400: v('ink-3'), 500: v('ink-3'), 600: v('ink-2'), 700: v('ink-2'),
+        800: v('ink'), 900: v('ink'),
       },
-      emerald: {
-        400: 'color-mix(in srgb, var(--color-success), white 20%)',
-        500: 'var(--color-success)',
-        600: 'color-mix(in srgb, var(--color-success), black 15%)',
+      primary: {
+        50: v('accent-soft'), 100: v('accent-soft'), 200: v('accent-soft'),
+        300: v('accent'), 500: v('accent'), 600: v('accent'), 700: v('accent'),
       },
-      green: {
-        50: 'color-mix(in srgb, var(--color-success), white 85%)',
-        100: 'color-mix(in srgb, var(--color-success), white 75%)',
-        600: 'var(--color-success)',
-        700: 'color-mix(in srgb, var(--color-success), black 20%)',
-      },
-      red: {
-        200: 'color-mix(in srgb, var(--color-danger), white 65%)',
-        300: 'color-mix(in srgb, var(--color-danger), white 50%)',
-        400: 'color-mix(in srgb, var(--color-danger), white 35%)',
-        500: 'var(--color-danger)',
-        600: 'color-mix(in srgb, var(--color-danger), black 15%)',
-        700: 'color-mix(in srgb, var(--color-danger), black 25%)',
-      },
-      yellow: {
-        50: 'color-mix(in srgb, var(--color-warning), white 85%)',
-        100: 'color-mix(in srgb, var(--color-warning), white 70%)',
-        400: 'color-mix(in srgb, var(--color-warning), white 25%)',
-        500: 'var(--color-warning)',
-        600: 'color-mix(in srgb, var(--color-warning), black 15%)',
-        700: 'color-mix(in srgb, var(--color-warning), black 25%)',
-      },
-      orange: {
-        400: 'color-mix(in srgb, var(--color-warning), white 20%)',
-        500: 'var(--color-warning)',
-      },
-      blue: {
-        50: 'color-mix(in srgb, var(--color-secondary), white 85%)',
-        400: 'color-mix(in srgb, var(--color-secondary), white 30%)',
-        500: 'var(--color-secondary)',
-        600: 'color-mix(in srgb, var(--color-secondary), black 15%)',
-      },
-      cyan: {
-        400: 'color-mix(in srgb, var(--color-secondary), white 30%)',
-        500: 'var(--color-secondary)',
-      },
-      teal: {
-        500: 'var(--color-secondary)',
-      },
-      purple: {
-        400: 'color-mix(in srgb, var(--color-primary), white 30%)',
-        500: 'var(--color-primary)',
-        600: 'var(--color-primary-700)',
-        900: 'var(--color-primary-700)',
-      },
-      violet: {
-        200: 'color-mix(in srgb, var(--color-primary), white 60%)',
-        300: 'color-mix(in srgb, var(--color-primary), white 45%)',
-        400: 'color-mix(in srgb, var(--color-primary), white 30%)',
-        500: 'var(--color-primary)',
-        600: 'var(--color-primary-700)',
-      },
-      pink: {
-        50: 'color-mix(in srgb, var(--color-accent), white 85%)',
-        300: 'color-mix(in srgb, var(--color-accent), white 45%)',
-        400: 'color-mix(in srgb, var(--color-accent), white 30%)',
-        500: 'var(--color-accent)',
-        600: 'color-mix(in srgb, var(--color-accent), black 15%)',
-      },
-      rose: {
-        400: 'color-mix(in srgb, var(--color-accent), white 30%)',
-        500: 'var(--color-accent)',
-      },
+      red: { 50: v('danger-soft'), 500: v('danger'), 600: v('danger'), 700: v('danger') },
+      emerald: { 500: v('success'), 600: v('success'), 700: v('success') },
+      amber: { 400: v('gold'), 500: v('gold'), 700: v('warning') },
+    },
+    fontFamily: {
+      sans: ['"Instrument Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      display: ['"Instrument Serif"', 'ui-serif', 'Georgia', 'serif'],
+      mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
     },
     extend: {
-      animation: {
-        'fade-in': 'fadeIn 0.5s ease-in',
-        'slide-up': 'slideUp 0.5s ease-out',
-        'bounce-slow': 'bounce 2s infinite',
-        'pulse-glow': 'pulseGlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+      borderRadius: {
+        sm: '4px',
+        DEFAULT: '6px',
+        md: '8px',
+        lg: '10px',
+        xl: '14px',
+      },
+      letterSpacing: {
+        label: '0.14em',
+      },
+      maxWidth: {
+        shell: '76rem',
+      },
+      boxShadow: {
+        lift: '0 1px 0 rgb(var(--line) / 1), 0 12px 32px -18px rgb(var(--shadow) / 0.35)',
+        pop: '0 24px 60px -24px rgb(var(--shadow) / 0.45)',
       },
       keyframes: {
-        fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
+        rise: {
+          '0%': { opacity: '0', transform: 'translateY(6px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
         },
-        slideUp: {
-          '0%': { transform: 'translateY(20px)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
+        shimmer: {
+          '100%': { transform: 'translateX(100%)' },
         },
-        pulseGlow: {
-          '0%, 100%': { boxShadow: '0 0 0 0 rgba(236, 72, 153, 0.7)' },
-          '50%': { boxShadow: '0 0 0 10px rgba(236, 72, 153, 0)' },
-        },
+      },
+      animation: {
+        rise: 'rise 380ms cubic-bezier(.2,.7,.2,1) both',
       },
     },
   },
   plugins: [],
-}
+};

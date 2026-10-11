@@ -72,6 +72,37 @@ public class VerificationDeliveryServiceImpl implements VerificationDeliveryServ
     }
 
     @Override
+    public boolean sendPasswordResetEmail(String email, String resetLink, int expiryMinutes) {
+        if (!emailEnabled) {
+            log.info("Email delivery disabled. Password reset link for {}: {}", email, resetLink);
+            return false;
+        }
+
+        JavaMailSender mailSender = mailSenderProvider.getIfAvailable();
+        if (mailSender == null || isBlank(emailFrom)) {
+            log.error("Email is enabled but SMTP/from config is missing.");
+            throw new IllegalStateException("Email provider is not configured");
+        }
+
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(emailFrom.trim());
+            message.setTo(email);
+            message.setSubject("Reset your BookMySalon password");
+            message.setText("We received a request to reset your BookMySalon password.\n\n"
+                    + "Reset it here: " + resetLink + "\n\n"
+                    + "This link is valid for " + expiryMinutes + " minutes. "
+                    + "If you did not request this, you can safely ignore this email.");
+            mailSender.send(message);
+            log.info("Password reset email sent to {}", email);
+            return true;
+        } catch (Exception ex) {
+            log.error("Failed to send password reset email to {}", email, ex);
+            throw new IllegalStateException("Failed to send password reset email");
+        }
+    }
+
+    @Override
     public void sendPhoneOtp(String phone, String otp) {
         String maskedPhone = maskPhone(phone);
         String normalizedPhone = normalizePhoneNumber(phone);

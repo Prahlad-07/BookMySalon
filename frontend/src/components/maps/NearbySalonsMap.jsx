@@ -55,18 +55,18 @@ const buildPopupHtml = (salon, userLocation) => {
   const addressLabel = [salon.address, salon.city].filter(Boolean).join(', ');
 
   return `
-    <div style="font-family: Manrope, sans-serif; min-width: 230px;">
-      <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 6px; color: var(--color-text);">${escapeHtml(
+    <div style="font-family: 'Instrument Sans', sans-serif; min-width: 230px;">
+      <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 6px; color: rgb(var(--ink));">${escapeHtml(
         salon.name || 'Salon'
       )}</h4>
       ${
         addressLabel
-          ? `<p style="font-size: 13px; margin: 0 0 8px; color: var(--color-muted);">${escapeHtml(addressLabel)}</p>`
+          ? `<p style="font-size: 13px; margin: 0 0 8px; color: rgb(var(--ink-2));">${escapeHtml(addressLabel)}</p>`
           : ''
       }
       ${
         distanceLabel
-          ? `<p style="font-size: 13px; margin: 0 0 10px; font-weight: 700; color: var(--color-primary);">${escapeHtml(
+          ? `<p style="font-size: 13px; margin: 0 0 10px; font-weight: 700; color: rgb(var(--accent));">${escapeHtml(
               distanceLabel
             )}</p>`
           : ''
@@ -74,7 +74,7 @@ const buildPopupHtml = (salon, userLocation) => {
       <div style="display: flex; flex-wrap: wrap; gap: 8px;">
         <a
           href="/salon/${encodeURIComponent(String(salon.id))}"
-          style="background: var(--color-primary); color: #fff; padding: 6px 10px; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: 700;"
+          style="background: rgb(var(--accent)); color: #fff; padding: 6px 10px; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: 700;"
         >
           View Salon
         </a>
@@ -82,7 +82,7 @@ const buildPopupHtml = (salon, userLocation) => {
           directionsUrl
             ? `<a href="${escapeHtml(
                 directionsUrl
-              )}" target="_blank" rel="noopener noreferrer" style="background: var(--color-surface-muted); color: var(--color-text); padding: 6px 10px; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: 700;">Directions</a>`
+              )}" target="_blank" rel="noopener noreferrer" style="background: rgb(var(--sunken)); color: rgb(var(--ink)); padding: 6px 10px; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: 700;">Directions</a>`
             : ''
         }
       </div>
@@ -169,7 +169,7 @@ export default function NearbySalonsMap({
             source: SOURCE_ID,
             filter: ['has', 'point_count'],
             paint: {
-              'circle-color': '#0f6e86',
+              'circle-color': '#7A2E26',
               'circle-radius': ['step', ['get', 'point_count'], 18, 10, 22, 30, 27],
               'circle-stroke-width': 2,
               'circle-stroke-color': '#ffffff',
@@ -198,7 +198,7 @@ export default function NearbySalonsMap({
             source: SOURCE_ID,
             filter: ['!', ['has', 'point_count']],
             paint: {
-              'circle-color': '#0f6e86',
+              'circle-color': '#7A2E26',
               'circle-radius': 10,
               'circle-opacity': 0.18,
             },
@@ -210,7 +210,7 @@ export default function NearbySalonsMap({
             source: SOURCE_ID,
             filter: ['!', ['has', 'point_count']],
             paint: {
-              'circle-color': '#e07a2f',
+              'circle-color': '#1B1714',
               'circle-radius': 6,
               'circle-stroke-color': '#ffffff',
               'circle-stroke-width': 2,
@@ -223,7 +223,7 @@ export default function NearbySalonsMap({
             source: SOURCE_ID,
             filter: ['==', ['get', 'id'], '__none__'],
             paint: {
-              'circle-color': '#0f6e86',
+              'circle-color': '#7A2E26',
               'circle-radius': 12,
               'circle-stroke-color': '#ffffff',
               'circle-stroke-width': 3,
@@ -315,7 +315,7 @@ export default function NearbySalonsMap({
         mapRef.current = null;
       }
     };
-  }, [accessToken]);
+  }, [accessToken, userLocation]);
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -416,7 +416,7 @@ export default function NearbySalonsMap({
 
       {isInitializing && (
         <div className="map-loading-overlay">
-          <div className="card-base rounded-xl px-4 py-3 text-sm text-slate-700">Loading nearby map...</div>
+          <div className="flex items-center gap-2 rounded-md border border-line bg-surface px-4 py-2.5 text-sm text-ink-2">Loading nearby map...</div>
         </div>
       )}
 

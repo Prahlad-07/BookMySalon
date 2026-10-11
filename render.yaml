@@ -18,8 +18,14 @@ services:
         sync: false
       - key: STRIPE_API_KEY
         sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: APP_FRONTEND_BASE_URL
+        sync: false
       - key: APP_CORS_ALLOWED_ORIGIN_PATTERNS
         value: http://localhost:3000,http://localhost:5173,https://*.vercel.app
+      - key: APP_RATE_LIMIT_ENABLED
+        value: "true"
       - key: APP_OTP_DEV_MODE
         value: "false"
       - key: OTP_EMAIL_ENABLED

@@ -21,6 +21,7 @@ frontend/.vite/
 # Java build artifacts
 **/target/
 *.class
+.m2/
 
 # Logs
 *.log

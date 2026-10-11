@@ -22,5 +22,6 @@ public class ReviewDto {
     private Double rating;
     private Long salonId;
     private Long userId;
+    private String reviewerName;
     private LocalDateTime createdAt;
 }

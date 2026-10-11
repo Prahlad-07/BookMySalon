@@ -12,10 +12,13 @@ import com.bookmysalon.entity.BookingStatus;
 import com.bookmysalon.entity.NotificationType;
 import com.bookmysalon.entity.Salon;
 import com.bookmysalon.entity.ServiceOffering;
+import com.bookmysalon.entity.User;
 import com.bookmysalon.exception.BookingNotFoundException;
+import com.bookmysalon.exception.ConflictException;
 import com.bookmysalon.repository.BookingRepository;
 import com.bookmysalon.repository.SalonRepository;
 import com.bookmysalon.repository.ServiceOfferingRepository;
+import com.bookmysalon.repository.UserRepository;
 import com.bookmysalon.service.BookingService;
 import com.bookmysalon.service.NotificationService;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +32,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,6 +47,7 @@ public class BookingServiceImpl implements BookingService {
     private final ServiceOfferingRepository serviceOfferingRepository;
     private final SalonRepository salonRepository;
     private final NotificationService notificationService;
+    private final UserRepository userRepository;
 
     @Override
     public BookingDto createBooking(BookingRequestDto bookingRequestDto, Long customerId) {
@@ -94,27 +101,66 @@ public class BookingServiceImpl implements BookingService {
     public BookingDto getBookingById(Long id) {
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new BookingNotFoundException("Booking not found with id: " + id));
-        return mapToDto(booking);
+        return enrich(List.of(booking)).get(0);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookingDto> getAllBookings() {
-        return bookingRepository.findAll().stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+        return enrich(bookingRepository.findAll());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookingDto> getBookingsBySalonId(Long salonId) {
-        return bookingRepository.findBySalonId(salonId).stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+        return enrich(bookingRepository.findBySalonId(salonId));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookingDto> getBookingsByCustomerId(Long customerId) {
-        return bookingRepository.findByCustomerId(customerId).stream()
-                .map(this::mapToDto)
+        return enrich(bookingRepository.findByCustomerId(customerId));
+    }
+
+    /**
+     * Maps bookings and resolves display names (salon, customer, services) with
+     * one batched lookup per entity type instead of a query per booking.
+     */
+    private List<BookingDto> enrich(List<Booking> bookings) {
+        if (bookings.isEmpty()) {
+            return List.of();
+        }
+        Set<Long> salonIds = bookings.stream().map(Booking::getSalonId).collect(Collectors.toSet());
+        Set<Long> customerIds = bookings.stream().map(Booking::getCustomerId).collect(Collectors.toSet());
+        Set<Long> serviceIds = bookings.stream()
+                .filter(b -> b.getServiceOfferingIds() != null)
+                .flatMap(b -> b.getServiceOfferingIds().stream())
+                .collect(Collectors.toSet());
+
+        Map<Long, Salon> salons = salonRepository.findAllById(salonIds).stream()
+                .collect(Collectors.toMap(Salon::getId, s -> s));
+        Map<Long, String> customers = userRepository.findAllById(customerIds).stream()
+                .collect(Collectors.toMap(User::getId, u -> u.getFullName() == null ? u.getUsername() : u.getFullName()));
+        Map<Long, String> services = serviceOfferingRepository.findAllById(serviceIds).stream()
+                .collect(Collectors.toMap(ServiceOffering::getId, ServiceOffering::getName));
+
+        return bookings.stream()
+                .sorted(Comparator.comparing(Booking::getStartTime, Comparator.nullsLast(Comparator.reverseOrder())))
+                .map(booking -> {
+                    BookingDto dto = mapToDto(booking);
+                    Salon salon = salons.get(booking.getSalonId());
+                    if (salon != null) {
+                        dto.setSalonName(salon.getName());
+                        dto.setSalonCity(salon.getCity());
+                        dto.setSalonOwnerId(salon.getOwnerId());
+                    }
+                    dto.setCustomerName(customers.get(booking.getCustomerId()));
+                    dto.setServiceNames(dto.getServiceOfferingIds().stream()
+                            .map(services::get)
+                            .filter(Objects::nonNull)
+                            .toList());
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -124,9 +170,16 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new BookingNotFoundException("Booking not found with id: " + id));
         BookingStatus previousStatus = booking.getStatus();
 
+        boolean isRescheduling = bookingDto.getStartTime() != null || bookingDto.getEndTime() != null;
+        boolean isStatusChange = bookingDto.getStatus() != null && bookingDto.getStatus() != previousStatus;
+
+        if ((isRescheduling || isStatusChange) && isTerminal(previousStatus)) {
+            throw new ConflictException("This booking is " + previousStatus.name().toLowerCase()
+                    + " and can no longer be modified");
+        }
+
         LocalDateTime updatedStart = bookingDto.getStartTime() != null ? bookingDto.getStartTime() : booking.getStartTime();
         LocalDateTime updatedEnd = bookingDto.getEndTime() != null ? bookingDto.getEndTime() : booking.getEndTime();
-        boolean isRescheduling = bookingDto.getStartTime() != null || bookingDto.getEndTime() != null;
 
         if (!updatedEnd.isAfter(updatedStart)) {
             throw new IllegalArgumentException("End time must be after start time");
@@ -140,10 +193,13 @@ public class BookingServiceImpl implements BookingService {
             validateWithinSalonHours(salon, updatedStart, updatedEnd);
             validateNoOverlap(booking.getSalonId(), updatedStart, updatedEnd, booking.getId());
         }
+        if (isStatusChange) {
+            assertTransitionAllowed(previousStatus, bookingDto.getStatus());
+        }
 
         if (bookingDto.getStartTime() != null) booking.setStartTime(updatedStart);
         if (bookingDto.getEndTime() != null) booking.setEndTime(updatedEnd);
-        if (bookingDto.getStatus() != null) booking.setStatus(bookingDto.getStatus());
+        if (isStatusChange) booking.setStatus(bookingDto.getStatus());
 
         Booking updatedBooking = bookingRepository.save(booking);
         notifyOnStatusChange(updatedBooking, previousStatus);
@@ -155,9 +211,30 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new BookingNotFoundException("Booking not found with id: " + id));
         BookingStatus previousStatus = booking.getStatus();
+        if (previousStatus == BookingStatus.CANCELLED) {
+            return; // idempotent
+        }
+        if (previousStatus == BookingStatus.COMPLETED) {
+            throw new ConflictException("A completed booking cannot be cancelled");
+        }
         booking.setStatus(BookingStatus.CANCELLED);
         Booking updatedBooking = bookingRepository.save(booking);
         notifyOnStatusChange(updatedBooking, previousStatus);
+    }
+
+    private boolean isTerminal(BookingStatus status) {
+        return status == BookingStatus.CANCELLED || status == BookingStatus.COMPLETED;
+    }
+
+    private void assertTransitionAllowed(BookingStatus from, BookingStatus to) {
+        boolean allowed = switch (from) {
+            case PENDING -> to == BookingStatus.CONFIRMED || to == BookingStatus.CANCELLED || to == BookingStatus.COMPLETED;
+            case CONFIRMED -> to == BookingStatus.COMPLETED || to == BookingStatus.CANCELLED;
+            case CANCELLED, COMPLETED -> false;
+        };
+        if (!allowed) {
+            throw new ConflictException("Cannot change booking status from " + from + " to " + to);
+        }
     }
 
     @Override
@@ -179,6 +256,7 @@ public class BookingServiceImpl implements BookingService {
                 .serviceOfferingIds(safeServiceOfferingIds)
                 .status(booking.getStatus())
                 .totalPrice(booking.getTotalPrice())
+                .createdAt(booking.getCreatedAt())
                 .build();
     }
 

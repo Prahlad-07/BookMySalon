@@ -8,7 +8,9 @@ package com.bookmysalon.service.impl;
 import com.bookmysalon.dto.SalonDto;
 import com.bookmysalon.entity.Salon;
 import com.bookmysalon.exception.SalonNotFoundException;
+import com.bookmysalon.repository.ReviewRepository;
 import com.bookmysalon.repository.SalonRepository;
+import com.bookmysalon.repository.ServiceOfferingRepository;
 import com.bookmysalon.service.SalonService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -17,7 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +32,8 @@ public class SalonServiceImpl implements SalonService {
     private static final double EARTH_RADIUS_KM = 6371.0;
 
     private final SalonRepository salonRepository;
+    private final ReviewRepository reviewRepository;
+    private final ServiceOfferingRepository serviceOfferingRepository;
 
     @Override
     public SalonDto createSalon(SalonDto salonDto) {
@@ -80,44 +86,93 @@ public class SalonServiceImpl implements SalonService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public SalonDto getSalonById(Long id) {
         Salon salon = salonRepository.findById(id)
                 .orElseThrow(() -> new SalonNotFoundException("Salon not found with id: " + id));
-        return mapToDto(salon);
+        double[] rating = ratingFor(id);
+        return mapToDto(salon, null, rating[0], (long) rating[1], serviceOfferingRepository.countBySalonId(id));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<SalonDto> getAllSalons() {
-        return salonRepository.findAll().stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+        return withStats(salonRepository.findAll());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<SalonDto> getSalonsByOwnerId(Long ownerId) {
-        return salonRepository.findByOwnerId(ownerId).stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+        return withStats(salonRepository.findByOwnerId(ownerId));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<SalonDto> getSalonsByCity(String city) {
-        return salonRepository.findByCity(city).stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+        return withStats(salonRepository.findByCity(city));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<SalonDto> getSalonsNearLocation(double latitude, double longitude, double radiusKm) {
         validateCoordinates(latitude, longitude);
         validateRadius(radiusKm);
 
-        return salonRepository.findByLatitudeIsNotNullAndLongitudeIsNotNull().stream()
-                .map(salon -> new SalonDistance(salon, haversineDistanceKm(latitude, longitude, salon.getLatitude(), salon.getLongitude())))
+        List<SalonDistance> nearby = salonRepository.findByLatitudeIsNotNullAndLongitudeIsNotNull().stream()
+                .map(salon -> new SalonDistance(salon,
+                        haversineDistanceKm(latitude, longitude, salon.getLatitude(), salon.getLongitude())))
                 .filter(salonDistance -> salonDistance.distanceKm <= radiusKm)
                 .sorted(Comparator.comparingDouble(salonDistance -> salonDistance.distanceKm))
-                .map(salonDistance -> mapToDto(salonDistance.salon, roundDistance(salonDistance.distanceKm)))
+                .toList();
+
+        Map<Long, double[]> ratings = ratingMap();
+        Map<Long, Long> serviceCounts = serviceCountMap();
+        return nearby.stream()
+                .map(sd -> {
+                    double[] r = ratings.getOrDefault(sd.salon.getId(), new double[]{0, 0});
+                    return mapToDto(sd.salon, roundDistance(sd.distanceKm), r[0], (long) r[1],
+                            serviceCounts.getOrDefault(sd.salon.getId(), 0L));
+                })
                 .collect(Collectors.toList());
+    }
+
+    private List<SalonDto> withStats(List<Salon> salons) {
+        Map<Long, double[]> ratings = ratingMap();
+        Map<Long, Long> serviceCounts = serviceCountMap();
+        return salons.stream()
+                .map(salon -> {
+                    double[] r = ratings.getOrDefault(salon.getId(), new double[]{0, 0});
+                    return mapToDto(salon, null, r[0], (long) r[1],
+                            serviceCounts.getOrDefault(salon.getId(), 0L));
+                })
+                .collect(Collectors.toList());
+    }
+
+    private Map<Long, double[]> ratingMap() {
+        Map<Long, double[]> map = new HashMap<>();
+        for (Object[] row : reviewRepository.ratingSummaryBySalon()) {
+            map.put(((Number) row[0]).longValue(),
+                    new double[]{round1(((Number) row[1]).doubleValue()), ((Number) row[2]).doubleValue()});
+        }
+        return map;
+    }
+
+    private Map<Long, Long> serviceCountMap() {
+        Map<Long, Long> map = new HashMap<>();
+        for (Object[] row : serviceOfferingRepository.countGroupBySalon()) {
+            map.put(((Number) row[0]).longValue(), ((Number) row[1]).longValue());
+        }
+        return map;
+    }
+
+    private double[] ratingFor(Long salonId) {
+        double avg = reviewRepository.averageRatingForSalon(salonId);
+        long count = reviewRepository.countBySalonId(salonId);
+        return new double[]{round1(avg), count};
+    }
+
+    private double round1(double value) {
+        return Math.round(value * 10.0) / 10.0;
     }
 
     @Override
@@ -184,10 +239,10 @@ public class SalonServiceImpl implements SalonService {
     }
 
     private SalonDto mapToDto(Salon salon) {
-        return mapToDto(salon, null);
+        return mapToDto(salon, null, 0d, 0L, 0L);
     }
 
-    private SalonDto mapToDto(Salon salon, Double distanceKm) {
+    private SalonDto mapToDto(Salon salon, Double distanceKm, double averageRating, long reviewCount, long serviceCount) {
         List<String> safeImages = salon.getImages() == null
                 ? new ArrayList<>()
                 : new ArrayList<>(salon.getImages());
@@ -206,6 +261,9 @@ public class SalonServiceImpl implements SalonService {
                 .openTime(salon.getOpenTime())
                 .closeTime(salon.getCloseTime())
                 .distanceKm(distanceKm)
+                .averageRating(averageRating)
+                .reviewCount(reviewCount)
+                .serviceCount(serviceCount)
                 .build();
     }
 

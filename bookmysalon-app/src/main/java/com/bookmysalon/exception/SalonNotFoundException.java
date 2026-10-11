@@ -5,7 +5,7 @@
  */
 package com.bookmysalon.exception;
 
-public class SalonNotFoundException extends RuntimeException {
+public class SalonNotFoundException extends ResourceNotFoundException {
     public SalonNotFoundException(String message) {
         super(message);
     }

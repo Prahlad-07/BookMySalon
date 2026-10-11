@@ -1,48 +1,101 @@
+/**
+ * @author Prahlad Yadav
+ * @version 2.0
+ * @since 2026-08-31
+ *
+ * <p>Content-based salon recommendations: score salons by how many of the
+ * services a customer has booked before they also offer, blended with the
+ * salon's average rating. Falls back to top-rated salons for new customers.</p>
+ */
 package com.bookmysalon.service.recommendation;
 
 import com.bookmysalon.dto.recommendation.RecommendationDto;
+import com.bookmysalon.entity.Salon;
+import com.bookmysalon.entity.ServiceOffering;
+import com.bookmysalon.repository.BookingRepository;
+import com.bookmysalon.repository.ReviewRepository;
+import com.bookmysalon.repository.SalonRepository;
+import com.bookmysalon.repository.ServiceOfferingRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class RecommendationService {
-    private final JdbcTemplate jdbc;
 
-    /**
-     * Recommend salons for a user using simple scoring: service overlap + rating + proximity placeholder.
-     */
-    public List<RecommendationDto> recommendSalons(Long userId, Double lat, Double lng, int limit) {
-        // 1) get user's top service ids
-        String sqlUserServices = "SELECT service_offering_id, COUNT(*) as cnt FROM bookings WHERE user_id = ? AND status='CONFIRMED' GROUP BY service_offering_id ORDER BY cnt DESC LIMIT 10";
-        List<Map<String, Object>> userServices = jdbc.queryForList(sqlUserServices, userId);
-        List<Long> topServiceIds = new ArrayList<>();
-        for (Map<String, Object> r : userServices) topServiceIds.add(((Number) r.get("service_offering_id")).longValue());
+    private final BookingRepository bookingRepository;
+    private final ServiceOfferingRepository serviceOfferingRepository;
+    private final SalonRepository salonRepository;
+    private final ReviewRepository reviewRepository;
 
-        // 2) score salons by how many of these services they offer and their average rating
-        String sql = "SELECT s.id AS salon_id, s.name AS salon_name, COALESCE(avg(r.rating),0) AS avg_rating, COUNT(so.id) AS match_count " +
-                "FROM salon s " +
-                "LEFT JOIN service_offering so ON so.salon_id = s.id " +
-                "LEFT JOIN reviews r ON r.salon_id = s.id " +
-                "WHERE so.id IN (" + (topServiceIds.isEmpty() ? "0" : topServiceIds.stream().map(Object::toString).reduce((a,b)->a+","+b).orElse("0")) + ") " +
-                "GROUP BY s.id, s.name ORDER BY match_count DESC, avg_rating DESC LIMIT ?";
+    public List<RecommendationDto> recommendSalons(Long userId, int limit) {
+        int safeLimit = Math.max(1, Math.min(limit, 20));
 
-        List<Map<String, Object>> rows = jdbc.queryForList(sql, limit);
-        List<RecommendationDto> out = new ArrayList<>();
-        for (Map<String, Object> r : rows) {
-            RecommendationDto dto = RecommendationDto.builder()
-                    .salonId(((Number) r.get("salon_id")).longValue())
-                    .salonName((String) r.get("salon_name"))
-                    .score(((Number) r.get("match_count")).doubleValue() + ((Number) r.get("avg_rating")).doubleValue() / 5.0)
-                    .reason(List.of("Service match", "High rating"))
-                    .build();
-            out.add(dto);
+        List<Long> bookedServiceIds = bookingRepository.distinctServiceOfferingIdsForCustomer(userId);
+        Set<String> bookedServiceNames = serviceOfferingRepository.findAllById(bookedServiceIds).stream()
+                .map(ServiceOffering::getName)
+                .filter(name -> name != null && !name.isBlank())
+                .map(name -> name.toLowerCase().trim())
+                .collect(Collectors.toSet());
+
+        Map<Long, Double> ratingBySalon = new HashMap<>();
+        for (Object[] row : reviewRepository.ratingSummaryBySalon()) {
+            ratingBySalon.put(((Number) row[0]).longValue(), ((Number) row[1]).doubleValue());
         }
-        return out;
+
+        Map<Long, List<ServiceOffering>> offeringsBySalon = serviceOfferingRepository.findAll().stream()
+                .filter(o -> o.getSalonId() != null)
+                .collect(Collectors.groupingBy(ServiceOffering::getSalonId));
+
+        List<RecommendationDto> scored = new ArrayList<>();
+        for (Salon salon : salonRepository.findAll()) {
+            double rating = ratingBySalon.getOrDefault(salon.getId(), 0d);
+            List<ServiceOffering> offerings = offeringsBySalon.getOrDefault(salon.getId(), List.of());
+            if (offerings.isEmpty()) {
+                continue;
+            }
+
+            long matchCount = offerings.stream()
+                    .map(o -> o.getName() == null ? "" : o.getName().toLowerCase().trim())
+                    .filter(bookedServiceNames::contains)
+                    .distinct()
+                    .count();
+
+            double score = matchCount * 2.0 + rating / 5.0 + Math.min(offerings.size(), 10) * 0.05;
+
+            List<String> reasons = new ArrayList<>();
+            if (matchCount > 0) {
+                reasons.add("Offers " + matchCount + " service" + (matchCount == 1 ? "" : "s")
+                        + " you have booked before");
+            }
+            if (rating >= 4.0) {
+                reasons.add("Highly rated (" + String.format("%.1f", rating) + ")");
+            }
+            if (reasons.isEmpty()) {
+                reasons.add(offerings.size() + " services available");
+            }
+
+            scored.add(RecommendationDto.builder()
+                    .salonId(salon.getId())
+                    .salonName(salon.getName())
+                    .score(Math.round(score * 100.0) / 100.0)
+                    .reason(reasons)
+                    .build());
+        }
+
+        return scored.stream()
+                .sorted(Comparator.comparingDouble(RecommendationDto::getScore).reversed())
+                .limit(safeLimit)
+                .toList();
     }
 }

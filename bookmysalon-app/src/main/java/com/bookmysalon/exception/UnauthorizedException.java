@@ -4,7 +4,6 @@
  * @since 2026-02-13
  */
 package com.bookmysalon.exception;
-
 public class UnauthorizedException extends RuntimeException {
     public UnauthorizedException(String message) {
         super(message);

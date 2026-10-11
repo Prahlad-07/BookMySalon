@@ -23,11 +23,16 @@ export default class AppErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="page-shell flex items-center justify-center p-6">
-          <div className="card-base max-w-xl w-full rounded-2xl p-5">
-            <h1 className="text-xl font-bold mb-2 text-slate-900">Something went wrong</h1>
-            <p className="text-sm text-slate-600">The app encountered a runtime error. Open browser console for details.</p>
-            {this.state.error?.message && <p className="notice-box notice-error mt-3 text-xs">{this.state.error.message}</p>}
+        <div className="flex min-h-screen items-center justify-center bg-paper px-6">
+          <div className="max-w-md">
+            <p className="eyebrow">Unexpected error</p>
+            <h1 className="display mt-3 text-[48px] text-ink">Something went wrong.</h1>
+            <p className="mt-3 text-ink-2">
+              The page hit a problem it could not recover from. Reloading usually fixes it — your data is safe.
+            </p>
+            <button type="button" className="btn-dark mt-7" onClick={() => window.location.reload()}>
+              Reload page
+            </button>
           </div>
         </div>
       );

@@ -55,7 +55,15 @@ public class DemoUserSeeder implements CommandLineRunner {
                 UserRole.SALON_OWNER
         );
 
-        log.info("Demo users are ready: customer.test@gmail.com and owner.test@gmail.com");
+        upsertDemoUser(
+                "Admin Test",
+                "admin.test@gmail.com",
+                "testadmin",
+                "Test@12345",
+                UserRole.ADMIN
+        );
+
+        log.info("Demo users are ready: customer.test@gmail.com, owner.test@gmail.com, admin.test@gmail.com (password Test@12345)");
     }
 
     private void upsertDemoUser(String fullName, String email, String username, String rawPassword, UserRole roleName) {

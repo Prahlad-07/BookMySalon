@@ -1,199 +1,165 @@
 /**
  * @author Prahlad Yadav
- * @version 1.0
+ * @version 3.0
  * @since 2026-02-13
  */
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowRight, Eye, EyeOff, Lock, Mail, Sparkles } from 'lucide-react';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import brandLogo from '../assets/brand-logo.png';
+import { GOOGLE_AUTH_URL } from '../config/apiBaseUrl';
 import { getDashboardPathByRole } from '../utils/roleRouting';
+import AuthLayout from '../components/AuthLayout';
+import { Field, Notice } from '../components/ui';
+import GoogleButton from '../components/GoogleButton';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://bookmysalon-5.onrender.com';
-const GOOGLE_AUTH_URL = `${API_BASE_URL}/oauth2/authorization/google`;
 const ENABLE_GOOGLE_OAUTH = import.meta.env.VITE_ENABLE_GOOGLE_OAUTH === 'true';
+const SHOW_DEMO_ACCOUNTS = import.meta.env.VITE_SHOW_DEMO_ACCOUNTS !== 'false';
 
 const DEMO_USERS = [
-  { label: 'Customer', email: 'customer.test@gmail.com', password: 'Test@12345' },
-  { label: 'Salon Owner', email: 'owner.test@gmail.com', password: 'Test@12345' },
+  { label: 'Customer', email: 'customer.test@gmail.com' },
+  { label: 'Salon owner', email: 'owner.test@gmail.com' },
+  { label: 'Admin', email: 'admin.test@gmail.com' },
 ];
+const DEMO_PASSWORD = 'Test@12345';
 
 export default function Login() {
   const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { login, error, user, loading, clearError } = useAuth();
+
   const [identifier, setIdentifier] = useState(() => searchParams.get('email') || '');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const { login, error, user, loading } = useAuth();
-  const navigate = useNavigate();
-
-  const loginMessage = searchParams.get('error');
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (loading || !user) return;
-    navigate(getDashboardPathByRole(user.role), { replace: true });
-  }, [loading, user, navigate]);
+    clearError();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const handleSubmit = async (event) => {
+  const redirectNotice = searchParams.get('error');
+  const from = location.state?.from;
+
+  const destinationFor = (role) => (from && from !== '/login' ? from : getDashboardPathByRole(role));
+
+  useEffect(() => {
+    if (!loading && user) navigate(destinationFor(user.role), { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, user]);
+
+  const submit = async (event) => {
     event.preventDefault();
-    if (!identifier || !password) return;
-
-    setIsLoading(true);
-    const loggedInUser = await login(identifier.trim(), password);
-    setIsLoading(false);
-
-    if (!loggedInUser) return;
-    navigate(getDashboardPathByRole(loggedInUser.role), { replace: true });
+    if (!identifier.trim() || !password) return;
+    setSubmitting(true);
+    const loggedIn = await login(identifier.trim(), password);
+    setSubmitting(false);
+    if (loggedIn) navigate(destinationFor(loggedIn.role), { replace: true });
   };
 
-  const renderedError = error || loginMessage;
+  const message = error || redirectNotice;
 
   return (
-    <div className="auth-shell">
-      <div className="page-content page-content--wide grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="hidden lg:flex glass-effect rounded-3xl p-10 flex-col justify-between">
-          <div>
-            <span className="badge-primary inline-flex items-center gap-2">
-              <Sparkles size={14} /> Welcome Back
-            </span>
-            <h1 className="text-4xl font-bold text-slate-900 mt-5 leading-tight">
-              Bookings, messages, and operations in one powerful workspace.
-            </h1>
-            <p className="text-slate-600 mt-4 leading-7">
-              Sign in as customer or salon owner and continue exactly where you paused.
-            </p>
-          </div>
-
-          <div className="card-base p-6 surface-muted">
-            <p className="text-slate-700 font-semibold mb-3">Instant demo access</p>
-            <div className="space-y-2">
-              {DEMO_USERS.map((demoUser) => (
-                <button
-                  key={demoUser.email}
-                  type="button"
-                  onClick={() => {
-                    setIdentifier(demoUser.email);
-                    setPassword(demoUser.password);
-                  }}
-                  className="w-full text-left rounded-xl border border-slate-200 bg-white/80 px-3 py-2 hover:border-primary-200 hover:bg-primary-50/70"
-                >
-                  <p className="text-sm font-semibold text-slate-900">{demoUser.label}</p>
-                  <p className="text-xs text-slate-600">{demoUser.email}</p>
-                </button>
-              ))}
-            </div>
-          </div>
+    <AuthLayout
+      eyebrow="Welcome back"
+      title="Sign in"
+      description="Pick up where you left off — your appointments, messages and salon are waiting."
+      footer={
+        <>
+          New to BookMySalon?{' '}
+          <Link to="/signup" className="link">
+            Create an account
+          </Link>
+        </>
+      }
+    >
+      {message && (
+        <div className="mb-6">
+          <Notice tone="error">{message}</Notice>
         </div>
+      )}
 
-        <div className="card-base rounded-3xl p-8 sm:p-10">
-          <div className="login-brand-wrap mb-5">
-            <img src={brandLogo} alt="BookMySalon logo" className="login-brand-logo" />
-          </div>
+      <form onSubmit={submit} className="space-y-5" noValidate>
+        <Field label="Email or username" htmlFor="login-identifier">
+          <input
+            id="login-identifier"
+            className="field"
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
+            autoComplete="username"
+            autoFocus
+            required
+          />
+        </Field>
 
-          <h2 className="text-3xl font-bold text-slate-900">Sign In</h2>
-          <p className="text-slate-600 mt-2">Use your email or username to access your workspace.</p>
-
-          {renderedError && <div className="notice-box notice-error mt-5">{renderedError}</div>}
-
-          <form onSubmit={handleSubmit} className="space-y-4 mt-6">
-            <div>
-              <label className="text-sm font-semibold text-slate-700">Email or Username</label>
-              <div className="relative mt-1.5">
-                <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input
-                  className="input-field input-with-icon"
-                  value={identifier}
-                  onChange={(event) => setIdentifier(event.target.value)}
-                  placeholder="you@example.com"
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="text-sm font-semibold text-slate-700">Password</label>
-              <div className="relative mt-1.5">
-                <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  className="input-field input-with-icon pr-11"
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  placeholder="Enter password"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((previous) => !previous)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
-              <div className="mt-2 text-right">
-                <Link to="/forgot-password" className="text-sm app-link">
-                  Forgot password?
-                </Link>
-              </div>
-            </div>
-
-            <button className="btn-primary w-full inline-flex items-center justify-center gap-2" disabled={isLoading}>
-              {isLoading ? 'Signing in...' : 'Sign In'}
-              {!isLoading && <ArrowRight size={16} />}
-            </button>
-          </form>
-
-          <div className="mt-5 lg:hidden card-base p-4 surface-muted">
-            <p className="text-sm font-semibold text-slate-800 mb-2">Try demo accounts</p>
-            <div className="space-y-2">
-              {DEMO_USERS.map((demoUser) => (
-                <button
-                  key={demoUser.email}
-                  type="button"
-                  onClick={() => {
-                    setIdentifier(demoUser.email);
-                    setPassword(demoUser.password);
-                  }}
-                  className="w-full text-left rounded-lg border border-slate-200 bg-white px-3 py-2 hover:border-primary-200 hover:bg-primary-50"
-                >
-                  <span className="text-sm font-semibold text-slate-900">{demoUser.label}</span>
-                  <span className="block text-xs text-slate-600">{demoUser.email}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {ENABLE_GOOGLE_OAUTH && (
-            <div className="mt-4">
-              <button
-                type="button"
-                onClick={() => {
-                  window.location.href = GOOGLE_AUTH_URL;
-                }}
-                className="w-full btn-secondary inline-flex items-center justify-center gap-2"
-              >
-                <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
-                  <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303C33.653 32.657 29.233 36 24 36c-6.627 0-12-5.373-12-12S17.373 12 24 12c3.059 0 5.849 1.154 7.971 3.029l5.657-5.657C34.053 6.053 29.279 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.651-.389-3.917z" />
-                  <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.849 1.154 7.971 3.029l5.657-5.657C34.053 6.053 29.279 4 24 4c-7.682 0-14.348 4.337-17.694 10.691z" />
-                  <path fill="#4CAF50" d="M24 44c5.176 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.141 35.091 26.715 36 24 36c-5.213 0-9.62-3.33-11.283-7.946l-6.522 5.025C9.5 39.556 16.227 44 24 44z" />
-                  <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.048 12.048 0 01-4.084 5.57l.003-.002 6.19 5.238C36.971 39.206 44 34 44 24c0-1.341-.138-2.651-.389-3.917z" />
-                </svg>
-                Continue with Google
-              </button>
-            </div>
-          )}
-
-          <p className="text-slate-600 text-sm mt-6">
-            New to BookMySalon?{' '}
-            <Link to="/signup" className="app-link">
-              Create your account
+        <div>
+          <div className="mb-1.5 flex items-baseline justify-between">
+            <label htmlFor="login-password" className="label !mb-0">
+              Password
+            </label>
+            <Link to="/forgot-password" className="text-[13px] text-ink-3 hover:text-ink">
+              Forgot password?
             </Link>
-          </p>
+          </div>
+          <div className="relative">
+            <input
+              id="login-password"
+              type={showPassword ? 'text' : 'password'}
+              className="field pr-11"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              className="absolute right-1 top-1/2 -translate-y-1/2 icon-btn"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div>
         </div>
-      </div>
-    </div>
+
+        <button type="submit" className="btn-dark btn-lg w-full" disabled={submitting || !identifier || !password}>
+          {submitting ? 'Signing in…' : 'Sign in'}
+        </button>
+      </form>
+
+      {ENABLE_GOOGLE_OAUTH && (
+        <>
+          <div className="my-6 flex items-center gap-4 text-xs text-ink-3">
+            <span className="h-px flex-1 bg-line" />
+            or
+            <span className="h-px flex-1 bg-line" />
+          </div>
+          <GoogleButton href={GOOGLE_AUTH_URL} />
+        </>
+      )}
+
+      {SHOW_DEMO_ACCOUNTS && (
+        <div className="mt-8 rounded-md border border-dashed border-line-strong p-4">
+          <p className="text-[13px] font-medium text-ink">Exploring the product?</p>
+          <p className="mt-0.5 text-[13px] text-ink-3">Fill in a demo account — the password is {DEMO_PASSWORD}.</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {DEMO_USERS.map((demo) => (
+              <button
+                key={demo.email}
+                type="button"
+                className="btn-secondary btn-sm"
+                onClick={() => {
+                  setIdentifier(demo.email);
+                  setPassword(DEMO_PASSWORD);
+                }}
+              >
+                {demo.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </AuthLayout>
   );
 }
