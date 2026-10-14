@@ -119,7 +119,7 @@ function SalonForm({ value, onChange, onSubmit, submitLabel, busy, onUseLocation
     <form onSubmit={onSubmit}>
       {title && (
         <div className="mb-2">
-          <h2 className="display text-[36px] text-ink">{title}</h2>
+          <h2 className="display text-[26px] text-ink">{title}</h2>
           {description && <p className="mt-1 text-ink-2">{description}</p>}
         </div>
       )}
@@ -578,7 +578,7 @@ export default function SalonOwnerDashboard() {
     return (
       <div className="page max-w-4xl">
         <p className="eyebrow">{salons.length ? t('owner.setup.newLocation') : t('owner.setup.welcome')}</p>
-        <h1 className="display mt-3 text-[48px] text-ink sm:text-[60px]">
+        <h1 className="display mt-3 text-[30px] text-ink sm:text-[34px]">
           {salons.length ? t('owner.addAnother') : t('owner.setup.title')}
         </h1>
         <p className="lede mt-3 max-w-xl">{t('owner.setup.body')}</p>
@@ -675,7 +675,7 @@ export default function SalonOwnerDashboard() {
         {section === 'overview' && (
           <div className="animate-fade">
             <p className="eyebrow">{t('nav.overview')}</p>
-            <h1 className="display mt-3 text-[44px] text-ink sm:text-[54px]">
+            <h1 className="display mt-3 text-[28px] text-ink sm:text-[30px]">
               {t(greetingKey(), { name: (user?.fullName || user?.name || '').split(' ')[0] || t('owner.there') })}
             </h1>
             <p className="lede mt-2">
@@ -788,7 +788,7 @@ export default function SalonOwnerDashboard() {
         {section === 'bookings' && (
           <div className="animate-fade">
             <p className="eyebrow">{t('admin.bookings')}</p>
-            <h1 className="display mt-3 text-[44px] text-ink sm:text-[54px]">{t('owner.calendar')}</h1>
+            <h1 className="display mt-3 text-[28px] text-ink sm:text-[30px]">{t('owner.calendar')}</h1>
             <div className="mt-6">{messages}</div>
 
             <div className="tabs mt-6" role="tablist">
@@ -869,7 +869,7 @@ export default function SalonOwnerDashboard() {
         {section === 'menu' && (
           <div className="animate-fade">
             <p className="eyebrow">{t('salon.menu')}</p>
-            <h1 className="display mt-3 text-[44px] text-ink sm:text-[54px]">{t('owner.menuTitle')}</h1>
+            <h1 className="display mt-3 text-[28px] text-ink sm:text-[30px]">{t('owner.menuTitle')}</h1>
             <div className="mt-6">{messages}</div>
 
             <div className="mt-8 grid gap-12 xl:grid-cols-[minmax(0,1fr)_360px]">
@@ -1055,7 +1055,7 @@ export default function SalonOwnerDashboard() {
         {section === 'profile' && profileDraft && (
           <div className="animate-fade">
             <p className="eyebrow">{t('owner.salonProfile')}</p>
-            <h1 className="display mt-3 text-[44px] text-ink sm:text-[54px]">{profileDraft.name || t('owner.yourSalon')}</h1>
+            <h1 className="display mt-3 text-[28px] text-ink sm:text-[30px]">{profileDraft.name || t('owner.yourSalon')}</h1>
             <div className="mt-6">{messages}</div>
             <div className="mt-4">
               <SalonForm

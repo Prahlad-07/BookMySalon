@@ -6,6 +6,7 @@
 
 import axios from 'axios';
 import { API_BASE_URL } from './apiBaseUrl';
+import { apiModeReady, isMockMode } from '../mock/mode';
 import {
   clearAuthSession,
   getAccessToken,
@@ -32,8 +33,17 @@ const AUTH_ENDPOINT_PREFIX = '/api/auth/';
 
 const isAuthEndpoint = (url = '') => url.includes(AUTH_ENDPOINT_PREFIX);
 
+// Demo mode: answer from the in-browser API. Loaded on demand, so real-mode bundles never pay for it.
+let demoAdapterPromise = null;
+const demoAdapter = (config) => {
+  demoAdapterPromise = demoAdapterPromise || import('../mock/adapter').then((m) => m.default);
+  return demoAdapterPromise.then((adapter) => adapter(config));
+};
+
 api.interceptors.request.use(
-  (config) => {
+  async (config) => {
+    await apiModeReady;
+    if (isMockMode()) config.adapter = demoAdapter;
     const token = getAccessToken();
     if (token && !isAuthEndpoint(config.url || '')) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -56,6 +66,8 @@ api.interceptors.response.use(
     return response.data;
   },
   async (error) => {
+    // Superseded requests (AbortController) are not failures — never retry or refresh them.
+    if (axios.isCancel(error)) return Promise.reject(error);
     const originalRequest = error.config;
     const requestUrl = originalRequest?.url || '';
 
@@ -81,6 +93,12 @@ api.interceptors.response.use(
       requestUrl.includes('/api/auth/refresh-token') ||
       requestUrl.includes('/api/auth/forgot-password') ||
       requestUrl.includes('/api/auth/reset-password');
+
+    // Demo sessions don't expire; a 401 there means a stale or real-mode token — sign out locally.
+    if (error.response?.status === 401 && isMockMode() && !isAuthRequest) {
+      clearAuthSession();
+      return Promise.reject(error);
+    }
 
     if (error.response?.status === 401 && originalRequest && !originalRequest._retry && !isAuthRequest) {
       originalRequest._retry = true;

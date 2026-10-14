@@ -50,6 +50,18 @@ public class BookingController {
         return ResponseEntity.ok(ApiResponse.ok(booking, "Booking created successfully"));
     }
 
+    /**
+     * Public: which intervals of a salon's day are already taken, so the booking UI can
+     * grey them out instead of failing on submit. Times only — no customer details.
+     */
+    @GetMapping("/salon/{salonId}/busy")
+    public ResponseEntity<ApiResponse<java.util.List<com.bookmysalon.dto.BusySlotDto>>> busySlots(
+            @PathVariable Long salonId,
+            @RequestParam("date") @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate date) {
+        var busy = bookingService.getBusySlots(salonId, date);
+        return ResponseEntity.ok(ApiResponse.ok(busy));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<BookingDto>> getBooking(@PathVariable Long id) {
         BookingDto booking = bookingService.getBookingById(id);

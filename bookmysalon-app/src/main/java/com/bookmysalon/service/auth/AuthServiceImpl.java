@@ -82,7 +82,7 @@ public class AuthServiceImpl implements AuthService {
         }
         String username = resolveAvailableUsername(request.getUsername(), email);
         if (userRepository.existsByEmailIgnoreCase(email)) {
-            throw new AuthException("Email already exists");
+            throw new ConflictException("Email already exists");
         }
 
         Set<UserRole> roleNames = resolveRequestedRoles(request);
@@ -119,7 +119,7 @@ public class AuthServiceImpl implements AuthService {
         }
         String username = resolveAvailableUsername(request.getUsername(), email);
         if (userRepository.existsByEmailIgnoreCase(email)) {
-            throw new AuthException("Email already exists");
+            throw new ConflictException("Email already exists");
         }
 
         signupVerificationSessionRepository.deleteByEmailIgnoreCase(email);
@@ -187,7 +187,7 @@ public class AuthServiceImpl implements AuthService {
 
         if (userRepository.existsByEmailIgnoreCase(session.getEmail())) {
             signupVerificationSessionRepository.delete(session);
-            throw new AuthException("Email already exists");
+            throw new ConflictException("Email already exists");
         }
         String username = resolveAvailableUsername(session.getUsername(), session.getEmail());
 

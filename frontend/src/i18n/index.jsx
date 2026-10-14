@@ -47,11 +47,11 @@ const loadScriptFont = (script) => {
     link.id = id;
     link.rel = 'stylesheet';
     const fam = family.replace(/ /g, '+');
-    link.href = `https://fonts.googleapis.com/css2?family=Noto+Sans+${fam}:wght@400;500;600;700&family=Noto+Serif+${fam}:wght@400;500&display=swap`;
+    link.href = `https://fonts.googleapis.com/css2?family=Noto+Sans+${fam}:wght@400;500;600;700&display=swap`;
     document.head.appendChild(link);
   }
   root.style.setProperty('--script-sans', `"Noto Sans ${family}"`);
-  root.style.setProperty('--script-serif', `"Noto Serif ${family}"`);
+  root.style.setProperty('--script-serif', `"Noto Sans ${family}"`);
 };
 
 const interpolate = (text, vars) =>
@@ -155,3 +155,13 @@ export function Rich({ text, emClassName = 'italic' }) {
     </>
   );
 }
+
+/** City names are proper nouns; use a locale's spelling where it provides one (city.Delhi → दिल्ली). */
+export const useCityLabel = () => {
+  const { t } = useI18n();
+  return (city) => {
+    const key = `city.${city}`;
+    const label = t(key);
+    return label === key ? city : label;
+  };
+};

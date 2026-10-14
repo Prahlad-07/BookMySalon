@@ -23,5 +23,7 @@ public class ReviewDto {
     private Long salonId;
     private Long userId;
     private String reviewerName;
+    private String salonName;
+    private String salonCity;
     private LocalDateTime createdAt;
 }

@@ -13,7 +13,7 @@ function CrashScreen() {
     <div className="flex min-h-screen items-center justify-center bg-paper px-6">
       <div className="max-w-md">
         <p className="eyebrow">{t('crash.eyebrow')}</p>
-        <h1 className="display mt-3 text-[48px] text-ink">{t('crash.title')}</h1>
+        <h1 className="display mt-3 text-[30px] text-ink">{t('crash.title')}</h1>
         <p className="mt-3 text-ink-2">{t('crash.body')}</p>
         <button type="button" className="btn-dark mt-7" onClick={() => window.location.reload()}>
           {t('crash.reload')}

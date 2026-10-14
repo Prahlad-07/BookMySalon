@@ -66,7 +66,7 @@ export default function OAuthCallback() {
       <div className="shell flex min-h-[70vh] flex-col justify-center py-20">
         <div className="max-w-md">
           <p className="eyebrow">{t('oauth.eyebrow')}</p>
-          <h1 className="display mt-3 text-[48px] text-ink">{t('oauth.title')}</h1>
+          <h1 className="display mt-3 text-[30px] text-ink">{t('oauth.title')}</h1>
           <p className="mt-3 text-ink-2">{error}</p>
           <Link to="/login" className="btn-dark mt-8">
             {t('auth.backToSignIn')}

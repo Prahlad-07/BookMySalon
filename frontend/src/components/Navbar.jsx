@@ -125,7 +125,12 @@ export default function Navbar() {
     navigate('/');
   };
 
-  const links = user ? linksFor(user.role) : [];
+  const links = user
+    ? linksFor(user.role)
+    : [
+        { to: '/salons', label: 'nav.discover' },
+        { to: '/signup', label: 'footer.listSalon' },
+      ];
 
   const linkClass = ({ isActive }) =>
     `relative py-1 text-[14px] font-medium transition-colors ${
@@ -135,11 +140,11 @@ export default function Navbar() {
     }`;
 
   return (
-    <header className="sticky top-0 z-50 border-b border-line bg-paper/90 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-line bg-paper/95 backdrop-blur-md">
       <div className="shell flex h-16 items-center justify-between gap-6">
         <div className="flex items-center gap-10">
           <Wordmark />
-          {user && (
+          {links.length > 0 && (
             <nav aria-label={t('nav.primary')} className="hidden items-center gap-7 md:flex">
               {links.map((item) => (
                 <NavLink key={item.to} to={item.to} className={linkClass}>

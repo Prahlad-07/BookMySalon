@@ -34,4 +34,7 @@ public class SalonDto {
     private Double averageRating;
     private Long reviewCount;
     private Long serviceCount;
+    private String description;
+    private Double minPrice;
+    private java.time.LocalDateTime createdAt;
 }

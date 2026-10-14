@@ -67,7 +67,7 @@ export default function ConfirmDialog({
         className="w-full max-w-[420px] animate-fade rounded-lg border border-line bg-surface p-6 shadow-pop"
       >
         <div className="flex items-start justify-between gap-4">
-          <h2 id="confirm-dialog-title" className="display text-[30px] leading-tight text-ink">
+          <h2 id="confirm-dialog-title" className="display text-[22px] leading-tight text-ink">
             {title}
           </h2>
           <button type="button" className="icon-btn -mr-2 -mt-1" onClick={() => !busy && onCancel?.()} aria-label={t('dialog.close')}>

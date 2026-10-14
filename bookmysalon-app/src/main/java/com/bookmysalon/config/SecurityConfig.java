@@ -67,6 +67,18 @@ public class SecurityConfig {
                                     "/api/payments/webhook"
                             ).permitAll()
                             .requestMatchers(HttpMethod.GET, "/api/auth/health", "/api/user/public/**").permitAll()
+                            // Public marketplace browsing. Booking, reviewing and messaging stay authenticated.
+                            .requestMatchers(HttpMethod.GET,
+                                    "/api/salons/search",
+                                    "/api/salons/insights",
+                                    "/api/salons/nearby",
+                                    "/api/salons/{id:\\d+}",
+                                    "/api/service-offerings/salon/{salonId:\\d+}",
+                                    "/api/categories/salon/{salonId:\\d+}",
+                                    "/api/reviews/salon/{salonId:\\d+}",
+                                    "/api/reviews/recent",
+                                    "/api/bookings/salon/{salonId:\\d+}/busy"
+                            ).permitAll()
                             .requestMatchers("/ws/**").permitAll();
 
                     if (oauth2Enabled) {

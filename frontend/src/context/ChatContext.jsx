@@ -5,15 +5,25 @@
  */
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Client } from '@stomp/stompjs';
-import SockJS from 'sockjs-client';
 import api from '../config/api';
 import { buildWebSocketUrl } from '../config/apiBaseUrl';
 import { getAccessToken } from '../utils/authSession';
 import { useAuth } from './AuthContext';
+import { apiModeReady, isMockMode } from '../mock/mode';
+import { bus } from '../mock/realtime';
 
 const ChatContext = createContext(null);
 
-const SockJsCtor = SockJS?.default || SockJS;
+/*
+ * Native WebSocket on the endpoint's raw transport (/ws/chat/websocket). SockJS's /info
+ * probe is a credentialed XHR, which the API's cookie-free CORS policy (rightly) refuses
+ * cross-origin — so with the frontend and API on different hosts it could never connect.
+ */
+const socketUrl = (token) => {
+  const url = new URL(buildWebSocketUrl('/ws/chat/websocket', { token }), window.location.href);
+  url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
+  return url.toString();
+};
 
 export function ChatProvider({ children }) {
   const { user } = useAuth();
@@ -61,13 +71,22 @@ export function ChatProvider({ children }) {
       return;
     }
 
+    // Demo mode: no socket — messages and notifications travel over an in-page bus.
+    let cancelled = false;
+    let stopDemo = null;
+    apiModeReady.then(() => {
+      if (cancelled || !isMockMode()) return;
+      setConnected(true);
+      refreshUnreadCounts();
+      fetchNotifications();
+      stopDemo = bus.onNotification(user.id, (payload) => {
+        setNotifications((prev) => [payload, ...prev.filter((item) => item.id !== payload.id)].slice(0, 50));
+        setUnread((prev) => ({ ...prev, unreadNotifications: prev.unreadNotifications + 1 }));
+      });
+    });
+
     const client = new Client({
-      webSocketFactory: () => {
-        if (!SockJsCtor) {
-          throw new Error('SockJS client not available');
-        }
-        return new SockJsCtor(buildWebSocketUrl('/ws/chat', { token }));
-      },
+      webSocketFactory: () => new WebSocket(socketUrl(token)),
       connectHeaders: {
         Authorization: `Bearer ${token}`,
       },
@@ -103,17 +122,22 @@ export function ChatProvider({ children }) {
       },
     });
 
-    try {
-      client.activate();
-      clientRef.current = client;
-    } catch (error) {
-      console.warn('Unable to activate chat WebSocket', error);
-      setConnected(false);
-      clientRef.current = null;
-      return () => {};
-    }
+    const startSocket = () => {
+      if (cancelled || isMockMode()) return;
+      try {
+        client.activate();
+        clientRef.current = client;
+      } catch (error) {
+        console.warn('Unable to activate chat WebSocket', error);
+        setConnected(false);
+        clientRef.current = null;
+      }
+    };
+    apiModeReady.then(startSocket);
 
     return () => {
+      cancelled = true;
+      stopDemo?.();
       if (notificationSubscriptionRef.current) {
         notificationSubscriptionRef.current.unsubscribe();
       }
@@ -123,6 +147,7 @@ export function ChatProvider({ children }) {
   }, [fetchNotifications, refreshUnreadCounts, user?.id]);
 
   const subscribeToConversation = useCallback((conversationId, onMessage) => {
+    if (isMockMode()) return bus.onMessage(conversationId, onMessage);
     if (!clientRef.current?.connected) {
       return () => {};
     }
@@ -136,6 +161,12 @@ export function ChatProvider({ children }) {
   }, []);
 
   const sendMessage = useCallback((payload) => {
+    if (isMockMode()) {
+      import('../mock/handlers')
+        .then(({ sendChatMessage }) => sendChatMessage(getAccessToken(), payload))
+        .catch((error) => console.warn('Demo message not sent', error));
+      return;
+    }
     if (!clientRef.current?.connected) {
       throw new Error('WebSocket is not connected');
     }

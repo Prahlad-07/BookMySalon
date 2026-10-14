@@ -70,10 +70,14 @@ stripe:
   currency: ${STRIPE_CURRENCY:inr}
 
 app:
+  # Salon hours are local; "open now" is evaluated in this zone.
+  timezone: ${APP_TIMEZONE:Asia/Kolkata}
   frontend:
     base-url: ${APP_FRONTEND_BASE_URL:http://localhost:3000}
   demo:
     seed-users: ${APP_DEMO_SEED_USERS:false}
+    # ~40 sample salons across 10 Indian cities with photos, INR menus and reviews.
+    seed-data: ${APP_DEMO_SEED_DATA:false}
   oauth2:
     enabled: ${APP_OAUTH2_ENABLED:false}
     redirect-uri: ${APP_OAUTH2_REDIRECT_URI:http://localhost:5173/oauth/callback}

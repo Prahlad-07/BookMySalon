@@ -18,9 +18,9 @@ const ENABLE_GOOGLE_OAUTH = import.meta.env.VITE_ENABLE_GOOGLE_OAUTH === 'true';
 const SHOW_DEMO_ACCOUNTS = import.meta.env.VITE_SHOW_DEMO_ACCOUNTS !== 'false';
 
 const DEMO_USERS = [
-  { label: 'role.CUSTOMER', email: 'customer.test@gmail.com' },
-  { label: 'role.SALON_OWNER', email: 'owner.test@gmail.com' },
-  { label: 'login.demoAdmin', email: 'admin.test@gmail.com' },
+  { key: 'customer', label: 'role.CUSTOMER', email: 'customer.test@gmail.com' },
+  { key: 'owner', label: 'role.SALON_OWNER', email: 'owner.test@gmail.com' },
+  { key: 'admin', label: 'login.demoAdmin', email: 'admin.test@gmail.com' },
 ];
 const DEMO_PASSWORD = 'Test@12345';
 
@@ -162,6 +162,7 @@ export default function Login() {
             {DEMO_USERS.map((demo) => (
               <button
                 key={demo.email}
+                data-demo-role={demo.key}
                 type="button"
                 className="btn-secondary btn-sm"
                 disabled={Boolean(demoPending) || submitting}

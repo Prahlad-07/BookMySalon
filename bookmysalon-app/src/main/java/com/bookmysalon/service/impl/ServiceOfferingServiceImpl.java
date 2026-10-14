@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 public class ServiceOfferingServiceImpl implements ServiceOfferingService {
 
     private final ServiceOfferingRepository serviceOfferingRepository;
+    private final com.bookmysalon.service.SalonStatsService salonStatsService;
 
     @Override
     public ServiceOfferingDto createServiceOffering(ServiceOfferingDto serviceOfferingDto) {
@@ -57,6 +58,7 @@ public class ServiceOfferingServiceImpl implements ServiceOfferingService {
         serviceOffering.setCategoryId(serviceOfferingDto.getCategoryId());
 
         ServiceOffering savedServiceOffering = serviceOfferingRepository.save(serviceOffering);
+        salonStatsService.refresh(savedServiceOffering.getSalonId());
         return mapToDto(savedServiceOffering);
     }
 
@@ -123,15 +125,17 @@ public class ServiceOfferingServiceImpl implements ServiceOfferingService {
         }
 
         ServiceOffering updatedServiceOffering = serviceOfferingRepository.save(serviceOffering);
+        salonStatsService.refresh(updatedServiceOffering.getSalonId());
         return mapToDto(updatedServiceOffering);
     }
 
     @Override
     public void deleteServiceOffering(Long id) {
-        if (!serviceOfferingRepository.existsById(id)) {
-            throw new CategoryNotFoundException("Service offering not found with id: " + id);
-        }
-        serviceOfferingRepository.deleteById(id);
+        ServiceOffering existing = serviceOfferingRepository.findById(id)
+                .orElseThrow(() -> new CategoryNotFoundException("Service offering not found with id: " + id));
+        serviceOfferingRepository.delete(existing);
+        serviceOfferingRepository.flush();
+        salonStatsService.refresh(existing.getSalonId());
     }
 
     private ServiceOfferingDto mapToDto(ServiceOffering serviceOffering) {

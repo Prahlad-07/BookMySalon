@@ -8,7 +8,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "format": "prettier --write \"src/**/*.{js,jsx,css}\""
+    "format": "prettier --write \"src/**/*.{js,jsx,css}\"",
+    "dev:demo": "vite --mode demo --port 3001",
+    "build:demo": "vite build --mode demo"
   },
   "dependencies": {
     "@stomp/stompjs": "^7.3.0",
@@ -17,8 +19,7 @@
     "prop-types": "^15.8.1",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "react-router-dom": "^7.17.0",
-    "sockjs-client": "^1.6.1"
+    "react-router-dom": "^7.17.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^6.0.2",

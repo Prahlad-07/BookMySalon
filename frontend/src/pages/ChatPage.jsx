@@ -174,7 +174,8 @@ export default function ChatPage() {
       out.push(m);
     });
     return out;
-    // dayLabel reads the active language; regroup when it changes.
+    // dayLabel reads the active language (module state), so regroup when `t` changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages, t]);
 
   const showThreadOnMobile = Boolean(participantId);
@@ -185,7 +186,7 @@ export default function ChatPage() {
         {/* Conversation list */}
         <aside className={`flex min-h-0 flex-col border-r border-line ${showThreadOnMobile ? 'hidden md:flex' : 'flex'}`}>
           <div className="border-b border-line px-5 py-5">
-            <h1 className="display text-[34px] leading-none text-ink">{t('nav.messages')}</h1>
+            <h1 className="display text-[22px] leading-none text-ink">{t('nav.messages')}</h1>
           </div>
           <div className="flex-1 overflow-y-auto scrollbar-thin">
             {loadingList ? (
@@ -250,7 +251,7 @@ export default function ChatPage() {
         <section className={`min-h-0 flex-col ${showThreadOnMobile ? 'flex' : 'hidden md:flex'}`}>
           {!conversation && !loadingThread ? (
             <div className="flex flex-1 flex-col items-center justify-center px-8 text-center">
-              <p className="display text-[34px] text-ink">{t('chat.pick')}</p>
+              <p className="display text-[22px] text-ink">{t('chat.pick')}</p>
               <p className="mt-2 max-w-xs text-sm text-ink-2">
                 {user?.role === 'SALON_OWNER' ? t('chat.pickOwner') : t('chat.pickCustomer')}
               </p>

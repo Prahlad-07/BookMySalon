@@ -18,16 +18,17 @@
       <change afterPath="$PROJECT_DIR$/bookmysalon-app/target/surefire-reports/com.bookmysalon.dto.auth.AuthRequestJsonAliasTest.txt" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/bookmysalon-app/target/surefire-reports/com.bookmysalon.service.auth.AuthServiceImplRegisterRoleTest.txt" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/bookmysalon-app/target/surefire-reports/com.bookmysalon.service.impl.SalonServiceImplTest.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/.env.local" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/.env.local" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/dto/ConversationDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/dto/ConversationDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/service/impl/MessageServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/chat/service/impl/MessageServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/config/CorsConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/config/CorsConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/config/DemoUserSeeder.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/config/DemoUserSeeder.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/config/RabbitMqConfig.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/config/WebConfig.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/config/WebSocketConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/config/WebSocketConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/AdminController.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/AdminController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/BookingController.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/BookingController.java" afterDir="false" />
@@ -37,10 +38,12 @@
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/ReviewController.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/ReviewController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/SalonController.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/SalonController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/ServiceOfferingController.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/ServiceOfferingController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/UserController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/analytics/AnalyticsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/analytics/AnalyticsController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/pricing/PricingController.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/pricing/PricingController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/recommendation/RecommendationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/recommendation/RecommendationController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/retention/RetentionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/controller/retention/RetentionController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/BookingDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/BookingDto.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/LoginDto.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/ReviewDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/ReviewDto.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/SalonDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/dto/SalonDto.java" afterDir="false" />
@@ -61,11 +64,15 @@
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/repository/PaymentOrderRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/repository/PaymentOrderRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/repository/RefreshTokenRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/repository/RefreshTokenRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/repository/ReviewRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/repository/ReviewRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/repository/SalonRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/repository/SalonRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/repository/ServiceOfferingRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/repository/ServiceOfferingRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/repository/UserRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/security/JwtAuthenticationFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/security/JwtAuthenticationFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/BookingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/BookingService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/NotificationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/NotificationService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/PaymentService.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/PaymentService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/ReviewService.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/ReviewService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/SalonService.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/SalonService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/UserService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/analytics/AnalyticsService.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/analytics/AnalyticsService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/auth/AuthServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/auth/AuthServiceImpl.java" afterDir="false" />
@@ -77,6 +84,7 @@
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/PaymentServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/PaymentServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/ReviewServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/ReviewServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/SalonServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/SalonServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/ServiceOfferingServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/ServiceOfferingServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/impl/UserServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/pricing/PricingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/pricing/PricingService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/recommendation/RecommendationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/main/java/com/bookmysalon/service/recommendation/RecommendationService.java" afterDir="false" />
@@ -86,11 +94,16 @@
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/test/java/com/bookmysalon/service/auth/AuthServiceImplRegisterRoleTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/test/java/com/bookmysalon/service/auth/AuthServiceImplRegisterRoleTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/src/test/java/com/bookmysalon/service/impl/SalonServiceImplTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/src/test/java/com/bookmysalon/service/impl/SalonServiceImplTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/chat/dto/ConversationDto$ConversationDtoBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/chat/dto/ConversationDto$ConversationDtoBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/chat/dto/ConversationDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/chat/dto/ConversationDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/chat/service/impl/MessageServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/chat/service/impl/MessageServiceImpl.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/config/CorsConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/config/CorsConfig.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/config/DemoUserSeeder.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/config/DemoUserSeeder.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/config/RabbitMqConfig.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/config/SecurityConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/config/SecurityConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/config/WebConfig.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/config/WebSocketConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/config/WebSocketConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/AdminController.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/AdminController.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/BookingController.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/BookingController.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/CategoryController.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/CategoryController.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/NotificationController.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/NotificationController.class" afterDir="false" />
@@ -98,10 +111,13 @@
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/ReviewController.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/ReviewController.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/SalonController.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/SalonController.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/ServiceOfferingController.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/ServiceOfferingController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/UserController.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/UserController.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/analytics/AnalyticsController.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/analytics/AnalyticsController.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/pricing/PricingController.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/pricing/PricingController.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/recommendation/RecommendationController.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/recommendation/RecommendationController.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/retention/RetentionController.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/controller/retention/RetentionController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/BookingDto$BookingDtoBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/BookingDto$BookingDtoBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/BookingDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/BookingDto.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/LoginDto$LoginDtoBuilder.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/LoginDto.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/ReviewDto$ReviewDtoBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/dto/ReviewDto$ReviewDtoBuilder.class" afterDir="false" />
@@ -127,11 +143,14 @@
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/repository/PaymentOrderRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/repository/PaymentOrderRepository.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/repository/RefreshTokenRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/repository/RefreshTokenRepository.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/repository/ReviewRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/repository/ReviewRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/repository/SalonRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/repository/SalonRepository.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/repository/ServiceOfferingRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/repository/ServiceOfferingRepository.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/repository/UserRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/repository/UserRepository.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/security/JwtAuthenticationFilter.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/security/JwtAuthenticationFilter.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/BookingService.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/BookingService.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/NotificationService.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/NotificationService.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/PaymentService.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/PaymentService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/ReviewService.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/ReviewService.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/SalonService.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/SalonService.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/UserService.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/UserService.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/analytics/AnalyticsService.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/classes/com/bookmysalon/service/analytics/AnalyticsService.class" afterDir="false" />
@@ -157,32 +176,44 @@
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/test-classes/com/bookmysalon/controller/SalonControllerTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/test-classes/com/bookmysalon/controller/SalonControllerTest.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/test-classes/com/bookmysalon/service/auth/AuthServiceImplRegisterRoleTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/test-classes/com/bookmysalon/service/auth/AuthServiceImplRegisterRoleTest.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bookmysalon-app/target/test-classes/com/bookmysalon/service/impl/SalonServiceImplTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/bookmysalon-app/target/test-classes/com/bookmysalon/service/impl/SalonServiceImplTest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.env.example" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/.env.example" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.eslintrc.cjs" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/.eslintrc.cjs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/public/favicon.svg" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/public/favicon.svg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Footer.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Footer.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/assets/detail-tools.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/assets/hero-salon.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/AppErrorBoundary.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/AppErrorBoundary.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/AuthLayout.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/AuthLayout.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/ConfirmDialog.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/ConfirmDialog.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/components/Navbar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Navbar.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/maps/MapboxLocationPicker.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/maps/MapboxLocationPicker.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/maps/NearbySalonsMap.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/maps/NearbySalonsMap.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/ui.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/ui.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/config/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/config/api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/context/AuthContext.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/context/AuthContext.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/config/apiBaseUrl.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/config/apiBaseUrl.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/context/ChatContext.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/context/ChatContext.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/i18n/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/i18n/index.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/i18n/locales/bn.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/i18n/locales/bn.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/i18n/locales/en.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/i18n/locales/en.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/i18n/locales/gu.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/i18n/locales/gu.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/i18n/locales/hi.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/i18n/locales/hi.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/i18n/locales/kn.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/i18n/locales/kn.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/i18n/locales/ml.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/i18n/locales/ml.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/i18n/locales/mr.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/i18n/locales/mr.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/i18n/locales/pa.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/i18n/locales/pa.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/i18n/locales/ta.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/i18n/locales/ta.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/i18n/locales/te.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/i18n/locales/te.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/index.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/AdminDashboard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/AdminDashboard.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/ChatPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/ChatPage.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/Home.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Home.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/Login.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Login.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/MyBookings.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/MyBookings.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/OAuthCallback.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/OAuthCallback.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Profile.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Profile.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/PaymentResult.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/PaymentResult.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/SalonDetail.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/SalonDetail.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/SalonList.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/SalonList.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/SalonOwnerDashboard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/SalonOwnerDashboard.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Signup.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Signup.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/tailwind.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/tailwind.config.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/vite.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/vite.config.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/payment-service/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/render.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/render.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -214,61 +245,61 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0" />
-      <entry key="MS500" value="1.0" />
-      <entry key="S2" value="1.0" />
-      <entry key="S5" value="1.0" />
-      <entry key="S10" value="1.0" />
-      <entry key="S30" value="1.0000022361712486" />
-      <entry key="S60" value="1.013532825291599" />
-      <entry key="M2" value="2.1443391283539954" />
-      <entry key="M5" value="18.389756553868903" />
-      <entry key="M10" value="50.0011078827618" />
-      <entry key="M15" value="80.41321982884504" />
-      <entry key="M30" value="171.55875782049895" />
-      <entry key="H1" value="342.1794752708105" />
-      <entry key="H2" value="569.3340959384718" />
-      <entry key="H4" value="782.308227608328" />
-      <entry key="D1" value="1126.6114019383315" />
-      <entry key="W1" value="1228.6791363992206" />
+      <entry key="MS100" value="0.004076863523233346" />
+      <entry key="MS500" value="0.9865415354314764" />
+      <entry key="S2" value="5.190795776190927" />
+      <entry key="S5" value="12.66929278002726" />
+      <entry key="S10" value="23.15211067059501" />
+      <entry key="S30" value="50.72416117263229" />
+      <entry key="S60" value="68.55354841374543" />
+      <entry key="M2" value="82.15562090128586" />
+      <entry key="M5" value="105.79809464174691" />
+      <entry key="M10" value="139.7970562241727" />
+      <entry key="M15" value="171.08744239597178" />
+      <entry key="M30" value="263.12744381736417" />
+      <entry key="H1" value="434.3446030621546" />
+      <entry key="H2" value="662.5048856255524" />
+      <entry key="H4" value="876.7312672506034" />
+      <entry key="D1" value="1223.0034494686645" />
+      <entry key="W1" value="1325.5847308087455" />
     </decayedCancelled>
     <decayedSelected>
-      <entry key="MS100" value="0.0" />
-      <entry key="MS500" value="0.0" />
-      <entry key="S2" value="0.0" />
-      <entry key="S5" value="0.0" />
-      <entry key="S10" value="1.4128781744642173E-284" />
-      <entry key="S30" value="3.862770964764865E-95" />
-      <entry key="S60" value="9.605099647595883E-48" />
-      <entry key="M2" value="5.1295325438335715E-24" />
-      <entry key="M5" value="9.372361374462363E-10" />
-      <entry key="M10" value="5.644468243560231E-5" />
-      <entry key="M15" value="0.0022716563833013437" />
-      <entry key="M30" value="0.09369414875961808" />
-      <entry key="H1" value="0.6092170688408586" />
-      <entry key="H2" value="1.5739980327343213" />
-      <entry key="H4" value="2.7092952261974395" />
-      <entry key="D1" value="5.628085678619161" />
-      <entry key="W1" value="6.772225725611095" />
+      <entry key="MS100" value="1.0" />
+      <entry key="MS500" value="1.0000001815702382" />
+      <entry key="S2" value="1.024340861796615" />
+      <entry key="S5" value="1.3610261635040126" />
+      <entry key="S10" value="2.0611525597676676" />
+      <entry key="S30" value="3.472648249655245" />
+      <entry key="S60" value="4.127449738495036" />
+      <entry key="M2" value="4.531816991638396" />
+      <entry key="M5" value="4.804365207958534" />
+      <entry key="M10" value="4.900777788457683" />
+      <entry key="M15" value="4.935649890180613" />
+      <entry key="M30" value="5.057976719116245" />
+      <entry key="H1" value="5.584954122594795" />
+      <entry key="H2" value="6.555879021482152" />
+      <entry key="H4" value="7.696710222745976" />
+      <entry key="D1" value="10.624477767938266" />
+      <entry key="W1" value="11.771625730644764" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.2871745887492588" />
-      <entry key="MS500" value="0.7791645796604998" />
-      <entry key="S2" value="0.9395227492140118" />
-      <entry key="S5" value="0.9753554615276419" />
-      <entry key="S10" value="0.9876008614453725" />
-      <entry key="S30" value="0.9958519882514673" />
-      <entry key="S60" value="1.0114528601547759" />
-      <entry key="M2" value="2.1431944872382056" />
-      <entry key="M5" value="18.388732433501033" />
-      <entry key="M10" value="50.00014027395304" />
-      <entry key="M15" value="80.41450570301768" />
-      <entry key="M30" value="171.65148582176514" />
-      <entry key="H1" value="342.7876957031554" />
-      <entry key="H2" value="570.9072287361158" />
-      <entry key="H4" value="785.0168963685927" />
-      <entry key="D1" value="1132.2393060777451" />
-      <entry key="W1" value="1235.45133196564" />
+      <entry key="MS100" value="0.020029018488315523" />
+      <entry key="MS500" value="1.4188955803299468" />
+      <entry key="S2" value="6.0051206763245455" />
+      <entry key="S5" value="13.862023909171583" />
+      <entry key="S10" value="25.04744828635148" />
+      <entry key="S30" value="54.08445571085303" />
+      <entry key="S60" value="72.61072445217913" />
+      <entry key="M2" value="86.64771128044552" />
+      <entry key="M5" value="110.58482563815231" />
+      <entry key="M10" value="144.68829768055497" />
+      <entry key="M15" value="176.01638268526622" />
+      <entry key="M30" value="268.18156815817093" />
+      <entry key="H1" value="439.92711179549343" />
+      <entry key="H2" value="669.0591727138442" />
+      <entry key="H4" value="884.4269865402835" />
+      <entry key="D1" value="1233.6276846701326" />
+      <entry key="W1" value="1337.3563176495368" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -337,8 +368,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-30f59d01ecdd-34e2839f716b-intellij.indexing.shared.core-IU-262.9437.185" />
-        <option value="bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-IU-262.9437.185" />
+        <option value="bundled-jdk-30f59d01ecdd-a203e0a19954-intellij.indexing.shared.core-IU-262.10968.63" />
+        <option value="bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-IU-262.10968.63" />
       </set>
     </attachedChunks>
   </component>
@@ -449,6 +480,9 @@
       <workItem from="1788797004436" duration="2045000" />
       <workItem from="1789374967280" duration="883000" />
       <workItem from="1790144282286" duration="81000" />
+      <workItem from="1791697766630" duration="746000" />
+      <workItem from="1791797464839" duration="1288000" />
+      <workItem from="1791996525831" duration="310000" />
     </task>
     <task id="LOCAL-00001" summary="frontend-added">
       <option name="closed" value="true" />

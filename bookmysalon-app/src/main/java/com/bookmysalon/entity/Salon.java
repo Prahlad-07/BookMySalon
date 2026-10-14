@@ -10,7 +10,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -20,7 +22,11 @@ import java.util.List;
         indexes = {
                 @Index(name = "idx_salons_owner_id", columnList = "owner_id"),
                 @Index(name = "idx_salons_city", columnList = "city"),
-                @Index(name = "idx_salons_lat_lng", columnList = "latitude, longitude")
+                @Index(name = "idx_salons_lat_lng", columnList = "latitude, longitude"),
+                @Index(name = "idx_salons_rating", columnList = "rating_avg, review_count"),
+                @Index(name = "idx_salons_rank", columnList = "rank_score"),
+                @Index(name = "idx_salons_min_price", columnList = "min_price"),
+                @Index(name = "idx_salons_created_at", columnList = "created_at")
         }
 )
 @Data
@@ -66,6 +72,34 @@ public class Salon {
 
     @Column(nullable = false)
     private LocalTime closeTime;
+
+    @Column(length = 1000)
+    private String description;
+
+    /*
+     * Denormalised listing stats, maintained by SalonStatsService whenever reviews or
+     * services change. Search sorts and filters on these columns directly so listing
+     * pages never aggregate the reviews / services tables at read time.
+     */
+    @Column(name = "rating_avg")
+    private Double ratingAvg;
+
+    @Column(name = "review_count")
+    private Integer reviewCount;
+
+    /** Bayesian-weighted rating used for "top rated" ordering (see SalonStatsService). */
+    @Column(name = "rank_score")
+    private Double rankScore;
+
+    @Column(name = "min_price")
+    private Double minPrice;
+
+    @Column(name = "service_count")
+    private Integer serviceCount;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", insertable = false, updatable = false)

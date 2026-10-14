@@ -28,6 +28,9 @@ services:
       # Set to "false" once real users are on this deployment.
       - key: APP_DEMO_SEED_USERS
         value: "true"
+      # ~40 sample salons across 10 Indian cities (photos, INR menus, reviews). Idempotent.
+      - key: APP_DEMO_SEED_DATA
+        value: "true"
       - key: APP_RATE_LIMIT_ENABLED
         value: "true"
       - key: APP_OTP_DEV_MODE

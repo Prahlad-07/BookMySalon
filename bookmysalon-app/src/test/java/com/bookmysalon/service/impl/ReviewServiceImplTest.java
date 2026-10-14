@@ -24,6 +24,7 @@ class ReviewServiceImplTest {
 
     @Mock ReviewRepository reviewRepository;
     @Mock SalonRepository salonRepository;
+    @Mock com.bookmysalon.service.SalonStatsService salonStatsService;
     @InjectMocks ReviewServiceImpl service;
 
     private ReviewRequestDto request() {
@@ -34,7 +35,7 @@ class ReviewServiceImplTest {
     void createsReviewWhenNoPriorReviewExists() {
         when(salonRepository.existsById(3L)).thenReturn(true);
         when(reviewRepository.existsByUserIdAndSalonId(7L, 3L)).thenReturn(false);
-        when(reviewRepository.save(any(Review.class))).thenAnswer(i -> {
+        when(reviewRepository.saveAndFlush(any(Review.class))).thenAnswer(i -> {
             Review r = i.getArgument(0);
             r.setId(11L);
             return r;
@@ -44,6 +45,7 @@ class ReviewServiceImplTest {
 
         assertEquals(11L, dto.getId());
         assertEquals(5.0, dto.getRating());
+        verify(salonStatsService).refresh(3L);
     }
 
     @Test
@@ -52,7 +54,7 @@ class ReviewServiceImplTest {
         when(reviewRepository.existsByUserIdAndSalonId(7L, 3L)).thenReturn(true);
 
         assertThrows(ConflictException.class, () -> service.createReview(request(), 7L));
-        verify(reviewRepository, never()).save(any());
+        verify(reviewRepository, never()).saveAndFlush(any());
     }
 
     @Test

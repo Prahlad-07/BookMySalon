@@ -58,7 +58,7 @@ export default function PaymentResult({ outcome }) {
           {status === 'processing' && <span className="spinner !h-3.5 !w-3.5" aria-hidden="true" />}
           {content.eyebrow}
         </p>
-        <h1 className="display mt-4 text-[52px] text-ink sm:text-[64px]">{content.title}</h1>
+        <h1 className="display mt-4 text-[32px] text-ink sm:text-[36px]">{content.title}</h1>
         <p className="lede mt-4">{content.body}</p>
         <div className="mt-9 flex flex-wrap gap-3">
           <Link to="/bookings" className="btn-dark">

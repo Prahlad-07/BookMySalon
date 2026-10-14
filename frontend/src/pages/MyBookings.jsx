@@ -31,7 +31,7 @@ function DateBlock({ date, muted }) {
       <span className="text-[10.5px] font-semibold uppercase tracking-label text-ink-3">
         {formatDate(date, { month: 'short' })}
       </span>
-      <span className={`num font-display text-[36px] leading-none ${muted ? '' : 'text-ink'}`}>{date.getDate()}</span>
+      <span className={`num font-semibold tracking-[-0.02em] text-[26px] leading-none ${muted ? '' : 'text-ink'}`}>{date.getDate()}</span>
       <span className="mt-0.5 text-[11px] text-ink-3">{formatDate(date, { weekday: 'short' })}</span>
     </div>
   );
@@ -252,7 +252,7 @@ export default function MyBookings() {
                           <p className="mt-1 text-sm text-ink-3">{b.serviceNames.join(', ')}</p>
                         )}
                       </div>
-                      <p className="num font-display text-[26px] leading-none text-ink">{money(b.totalPrice)}</p>
+                      <p className="num font-semibold tracking-[-0.02em] text-[22px] leading-none text-ink">{money(b.totalPrice)}</p>
                     </div>
 
                     <div className="mt-4 flex flex-wrap items-center gap-2">

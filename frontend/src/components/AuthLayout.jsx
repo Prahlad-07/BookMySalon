@@ -13,7 +13,7 @@ export default function AuthLayout({ eyebrow, title, description, children, foot
       <div className="flex flex-col px-5 py-12 sm:px-12 lg:px-16 xl:px-24">
         <div className="mx-auto flex w-full max-w-[420px] flex-1 flex-col justify-center animate-fade">
           {eyebrow && <p className="eyebrow mb-4">{eyebrow}</p>}
-          <h1 className="display text-[44px] text-ink sm:text-[52px]">{title}</h1>
+          <h1 className="display text-[28px] text-ink sm:text-[32px]">{title}</h1>
           {description && <p className="mt-3 text-[15.5px] leading-relaxed text-ink-2">{description}</p>}
           <div className="mt-9">{children}</div>
           {footer && <div className="mt-8 text-sm text-ink-2">{footer}</div>}
@@ -26,7 +26,7 @@ export default function AuthLayout({ eyebrow, title, description, children, foot
         <div className="absolute inset-x-0 bottom-0 p-12 text-white xl:p-16">
           {aside || (
             <>
-              <p className="display text-[40px] leading-[1.05] xl:text-[48px]">
+              <p className="display text-[28px] leading-[1.05] xl:text-[30px]">
                 <Rich text={t('authAside.title')} />
               </p>
               <p className="mt-6 max-w-sm text-[15px] leading-relaxed text-white/75">{t('authAside.body')}</p>

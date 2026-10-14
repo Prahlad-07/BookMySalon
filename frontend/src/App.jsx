@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Link, Route, Routes, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
+import DemoModeBanner from './components/DemoModeBanner';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
 import SalonOwnerRoute from './components/SalonOwnerRoute';
@@ -39,7 +40,7 @@ function NotFound() {
   return (
     <div className="shell flex min-h-[70vh] flex-col items-start justify-center py-24">
       <p className="eyebrow">{t('notFound.eyebrow')}</p>
-      <h1 className="display mt-4 text-[64px] text-ink sm:text-[88px]">{t('notFound.title')}</h1>
+      <h1 className="display mt-4 text-[36px] text-ink sm:text-[44px]">{t('notFound.title')}</h1>
       <p className="lede mt-4 max-w-md">{t('notFound.body')}</p>
       <div className="mt-8 flex flex-wrap gap-3">
         <Link to="/" className="btn-dark">
@@ -69,6 +70,7 @@ export default function App() {
         <RouteEffects />
         <SkipLink />
         <div className="flex min-h-screen flex-col">
+          <DemoModeBanner />
           <Navbar />
 
           <main id="main-content" className="flex-1" tabIndex="-1">
@@ -81,25 +83,10 @@ export default function App() {
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
 
-                {['/salons', '/customer/dashboard'].map((path) => (
-                  <Route
-                    key={path}
-                    path={path}
-                    element={
-                      <ProtectedRoute>
-                        <SalonList />
-                      </ProtectedRoute>
-                    }
-                  />
-                ))}
-                <Route
-                  path="/salon/:salonId"
-                  element={
-                    <ProtectedRoute>
-                      <SalonDetail />
-                    </ProtectedRoute>
-                  }
-                />
+                {/* Browsing is public; booking, reviews and chat still require sign-in. */}
+                <Route path="/salons" element={<SalonList />} />
+                <Route path="/customer/dashboard" element={<SalonList />} />
+                <Route path="/salon/:salonId" element={<SalonDetail />} />
                 <Route
                   path="/bookings"
                   element={

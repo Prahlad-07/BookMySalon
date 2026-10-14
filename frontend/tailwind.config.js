@@ -53,26 +53,28 @@ export default {
       // --script-* is set per language (Noto Devanagari, Tamil, …). Latin glyphs
       // keep the brand faces; Indic glyphs fall through to the Noto family.
       sans: ['"Instrument Sans"', 'var(--script-sans)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-      display: ['"Instrument Serif"', 'var(--script-serif)', 'ui-serif', 'Georgia', 'serif'],
+      display: ['"Instrument Sans"', 'var(--script-sans)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
     },
     extend: {
       borderRadius: {
-        sm: '4px',
-        DEFAULT: '6px',
-        md: '8px',
-        lg: '10px',
-        xl: '14px',
+        sm: '6px',
+        DEFAULT: '8px',
+        md: '10px',
+        lg: '12px',
+        xl: '16px',
+        '2xl': '20px',
       },
       letterSpacing: {
         label: '0.14em',
       },
       maxWidth: {
-        shell: '76rem',
+        shell: '80rem',
       },
       boxShadow: {
-        lift: '0 1px 0 rgb(var(--line) / 1), 0 12px 32px -18px rgb(var(--shadow) / 0.35)',
-        pop: '0 24px 60px -24px rgb(var(--shadow) / 0.45)',
+        lift: '0 1px 2px rgb(var(--shadow) / 0.06), 0 8px 24px -12px rgb(var(--shadow) / 0.18)',
+        pop: '0 2px 6px rgb(var(--shadow) / 0.06), 0 24px 48px -16px rgb(var(--shadow) / 0.28)',
+        bar: '0 1px 2px rgb(var(--shadow) / 0.05), 0 6px 20px -8px rgb(var(--shadow) / 0.16)',
       },
       keyframes: {
         rise: {
