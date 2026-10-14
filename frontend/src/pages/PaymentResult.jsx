@@ -6,9 +6,11 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import api from '../config/api';
+import { useT } from '../i18n';
 
 export default function PaymentResult({ outcome }) {
   const location = useLocation();
+  const t = useT();
   const params = new URLSearchParams(location.search);
   const bookingId = params.get('bookingId');
   const [status, setStatus] = useState(outcome === 'success' ? 'processing' : 'cancelled');
@@ -42,28 +44,12 @@ export default function PaymentResult({ outcome }) {
     return () => window.clearTimeout(timer);
   }, [outcome, bookingId]);
 
+  const eyebrowKey = { processing: 'pay.eyebrow', paid: 'pay.received', pending: 'pay.received', cancelled: 'pay.cancelledEyebrow' };
   const content = {
-    processing: {
-      eyebrow: 'Payment',
-      title: 'Confirming your payment…',
-      body: 'We’re waiting for the payment provider to confirm. This usually takes a few seconds — no need to refresh.',
-    },
-    paid: {
-      eyebrow: 'Payment received',
-      title: 'You’re all set.',
-      body: 'Your booking is confirmed and the salon has been notified. You’ll find it under Appointments.',
-    },
-    pending: {
-      eyebrow: 'Payment received',
-      title: 'Almost there.',
-      body: 'Your payment went through, but the confirmation is taking longer than usual. Check Appointments in a moment.',
-    },
-    cancelled: {
-      eyebrow: 'Checkout cancelled',
-      title: 'No charge was made.',
-      body: 'Your booking is still held. You can pay from Appointments whenever you’re ready.',
-    },
-  }[status];
+    eyebrow: t(eyebrowKey[status]),
+    title: t(`pay.${status}.title`),
+    body: t(`pay.${status}.body`),
+  };
 
   return (
     <div className="shell flex min-h-[70vh] flex-col justify-center py-20">
@@ -72,14 +58,14 @@ export default function PaymentResult({ outcome }) {
           {status === 'processing' && <span className="spinner !h-3.5 !w-3.5" aria-hidden="true" />}
           {content.eyebrow}
         </p>
-        <h1 className="display mt-4 text-[52px] text-ink sm:text-[64px]">{content.title}</h1>
+        <h1 className="display mt-4 text-[32px] text-ink sm:text-[36px]">{content.title}</h1>
         <p className="lede mt-4">{content.body}</p>
         <div className="mt-9 flex flex-wrap gap-3">
           <Link to="/bookings" className="btn-dark">
-            View appointments
+            {t('pay.viewAppointments')}
           </Link>
           <Link to="/salons" className="btn-secondary">
-            Browse salons
+            {t('notFound.browse')}
           </Link>
         </div>
       </div>

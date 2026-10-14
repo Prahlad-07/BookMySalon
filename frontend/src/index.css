@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -9,53 +9,56 @@
    ------------------------------------------------------------------ */
 :root {
   color-scheme: light;
-  --paper: 245 241 234;
-  --surface: 251 249 245;
-  --sunken: 238 233 224;
-  --line: 226 219 207;
-  --line-strong: 205 196 181;
-  --ink: 27 23 20;
-  --ink-2: 94 85 76;
-  --ink-3: 136 126 115;
-  --accent: 122 46 38;
-  --accent-hover: 96 34 28;
-  --accent-soft: 243 230 225;
-  --accent-ink: 251 246 240;
-  --sage: 91 107 85;
-  --sage-soft: 230 234 225;
-  --gold: 176 128 52;
-  --success: 52 104 66;
-  --success-soft: 228 238 228;
-  --warning: 146 100 28;
-  --warning-soft: 246 236 216;
-  --danger: 160 52 40;
-  --danger-soft: 246 226 222;
-  --shadow: 60 40 25;
+  --script-sans: system-ui;
+  --script-serif: Georgia;
+  /* Neutral, white-based product palette; brand colour is a deep rose-wine. */
+  --paper: 255 255 255;
+  --surface: 255 255 255;
+  --sunken: 246 245 243;
+  --line: 234 232 228;
+  --line-strong: 214 210 204;
+  --ink: 24 22 20;
+  --ink-2: 84 79 74;
+  --ink-3: 130 124 118;
+  --accent: 156 31 66;
+  --accent-hover: 128 22 52;
+  --accent-soft: 252 238 242;
+  --accent-ink: 255 255 255;
+  --sage: 64 110 84;
+  --sage-soft: 232 242 236;
+  --gold: 214 150 30;
+  --success: 21 128 61;
+  --success-soft: 230 245 236;
+  --warning: 161 98 7;
+  --warning-soft: 254 243 219;
+  --danger: 190 38 38;
+  --danger-soft: 254 236 236;
+  --shadow: 28 20 16;
 }
 
 [data-theme='dark'] {
   color-scheme: dark;
-  --paper: 20 18 16;
-  --surface: 28 25 22;
-  --sunken: 35 32 28;
-  --line: 48 43 38;
-  --line-strong: 70 63 55;
-  --ink: 241 236 228;
-  --ink-2: 182 172 159;
-  --ink-3: 136 126 115;
-  --accent: 222 146 124;
-  --accent-hover: 236 168 148;
-  --accent-soft: 52 33 29;
-  --accent-ink: 27 18 15;
-  --sage: 157 172 145;
-  --sage-soft: 36 41 33;
-  --gold: 214 170 98;
-  --success: 132 190 145;
-  --success-soft: 30 44 33;
-  --warning: 222 178 104;
-  --warning-soft: 50 40 22;
-  --danger: 236 132 118;
-  --danger-soft: 56 28 24;
+  --paper: 13 13 14;
+  --surface: 21 21 23;
+  --sunken: 28 28 31;
+  --line: 40 40 44;
+  --line-strong: 62 62 68;
+  --ink: 244 243 241;
+  --ink-2: 182 178 172;
+  --ink-3: 132 128 122;
+  --accent: 246 120 152;
+  --accent-hover: 250 148 174;
+  --accent-soft: 56 22 33;
+  --accent-ink: 22 10 14;
+  --sage: 134 190 156;
+  --sage-soft: 26 40 32;
+  --gold: 234 179 64;
+  --success: 112 204 140;
+  --success-soft: 22 42 30;
+  --warning: 236 184 92;
+  --warning-soft: 48 38 18;
+  --danger: 244 128 128;
+  --danger-soft: 56 24 24;
   --shadow: 0 0 0;
 }
 
@@ -75,7 +78,7 @@
     color: rgb(var(--ink));
     font-family: theme('fontFamily.sans');
     font-size: 15px;
-    line-height: 1.55;
+    line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-feature-settings: 'ss01', 'cv11';
@@ -83,8 +86,8 @@
 
   h1, h2, h3, h4 {
     margin: 0;
-    font-weight: 600;
-    letter-spacing: -0.01em;
+    font-weight: 650;
+    letter-spacing: -0.02em;
     text-wrap: balance;
   }
 
@@ -121,17 +124,21 @@
   }
 
   /* Type */
+  /* Headings are the UI face at heavier weight — no decorative serif. */
   .display {
     font-family: theme('fontFamily.display');
-    font-weight: 400;
-    letter-spacing: -0.015em;
-    line-height: 1.02;
+    font-weight: 650;
+    letter-spacing: -0.028em;
+    line-height: 1.08;
   }
   .eyebrow {
-    @apply text-[11px] font-semibold uppercase tracking-label text-ink-3;
+    @apply text-[13px] font-medium text-ink-3;
   }
   .lede {
-    @apply text-[17px] leading-relaxed text-ink-2;
+    @apply text-[16px] leading-relaxed text-ink-2;
+  }
+  .h-section {
+    @apply text-[22px] font-semibold tracking-[-0.02em] text-ink sm:text-[26px];
   }
   .num {
     font-variant-numeric: tabular-nums;
@@ -142,10 +149,10 @@
 
   /* Surfaces */
   .panel {
-    @apply rounded-lg border border-line bg-surface;
+    @apply rounded-xl border border-line bg-surface;
   }
   .panel-sunken {
-    @apply rounded-lg bg-sunken;
+    @apply rounded-xl bg-sunken;
   }
   .rule {
     @apply border-t border-line;
@@ -153,26 +160,30 @@
 
   /* Buttons */
   .btn {
-    @apply inline-flex h-10 select-none items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 text-sm font-semibold transition-[background,color,border-color,transform] duration-150 active:translate-y-px disabled:pointer-events-none disabled:opacity-45;
+    @apply inline-flex h-10 select-none items-center justify-center gap-2 whitespace-nowrap rounded-[10px] px-4 text-sm font-semibold transition-[background,color,border-color,box-shadow,transform] duration-150 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45;
   }
-  .btn-sm { @apply h-8 gap-1.5 px-3 text-[13px]; }
+  .btn-sm { @apply h-8 gap-1.5 rounded-lg px-3 text-[13px]; }
   .btn-lg { @apply h-12 px-6 text-[15px]; }
-  .btn-primary { @apply btn bg-accent text-accent-ink hover:bg-accent-hover; }
+  .btn-primary { @apply btn bg-accent text-accent-ink shadow-[0_1px_0_rgb(0_0_0/0.08)] hover:bg-accent-hover; }
   .btn-dark { @apply btn bg-ink text-paper hover:bg-ink/85; }
-  .btn-secondary { @apply btn border border-line-strong bg-surface text-ink hover:border-ink/40; }
+  .btn-secondary { @apply btn border border-line-strong bg-surface text-ink hover:border-ink/40 hover:bg-sunken/60; }
   .btn-ghost { @apply btn text-ink-2 hover:bg-sunken hover:text-ink; }
   .btn-danger { @apply btn border border-danger/30 bg-transparent text-danger hover:bg-danger-soft; }
   .btn-danger-solid { @apply btn bg-danger text-white hover:opacity-90; }
   .icon-btn {
-    @apply inline-flex h-9 w-9 items-center justify-center rounded-md text-ink-2 transition-colors hover:bg-sunken hover:text-ink;
+    @apply inline-flex h-9 w-9 items-center justify-center rounded-full text-ink-2 transition-colors hover:bg-sunken hover:text-ink;
   }
+  .chip {
+    @apply inline-flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-line-strong bg-surface px-3.5 text-[13.5px] font-medium text-ink transition-colors hover:border-ink/40;
+  }
+  .chip[aria-pressed='true'], .chip-active { @apply border-ink bg-ink text-paper hover:border-ink; }
 
   /* Forms */
   .label {
     @apply mb-1.5 block text-[13px] font-medium text-ink-2;
   }
   .field {
-    @apply block h-11 w-full rounded-md border border-line-strong bg-surface px-3.5 text-[15px] text-ink placeholder:text-ink-3 transition-[border-color,box-shadow] hover:border-ink/35 focus:border-accent focus:outline-none focus:ring-[3px] focus:ring-accent/15 disabled:bg-sunken disabled:text-ink-3;
+    @apply block h-11 w-full rounded-[10px] border border-line-strong bg-surface px-3.5 text-[15px] text-ink placeholder:text-ink-3 transition-[border-color,box-shadow] hover:border-ink/35 focus:border-accent focus:outline-none focus:ring-[3px] focus:ring-accent/15 disabled:bg-sunken disabled:text-ink-3;
   }
   textarea.field { @apply h-auto py-2.5 leading-relaxed; }
   select.field {
@@ -186,7 +197,7 @@
 
   /* Tags */
   .tag {
-    @apply inline-flex h-6 items-center gap-1.5 rounded-full border px-2.5 text-[11.5px] font-semibold uppercase tracking-[0.06em];
+    @apply inline-flex h-6 items-center gap-1.5 rounded-full border px-2.5 text-[12px] font-semibold;
   }
   .tag-neutral { @apply tag border-line-strong text-ink-2; }
   .tag-accent { @apply tag border-accent/25 bg-accent-soft text-accent; }
@@ -197,7 +208,7 @@
 
   /* Notices */
   .notice {
-    @apply flex items-start gap-3 rounded-md border px-4 py-3 text-sm leading-relaxed;
+    @apply flex items-start gap-3 rounded-xl border px-4 py-3 text-sm leading-relaxed;
   }
   .notice-info { @apply notice border-line bg-sunken text-ink-2; }
   .notice-success { @apply notice border-success/25 bg-success-soft text-success; }
@@ -213,7 +224,7 @@
 
   /* Skeleton */
   .skeleton {
-    @apply relative overflow-hidden rounded bg-sunken;
+    @apply relative overflow-hidden rounded-lg bg-sunken;
   }
   .skeleton::after {
     content: '';
@@ -231,7 +242,7 @@
   /* Data table */
   .data-table { @apply w-full text-left text-sm; }
   .data-table th, .data-table td { @apply pr-5 last:pr-0; }
-  .data-table th { @apply border-b border-line pb-3 text-[11px] font-semibold uppercase tracking-label text-ink-3; }
+  .data-table th { @apply border-b border-line pb-3 text-[12.5px] font-medium text-ink-3; }
   .data-table td { @apply border-b border-line py-3.5 align-middle; }
   .data-table tr:last-child td { @apply border-b-0; }
 
@@ -268,6 +279,10 @@
   .animate-fade { animation: rise 380ms cubic-bezier(.2, .7, .2, 1) both; }
   .text-balance { text-wrap: balance; }
   .scrollbar-thin { scrollbar-width: thin; }
+  .no-scrollbar { scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .img-fade { transition: opacity 400ms ease; }
+  .img-fade[data-loaded='false'] { opacity: 0; }
 }
 
 @keyframes rise {
@@ -277,6 +292,25 @@
 @keyframes shimmer {
   100% { transform: translateX(100%); }
 }
+
+/* ------------------------------------------------------------------
+   Indic scripts — letter-spacing and all-caps are Latin conventions.
+   Tracking breaks conjuncts and matras; tight leading clips them.
+   ------------------------------------------------------------------ */
+html[data-script]:not([data-script='latn']) body { line-height: 1.7; }
+html[data-script]:not([data-script='latn']) :is(h1, h2, h3, h4) { letter-spacing: 0; }
+html[data-script]:not([data-script='latn']) .display {
+  letter-spacing: 0;
+  line-height: 1.3;
+  font-weight: 600;
+}
+html[data-script]:not([data-script='latn']) :is(.eyebrow, .data-table th, .tag-neutral, .tag-accent, .tag-success, .tag-warning, .tag-danger) {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 12.5px;
+}
+html[data-script]:not([data-script='latn']) .field,
+html[data-script]:not([data-script='latn']) .btn { line-height: 1.4; }
 
 /* Mapbox popup on-brand */
 .mapboxgl-popup-content {

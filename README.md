@@ -68,6 +68,32 @@ These folders are present but not active runtime services in the current repo st
 - Live topic messaging: `/topic/messages/{conversationId}`
 - User-specific notifications: `/user/queue/notifications`
 
+### Indian Languages & India Market
+- 10 languages: English, हिन्दी, বাংলা, मराठी, తెలుగు, தமிழ், ગુજરાતી, ಕನ್ನಡ, മലയാളം, ਪੰਜਾਬੀ.
+- Picked automatically from the browser, switchable from the navbar, footer, home page or Account settings; the choice is remembered.
+- Each script gets its own Noto Sans/Serif font, loaded only when that language is chosen; Indic text drops Latin-only letter-spacing and uppercase.
+- Prices in rupees with Indian grouping (₹1,25,000; ₹2.4L on charts); dates and times follow the chosen language. Stripe charges in INR by default (`STRIPE_CURRENCY`).
+- Strings live in `frontend/src/i18n/locales/*.js` (`en.js` is the source; missing keys fall back to English). Translations were drafted in-house — have a native speaker review before a wide launch.
+
+## Demo mode and sample data
+
+The frontend can run without any backend, so the deployed site never shows a broken page.
+
+| `VITE_API_MODE` | Behaviour |
+|---|---|
+| `auto` (default) | Probes `GET /api/auth/health` for up to 8 s. If the backend answers, everything is live; otherwise the app switches to **demo mode** for that tab. |
+| `real` | Always use the backend. |
+| `mock` | Always use the in-browser demo API (`npm run dev:demo` / `npm run build:demo`). |
+
+Demo mode:
+- Shows a permanent “Demo mode” bar — sample data is never presented as real.
+- Serves a snapshot of the real catalogue (`frontend/src/mock/fixtures.json`) plus a generated booking history so dashboards aren’t empty.
+- Supports the full flow: browse, search, book, reschedule/cancel, chat, owner workspace, admin overview, sign-up. Everything a visitor creates stays in their browser (`localStorage`) and can be wiped with **Reset demo**.
+- Never simulates payments: online checkout is disabled in demo mode.
+- Lives entirely in `frontend/src/mock/` and is code-split, so real-mode visitors don’t download it. Route handlers mirror the Spring controllers’ paths and response shapes; refresh the snapshot with `node scripts/export-fixtures.mjs http://localhost:8080 src/mock/fixtures.json` against a running backend.
+
+Backend sample data: set `APP_DEMO_SEED_DATA=true` to seed ~40 salons across 10 Indian cities (verified Unsplash photos, INR menus, opening hours, reviews). Seeding is deterministic and idempotent; demo owner/reviewer accounts get random passwords and can’t be signed into.
+
 ## Tech Stack
 
 ### Backend

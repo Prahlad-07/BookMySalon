@@ -4,18 +4,39 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Star } from 'lucide-react';
+import { useT } from '../i18n';
 
-export function Wordmark({ to = '/', className = '' }) {
+/**
+ * BookMySalon mark: a geometric "B" on a rose-wine tile, with a small sparkle for
+ * beauty. The sparkle is dropped below 24px (favicon sizes) where it turns to noise.
+ */
+export function Mark({ size = 30, className = '' }) {
   return (
-    <Link to={to} className={`group inline-flex items-center gap-2.5 ${className}`} aria-label="BookMySalon home">
-      <span
-        aria-hidden="true"
-        className="flex h-7 w-7 items-center justify-center rounded-[7px] bg-accent font-display text-[19px] italic leading-none text-accent-ink"
-      >
-        b
-      </span>
-      <span className="font-display text-[23px] leading-none tracking-[-0.01em] text-ink">
-        BookMy<span className="italic">Salon</span>
+    <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true" className={`shrink-0 ${className}`}>
+      <rect width="64" height="64" rx="16" className="fill-accent" />
+      <path
+        d={size < 24 ? 'M23 15.5V48.5M23 15.5H30A7 7 0 0 1 30 29.5H23M23 29.5H31.5A9.5 9.5 0 0 1 31.5 48.5H23' : 'M22 15.5V48.5M22 15.5H29A7 7 0 0 1 29 29.5H22M22 29.5H30.5A9.5 9.5 0 0 1 30.5 48.5H22'}
+        fill="none"
+        strokeWidth="6.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="stroke-accent-ink"
+      />
+      {size >= 24 && (
+        <path d="M49 9.5 L50.5 13.3 L54.3 14.8 L50.5 16.3 L49 20.1 L47.5 16.3 L43.7 14.8 L47.5 13.3 Z" className="fill-accent-ink" opacity="0.82" />
+      )}
+    </svg>
+  );
+}
+
+export function Wordmark({ to = '/', className = '', size = 'md' }) {
+  const t = useT();
+  const lg = size === 'lg';
+  return (
+    <Link to={to} className={`group inline-flex items-center gap-2.5 ${className}`} aria-label={t('nav.home')}>
+      <Mark size={lg ? 36 : 30} className="transition-transform duration-300 group-hover:-rotate-6" />
+      <span className={`${lg ? 'text-[22px]' : 'text-[19px]'} font-bold leading-none tracking-[-0.035em] text-ink`}>
+        BookMy<span className="text-accent">Salon</span>
       </span>
     </Link>
   );
@@ -23,11 +44,11 @@ export function Wordmark({ to = '/', className = '' }) {
 
 export function PageHeader({ eyebrow, title, description, actions, className = '' }) {
   return (
-    <header className={`flex flex-col gap-6 border-b border-line pb-8 md:flex-row md:items-end md:justify-between ${className}`}>
+    <header className={`flex flex-col gap-5 md:flex-row md:items-end md:justify-between ${className}`}>
       <div className="max-w-2xl">
-        {eyebrow && <p className="eyebrow mb-3">{eyebrow}</p>}
-        <h1 className="display text-[44px] text-ink sm:text-[56px]">{title}</h1>
-        {description && <p className="lede mt-3 max-w-xl">{description}</p>}
+        {eyebrow && <p className="eyebrow mb-2">{eyebrow}</p>}
+        <h1 className="display text-[28px] text-ink sm:text-[34px]">{title}</h1>
+        {description && <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-ink-2">{description}</p>}
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
     </header>
@@ -50,9 +71,13 @@ export function SectionTitle({ index, title, description, action }) {
 }
 
 export function Stars({ value = 0, size = 13, className = '' }) {
+  const t = useT();
   const rounded = Math.round(Number(value) || 0);
   return (
-    <span className={`inline-flex items-center gap-[2px] ${className}`} aria-label={`${Number(value || 0).toFixed(1)} out of 5`}>
+    <span
+      className={`inline-flex items-center gap-[2px] ${className}`}
+      aria-label={t('common.ratingOutOf5', { value: Number(value || 0).toFixed(1) })}
+    >
       {[1, 2, 3, 4, 5].map((i) => (
         <Star
           key={i}
@@ -94,38 +119,40 @@ export function Avatar({ name, size = 36, className = '' }) {
   );
 }
 
-const STATUS_STYLE = {
-  PENDING: { cls: 'tag-warning', label: 'Pending' },
-  CONFIRMED: { cls: 'tag-success', label: 'Confirmed' },
-  COMPLETED: { cls: 'tag-neutral', label: 'Completed' },
-  CANCELLED: { cls: 'tag-danger', label: 'Cancelled' },
+const STATUS_CLASS = {
+  PENDING: 'tag-warning',
+  CONFIRMED: 'tag-success',
+  COMPLETED: 'tag-neutral',
+  CANCELLED: 'tag-danger',
 };
 
 export function StatusTag({ status }) {
-  const style = STATUS_STYLE[String(status || '').toUpperCase()] || { cls: 'tag-neutral', label: status || 'Unknown' };
+  const t = useT();
+  const key = String(status || '').toUpperCase();
   return (
-    <span className={style.cls}>
+    <span className={STATUS_CLASS[key] || 'tag-neutral'}>
       <span className="dot" aria-hidden="true" />
-      {style.label}
+      {STATUS_CLASS[key] ? t(`status.${key}`) : status || t('status.UNKNOWN')}
     </span>
   );
 }
 
-export function EmptyState({ title, description, action, className = '' }) {
+export function EmptyState({ title, description, action, className = '', as: Heading = 'p' }) {
   return (
-    <div className={`flex flex-col items-center rounded-lg border border-dashed border-line-strong px-6 py-16 text-center ${className}`}>
-      <p className="display text-[30px] text-ink">{title}</p>
+    <div className={`flex flex-col items-center rounded-xl border border-dashed border-line-strong px-6 py-14 text-center ${className}`}>
+      <Heading className="text-[18px] font-semibold tracking-[-0.01em] text-ink">{title}</Heading>
       {description && <p className="mt-2 max-w-sm text-sm text-ink-2">{description}</p>}
       {action && <div className="mt-6">{action}</div>}
     </div>
   );
 }
 
-export function PageLoader({ label = 'Loading' }) {
+export function PageLoader({ label }) {
+  const t = useT();
   return (
     <div className="flex min-h-[50vh] items-center justify-center gap-3 text-sm text-ink-3" role="status">
       <span className="spinner" aria-hidden="true" />
-      {label}…
+      {label || t('common.loading')}…
     </div>
   );
 }
@@ -145,13 +172,14 @@ export function Field({ label, htmlFor, hint, error, children, className = '' })
 }
 
 export function Notice({ tone = 'info', children, onDismiss }) {
+  const t = useT();
   if (!children) return null;
   return (
     <div className={`notice-${tone}`} role={tone === 'error' ? 'alert' : 'status'}>
       <div className="flex-1">{children}</div>
       {onDismiss && (
         <button type="button" onClick={onDismiss} className="text-xs font-semibold opacity-70 hover:opacity-100">
-          Dismiss
+          {t('common.dismiss')}
         </button>
       )}
     </div>
@@ -162,16 +190,11 @@ export function Stat({ label, value, note, className = '' }) {
   return (
     <div className={className}>
       <p className="eyebrow">{label}</p>
-      <p className="num mt-2 font-display text-[40px] leading-none text-ink">{value}</p>
+      <p className="num mt-1.5 text-[30px] font-semibold leading-none tracking-[-0.03em] text-ink">{value}</p>
       {note && <p className="mt-2 text-[13px] text-ink-3">{note}</p>}
     </div>
   );
 }
 
-export const money = (value) =>
-  `$${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-
-export const shortMoney = (value) => {
-  const n = Number(value || 0);
-  return Number.isInteger(n) ? `$${n}` : money(n);
-};
+// Formatting lives in i18n/format so prices follow the active language (₹, en-IN grouping).
+export { money, shortMoney } from '../i18n/format';

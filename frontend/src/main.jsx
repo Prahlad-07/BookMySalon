@@ -8,6 +8,7 @@ import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import AppErrorBoundary from './components/AppErrorBoundary.jsx'
 import { ThemeProvider } from './context/ThemeContext.jsx'
+import { I18nProvider } from './i18n/index.jsx'
 import './index.css'
 
 if (typeof globalThis.global === 'undefined') {
@@ -16,10 +17,12 @@ if (typeof globalThis.global === 'undefined') {
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <ThemeProvider>
-      <AppErrorBoundary>
-        <App />
-      </AppErrorBoundary>
-    </ThemeProvider>
+    <I18nProvider>
+      <ThemeProvider>
+        <AppErrorBoundary>
+          <App />
+        </AppErrorBoundary>
+      </ThemeProvider>
+    </I18nProvider>
   </React.StrictMode>,
 )

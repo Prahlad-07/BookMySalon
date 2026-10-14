@@ -20,4 +20,11 @@ public interface ServiceOfferingRepository extends JpaRepository<ServiceOffering
 
     @Query("select s.salonId, count(s) from ServiceOffering s group by s.salonId")
     List<Object[]> countGroupBySalon();
+
+    @Query("select min(s.price), count(s) from ServiceOffering s where s.salonId = :salonId")
+    List<Object[]> statsForSalon(@org.springframework.data.repository.query.Param("salonId") Long salonId);
+
+    @Query("select min(s.price) from ServiceOffering s where s.salonId = :salonId and s.price >= :floor")
+    Double minPriceAtLeast(@org.springframework.data.repository.query.Param("salonId") Long salonId,
+                           @org.springframework.data.repository.query.Param("floor") double floor);
 }

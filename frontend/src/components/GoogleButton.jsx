@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function GoogleButton({ href, label = 'Continue with Google' }) {
+export default function GoogleButton({ href, label }) {
   return (
     <a href={href} className="btn-secondary btn-lg w-full">
       <svg width="17" height="17" viewBox="0 0 48 48" aria-hidden="true">

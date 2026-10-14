@@ -361,4 +361,16 @@ public class BookingServiceImpl implements BookingService {
             throw new IllegalArgumentException("Selected slot is outside salon operating hours");
         }
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<com.bookmysalon.dto.BusySlotDto> getBusySlots(Long salonId, java.time.LocalDate date) {
+        LocalDateTime from = date.atStartOfDay();
+        return bookingRepository
+                .findBySalonIdAndStatusInAndStartTimeLessThanAndEndTimeGreaterThanOrderByStartTime(
+                        salonId, List.of(BookingStatus.PENDING, BookingStatus.CONFIRMED), from.plusDays(1), from)
+                .stream()
+                .map(b -> new com.bookmysalon.dto.BusySlotDto(b.getStartTime(), b.getEndTime()))
+                .toList();
+    }
 }

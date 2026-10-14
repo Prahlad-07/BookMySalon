@@ -32,4 +32,13 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Object[]> ratingSummaryBySalon();
 
     long countBySalonId(Long salonId);
+
+    @Query("select coalesce(avg(r.rating), 0), count(r) from Review r where r.salonId = :salonId")
+    List<Object[]> statsForSalon(@Param("salonId") Long salonId);
+
+    @Query("select coalesce(avg(r.rating), 0), count(r) from Review r")
+    List<Object[]> platformStats();
+
+    @Query("select r from Review r join fetch r.user join fetch r.salon where r.rating >= :minRating order by r.createdAt desc")
+    List<Review> findRecent(@Param("minRating") double minRating, org.springframework.data.domain.Pageable pageable);
 }

@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MAPBOX_DEFAULT_CENTER, MAPBOX_STYLE_URL, formatCoordinate } from '../../config/mapbox';
 import { loadMapboxGl } from '../../utils/loadMapboxGl';
+import { useT } from '../../i18n';
 
 export default function MapboxLocationPicker({
   accessToken,
@@ -17,6 +18,9 @@ export default function MapboxLocationPicker({
 
   const [mapError, setMapError] = useState('');
   const [isInitializing, setIsInitializing] = useState(true);
+  const t = useT();
+  const tRef = useRef(t);
+  tRef.current = t;
 
   const valueLatitude = value?.latitude;
   const valueLongitude = value?.longitude;
@@ -117,7 +121,7 @@ export default function MapboxLocationPicker({
         });
 
         map.on('error', () => {
-          setMapError('Map failed to load completely. Please refresh and try again.');
+          setMapError(tRef.current('map.failed'));
           setIsInitializing(false);
         });
 
@@ -126,7 +130,7 @@ export default function MapboxLocationPicker({
         setMapError('');
       } catch (error) {
         if (!isCancelled) {
-          setMapError(error?.message || 'Unable to load Mapbox map');
+          setMapError(tRef.current('map.failed'));
           setIsInitializing(false);
         }
       }
@@ -173,23 +177,27 @@ export default function MapboxLocationPicker({
         <div ref={containerRef} className="h-80 w-full" />
         {isInitializing && (
           <div className="map-loading-overlay">
-            <div className="flex items-center gap-2 rounded-md border border-line bg-surface px-4 py-2.5 text-sm text-ink-2">Loading map...</div>
+            <div className="flex items-center gap-2 rounded-md border border-line bg-surface px-4 py-2.5 text-sm text-ink-2">{t('map.loading')}…</div>
           </div>
         )}
       </div>
 
       <div className="num mt-2 flex flex-wrap items-center gap-3 text-[13px] text-ink-3">
-        <span>Lat: {formatCoordinate(value?.latitude)}</span>
-        <span>Lng: {formatCoordinate(value?.longitude)}</span>
+        <span>
+          {t('owner.form.lat')}: {formatCoordinate(value?.latitude)}
+        </span>
+        <span>
+          {t('owner.form.lng')}: {formatCoordinate(value?.longitude)}
+        </span>
       </div>
 
       <div className="map-control-row">
         <button type="button" onClick={centerOnMarker} className="btn-secondary btn-sm">
-          Center on Pin
+          {t('map.center')}
         </button>
         {!readOnly && (
           <button type="button" onClick={resetToDefaultLocation} className="btn-secondary btn-sm">
-            Reset to Default
+            {t('map.reset')}
           </button>
         )}
       </div>

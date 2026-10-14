@@ -1,124 +1,124 @@
 /**
  * @author Prahlad Yadav
- * @version 3.0
+ * @version 4.0
  * @since 2026-02-14
+ *
+ * Public salon search. Filters live in the URL (shareable, back-button friendly);
+ * results are paged server-side, so the page stays fast whatever the catalogue size.
  */
-import React, { useDeferredValue, useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { LocateFixed, Map as MapIcon, Search, Star, X } from 'lucide-react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { LocateFixed, Map as MapIcon, Search, SlidersHorizontal, X } from 'lucide-react';
 import api from '../config/api';
 import { MAPBOX_ACCESS_TOKEN } from '../config/mapbox';
 import NearbySalonsMap from '../components/maps/NearbySalonsMap';
-import { openState } from '../utils/time';
-import { EmptyState, Notice, PageHeader } from '../components/ui';
+import SalonCard, { SalonCardSkeleton } from '../components/SalonCard';
+import { EmptyState, Notice } from '../components/ui';
+import useApi from '../hooks/useApi';
+import { useCityLabel, useT } from '../i18n';
+import { formatNumber, money } from '../i18n/format';
+import { POPULAR_SEARCHES } from '../lib/catalog';
 
-const getBrowserLocation = () =>
+const PAGE_SIZE = 12;
+const PRICE_CAPS = [500, 1000, 2500];
+
+const getBrowserLocation = (t) =>
   new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
-      reject(new Error('Your browser doesn’t support location.'));
+      reject(new Error(t('salons.err.noGeo')));
       return;
     }
     navigator.geolocation.getCurrentPosition(
       (p) => resolve({ latitude: p.coords.latitude, longitude: p.coords.longitude }),
-      () => reject(new Error('Location access was denied. Enable it in your browser to sort by distance.')),
+      () => reject(new Error(t('salons.err.geoDenied'))),
       { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 }
     );
   });
 
-function SalonCard({ salon }) {
-  const image = (salon.images || [])[0];
-  const rating = Number(salon.averageRating || 0);
-  const state = openState(salon.openTime, salon.closeTime);
-  const distance = Number(salon.distanceKm);
-
-  return (
-    <Link to={`/salon/${salon.id}`} className="group block focus-visible:outline-none" aria-label={salon.name}>
-      <div className="relative overflow-hidden rounded-lg bg-sunken ring-offset-4 ring-offset-paper group-focus-visible:ring-2 group-focus-visible:ring-accent">
-        {image ? (
-          <img
-            src={image}
-            alt=""
-            loading="lazy"
-            className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-          />
-        ) : (
-          <div className="flex aspect-[4/3] items-center justify-center font-display text-[56px] italic text-ink-3">
-            {salon.name?.[0] || 'S'}
-          </div>
-        )}
-        {Number.isFinite(distance) && salon.distanceKm != null && (
-          <span className="num absolute left-3 top-3 rounded-full bg-surface/95 px-2.5 py-1 text-[12px] font-semibold text-ink">
-            {distance < 1 ? `${Math.round(distance * 1000)} m` : `${distance.toFixed(1)} km`}
-          </span>
-        )}
-      </div>
-
-      <div className="mt-4 flex items-start justify-between gap-3">
-        <h3 className="text-[17px] font-semibold leading-snug text-ink group-hover:underline group-hover:decoration-line-strong group-hover:underline-offset-4">
-          {salon.name}
-        </h3>
-        {rating > 0 ? (
-          <span className="num flex shrink-0 items-center gap-1 text-sm font-semibold text-ink">
-            <Star size={13} className="fill-gold text-gold" aria-hidden="true" />
-            {rating.toFixed(1)}
-            <span className="font-normal text-ink-3">({salon.reviewCount})</span>
-          </span>
-        ) : (
-          <span className="shrink-0 text-[13px] text-ink-3">New</span>
-        )}
-      </div>
-      <p className="mt-1 truncate text-sm text-ink-2">{[salon.address, salon.city].filter(Boolean).join(', ')}</p>
-      <p className="mt-2 flex items-center gap-2 text-[13px] text-ink-3">
-        {state && (
-          <span className={`flex items-center gap-1.5 ${state.open ? 'text-success' : ''}`}>
-            <span className={`h-1.5 w-1.5 rounded-full ${state.open ? 'bg-success' : 'bg-ink-3'}`} aria-hidden="true" />
-            {state.label}
-          </span>
-        )}
-        <span aria-hidden="true">·</span>
-        <span>
-          {salon.serviceCount || 0} service{salon.serviceCount === 1 ? '' : 's'}
-        </span>
-      </p>
-    </Link>
-  );
-}
-
-function CardSkeleton() {
-  return (
-    <div>
-      <div className="skeleton aspect-[4/3] rounded-lg" />
-      <div className="skeleton mt-4 h-5 w-2/3" />
-      <div className="skeleton mt-2 h-4 w-1/2" />
-    </div>
-  );
-}
-
 export default function SalonList() {
-  const [salons, setSalons] = useState([]);
+  const t = useT();
+  const cityLabel = useCityLabel();
+  const [params, setParams] = useSearchParams();
+
+  const q = params.get('q') || '';
+  const city = params.get('city') || '';
+  const sort = params.get('sort') || 'rating';
+  const open = params.get('open') === '1';
+  const minRating = Number(params.get('rating')) || 0;
+  const maxPrice = Number(params.get('price')) || 0;
+
+  const [draft, setDraft] = useState(q);
+  const [items, setItems] = useState([]);
+  const [page, setPage] = useState(0);
+  const [total, setTotal] = useState(null);
+  const [hasNext, setHasNext] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState('');
-  const [query, setQuery] = useState('');
-  const [city, setCity] = useState('');
-  const [sortBy, setSortBy] = useState('rating');
-  const [openOnly, setOpenOnly] = useState(false);
   const [location, setLocation] = useState(null);
   const [locating, setLocating] = useState(false);
   const [radiusKm, setRadiusKm] = useState(15);
   const [showMap, setShowMap] = useState(false);
   const [activeSalonId, setActiveSalonId] = useState(null);
-  const deferredQuery = useDeferredValue(query);
+  const controller = useRef(null);
 
-  const loadAll = async () => {
+  const insights = useApi('/api/salons/insights', null, { ttl: 300_000 });
+  const cities = insights.data?.topCities || [];
+
+  const update = (patch) => {
+    const next = new URLSearchParams(params);
+    Object.entries(patch).forEach(([k, v]) => {
+      if (v === '' || v == null || v === false || v === 0) next.delete(k);
+      else next.set(k, String(v));
+    });
+    setParams(next, { replace: true });
+  };
+
+  // Keep the box in sync when the URL changes (back button, category links).
+  useEffect(() => setDraft(q), [q]);
+
+  // Debounce typing into the URL.
+  useEffect(() => {
+    if (draft === q) return undefined;
+    const id = setTimeout(() => update({ q: draft.trim() }), 300);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draft]);
+
+  const query = useMemo(
+    () => ({
+      ...(q && { q }),
+      ...(city && { city }),
+      ...(open && { openNow: true }),
+      ...(minRating && { minRating }),
+      ...(maxPrice && { maxPrice }),
+      sort,
+      size: PAGE_SIZE,
+    }),
+    [q, city, open, minRating, maxPrice, sort]
+  );
+
+  const fetchPage = async (pageIndex, append) => {
+    controller.current?.abort();
+    const ctrl = new AbortController();
+    controller.current = ctrl;
     try {
-      setLoading(true);
+      if (append) setLoadingMore(true);
+      else setLoading(true);
       setError('');
-      const data = await api.get('/api/salons');
-      setSalons(Array.isArray(data) ? data : []);
+      const data = await api.get('/api/salons/search', { params: { ...query, page: pageIndex }, signal: ctrl.signal });
+      if (ctrl.signal.aborted) return;
+      setItems((prev) => (append ? [...prev, ...(data.items || [])] : data.items || []));
+      setPage(pageIndex);
+      setTotal(data.totalItems ?? 0);
+      setHasNext(Boolean(data.hasNext));
     } catch (err) {
-      setError(err?.response?.data?.error || 'We couldn’t load salons right now. Please try again.');
+      if (!ctrl.signal.aborted) setError(err?.response?.data?.error || t('salons.err.load'));
     } finally {
-      setLoading(false);
+      if (!ctrl.signal.aborted) {
+        setLoading(false);
+        setLoadingMore(false);
+      }
     }
   };
 
@@ -129,24 +129,28 @@ export default function SalonList() {
       const data = await api.get('/api/salons/nearby', {
         params: { lat: coords.latitude, lng: coords.longitude, radius },
       });
-      setSalons(Array.isArray(data) ? data : []);
-      setSortBy('distance');
+      const list = Array.isArray(data) ? data : [];
+      setItems(list);
+      setTotal(list.length);
+      setHasNext(false);
     } catch (err) {
-      setError(err?.response?.data?.error || 'We couldn’t load nearby salons.');
+      setError(err?.response?.data?.error || t('salons.err.nearby'));
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadAll();
-  }, []);
+    if (location) return undefined;
+    fetchPage(0, false);
+    return () => controller.current?.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query, location]);
 
   const useMyLocation = async () => {
     try {
       setLocating(true);
-      setError('');
-      const coords = await getBrowserLocation();
+      const coords = await getBrowserLocation(t);
       setLocation(coords);
       await loadNearby(coords, radiusKm);
     } catch (err) {
@@ -156,113 +160,152 @@ export default function SalonList() {
     }
   };
 
-  const clearLocation = () => {
-    setLocation(null);
-    setSortBy('rating');
-    loadAll();
+  const filtersActive = Boolean(q || city || open || minRating || maxPrice);
+  const clearAll = () => {
+    setDraft('');
+    setParams(sort !== 'rating' ? { sort } : {}, { replace: true });
   };
 
-  const cities = useMemo(
-    () => Array.from(new Set(salons.map((s) => String(s.city || '').trim()).filter(Boolean))).sort(),
-    [salons]
-  );
-
-  const visible = useMemo(() => {
-    const q = deferredQuery.trim().toLowerCase();
-    const list = salons.filter((salon) => {
-      if (city && String(salon.city || '').trim() !== city) return false;
-      if (openOnly && !openState(salon.openTime, salon.closeTime)?.open) return false;
-      if (!q) return true;
-      return [salon.name, salon.address, salon.city].some((v) => String(v || '').toLowerCase().includes(q));
-    });
-    const sorted = [...list];
-    if (sortBy === 'name') sorted.sort((a, b) => String(a.name).localeCompare(String(b.name)));
-    if (sortBy === 'rating')
-      sorted.sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0) || (b.reviewCount || 0) - (a.reviewCount || 0));
-    if (sortBy === 'distance') sorted.sort((a, b) => (a.distanceKm ?? Infinity) - (b.distanceKm ?? Infinity));
-    return sorted;
-  }, [salons, deferredQuery, city, openOnly, sortBy]);
-
-  const filtersActive = Boolean(query || city || openOnly);
+  const title = location
+    ? t('salons.titleNear')
+    : q
+      ? t('list.resultsFor', { q })
+      : city
+        ? t('list.inCity', { city: cityLabel(city) })
+        : t('salons.title');
 
   return (
-    <div className="page">
-      <PageHeader
-        eyebrow="Discover"
-        title={location ? 'Salons near you' : 'Find your salon'}
-        description="Compare menus, prices, opening hours and reviews — then book a time that suits you."
-      />
+    <div className="shell pb-24 pt-6 sm:pt-8">
+      <h1 className="display text-[26px] text-ink sm:text-[32px]">{title}</h1>
+      <p className="mt-1 text-[14.5px] text-ink-2">
+        {loading && total == null ? t('salons.loading') : t('salons.count', { count: total || 0 })}
+        {!location && insights.data && !filtersActive && (
+          <> · {t('h.stat.citiesValue', { n: formatNumber(insights.data.cities) })}</>
+        )}
+      </p>
 
-      <div className="mt-8 flex flex-col gap-3 lg:flex-row lg:items-center">
-        <div className="relative flex-1">
-          <Search size={17} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-3" />
-          <input
-            className="field pl-10"
-            placeholder="Search by salon, street or city"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            aria-label="Search salons"
-          />
+      {/* Toolbar */}
+      <div className="sticky top-16 z-30 -mx-5 mt-5 border-b border-line bg-paper/95 px-5 py-3 backdrop-blur-md sm:mx-0 sm:px-0">
+        <div className="flex flex-col gap-2.5 lg:flex-row lg:items-center">
+          <label className="relative flex-1">
+            <Search size={17} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-3" />
+            <span className="sr-only">{t('salons.searchLabel')}</span>
+            <input
+              className="field h-11 rounded-full pl-10 pr-10"
+              placeholder={t('h.searchPlaceholder')}
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              disabled={Boolean(location)}
+            />
+            {draft && (
+              <button
+                type="button"
+                className="icon-btn absolute right-1 top-1/2 h-8 w-8 -translate-y-1/2"
+                onClick={() => setDraft('')}
+                aria-label={t('salons.clearFilters')}
+              >
+                <X size={15} />
+              </button>
+            )}
+          </label>
+          <div className="flex gap-2">
+            <select
+              className="field h-11 w-auto min-w-0 flex-1 rounded-full sm:min-w-[9.5rem] sm:flex-none"
+              value={city}
+              onChange={(e) => update({ city: e.target.value })}
+              aria-label={t('salons.city')}
+              disabled={Boolean(location)}
+            >
+              <option value="">{t('salons.allCities')}</option>
+              {cities.map((c) => (
+                <option key={c.city} value={c.city}>
+                  {cityLabel(c.city)} ({c.salons})
+                </option>
+              ))}
+            </select>
+            <select
+              className="field h-11 w-auto min-w-0 flex-1 rounded-full sm:flex-none"
+              value={sort}
+              onChange={(e) => update({ sort: e.target.value === 'rating' ? '' : e.target.value })}
+              aria-label={t('salons.sortBy')}
+              disabled={Boolean(location)}
+            >
+              <option value="rating">{t('salons.sortRating')}</option>
+              <option value="reviews">{t('list.sortReviews')}</option>
+              <option value="price">{t('list.sortPrice')}</option>
+              <option value="newest">{t('list.sortNewest')}</option>
+              <option value="name">{t('salons.sortName')}</option>
+            </select>
+          </div>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <select className="field w-auto min-w-[9rem]" value={city} onChange={(e) => setCity(e.target.value)} aria-label="City">
-            <option value="">All cities</option>
-            {cities.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-          <select className="field w-auto" value={sortBy} onChange={(e) => setSortBy(e.target.value)} aria-label="Sort by">
-            <option value="rating">Top rated</option>
-            {location && <option value="distance">Nearest</option>}
-            <option value="name">A–Z</option>
-          </select>
-          <button
-            type="button"
-            onClick={() => setOpenOnly((v) => !v)}
-            className={`btn ${openOnly ? 'bg-ink text-paper' : 'border border-line-strong bg-surface text-ink hover:border-ink/40'}`}
-            aria-pressed={openOnly}
-          >
-            Open now
-          </button>
+
+        <div className="-mx-5 mt-2.5 flex items-center gap-2 overflow-x-auto px-5 pb-0.5 no-scrollbar sm:mx-0 sm:px-0">
+          <SlidersHorizontal size={16} className="shrink-0 text-ink-3" aria-hidden="true" />
           {location ? (
-            <button type="button" className="btn-secondary" onClick={clearLocation}>
-              <X size={15} /> Near me
-            </button>
+            <>
+              <button type="button" className="chip chip-active" onClick={() => setLocation(null)}>
+                <X size={14} /> {t('salons.nearMe')}
+              </button>
+              {[5, 15, 30, 60].map((r) => (
+                <button
+                  key={r}
+                  type="button"
+                  className="chip"
+                  aria-pressed={radiusKm === r}
+                  onClick={() => {
+                    setRadiusKm(r);
+                    loadNearby(location, r);
+                  }}
+                >
+                  {t('salons.km', { n: r })}
+                </button>
+              ))}
+            </>
           ) : (
-            <button type="button" className="btn-secondary" onClick={useMyLocation} disabled={locating}>
-              <LocateFixed size={15} /> {locating ? 'Locating…' : 'Near me'}
-            </button>
+            <>
+              <button type="button" className="chip" aria-pressed={open} onClick={() => update({ open: open ? '' : '1' })}>
+                {t('salons.openNow')}
+              </button>
+              <button
+                type="button"
+                className="chip"
+                aria-pressed={minRating >= 4}
+                onClick={() => update({ rating: minRating >= 4 ? '' : 4 })}
+              >
+                {t('list.rated4')}
+              </button>
+              {PRICE_CAPS.map((cap) => (
+                <button
+                  key={cap}
+                  type="button"
+                  className="chip"
+                  aria-pressed={maxPrice === cap}
+                  onClick={() => update({ price: maxPrice === cap ? '' : cap })}
+                >
+                  {t('list.under', { price: money(cap) })}
+                </button>
+              ))}
+              <button type="button" className="chip" onClick={useMyLocation} disabled={locating}>
+                <LocateFixed size={14} /> {locating ? t('salons.locating') : t('salons.nearMe')}
+              </button>
+            </>
           )}
           {MAPBOX_ACCESS_TOKEN && (
-            <button type="button" className="btn-secondary" onClick={() => setShowMap((v) => !v)} aria-pressed={showMap}>
-              <MapIcon size={15} /> {showMap ? 'Hide map' : 'Map'}
+            <button type="button" className="chip" aria-pressed={showMap} onClick={() => setShowMap((v) => !v)}>
+              <MapIcon size={14} /> {showMap ? t('salons.hideMap') : t('salons.map')}
+            </button>
+          )}
+          {filtersActive && !location && (
+            <button
+              type="button"
+              className="ml-1 shrink-0 text-[13.5px] font-medium text-ink-3 underline-offset-4 hover:text-ink hover:underline"
+              onClick={clearAll}
+            >
+              {t('salons.clearFilters')}
             </button>
           )}
         </div>
       </div>
-
-      {location && (
-        <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-ink-2">
-          <span>Within</span>
-          {[5, 15, 30, 60].map((r) => (
-            <button
-              key={r}
-              type="button"
-              onClick={() => {
-                setRadiusKm(r);
-                loadNearby(location, r);
-              }}
-              className={`rounded-full border px-3 py-1 text-[13px] ${
-                radiusKm === r ? 'border-ink bg-ink text-paper' : 'border-line-strong hover:border-ink/40'
-              }`}
-            >
-              {r} km
-            </button>
-          ))}
-        </div>
-      )}
 
       {error && (
         <div className="mt-6">
@@ -273,10 +316,10 @@ export default function SalonList() {
       )}
 
       {showMap && MAPBOX_ACCESS_TOKEN && (
-        <div className="mt-8">
+        <div className="mt-6">
           <NearbySalonsMap
             accessToken={MAPBOX_ACCESS_TOKEN}
-            salons={visible}
+            salons={items}
             userLocation={location}
             activeSalonId={activeSalonId}
             onSalonSelect={(salon) => setActiveSalonId(Number(salon.id))}
@@ -284,49 +327,69 @@ export default function SalonList() {
         </div>
       )}
 
-      <div className="mt-10 flex items-baseline justify-between border-b border-line pb-3">
-        <p className="text-sm text-ink-2">
-          {loading ? 'Loading salons…' : `${visible.length} ${visible.length === 1 ? 'salon' : 'salons'}`}
-        </p>
-        {filtersActive && (
-          <button
-            type="button"
-            className="text-sm text-ink-3 hover:text-ink"
-            onClick={() => {
-              setQuery('');
-              setCity('');
-              setOpenOnly(false);
-            }}
-          >
-            Clear filters
-          </button>
-        )}
-      </div>
-
       {loading ? (
-        <div className="mt-8 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-          {[0, 1, 2, 3, 4, 5].map((i) => (
-            <CardSkeleton key={i} />
+        <div className="mt-7 grid gap-x-5 gap-y-9 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {Array.from({ length: 8 }, (_, i) => (
+            <SalonCardSkeleton key={i} />
           ))}
         </div>
-      ) : visible.length === 0 ? (
+      ) : items.length === 0 ? (
         <EmptyState
           className="mt-8"
-          title={salons.length ? 'Nothing matches that.' : 'No salons yet.'}
-          description={
-            salons.length
-              ? 'Try a different name or city, or widen your search radius.'
-              : 'Salons will appear here as soon as owners publish their profiles.'
+          title={filtersActive || location ? t('salons.emptyFiltered') : t('salons.empty')}
+          description={filtersActive || location ? t('salons.emptyFilteredBody') : t('salons.emptyBody')}
+          action={
+            filtersActive && (
+              <div className="flex flex-col items-center gap-5">
+                <button type="button" className="btn-secondary" onClick={clearAll}>
+                  {t('salons.clearFilters')}
+                </button>
+                <div className="flex max-w-lg flex-wrap justify-center gap-2">
+                  <span className="w-full text-[13px] text-ink-3">{t('list.tryInstead')}</span>
+                  {POPULAR_SEARCHES.map((term) => (
+                    <button
+                      key={term}
+                      type="button"
+                      className="chip"
+                      onClick={() => {
+                        setDraft(term);
+                        setParams({ q: term }, { replace: true });
+                      }}
+                    >
+                      {t(`h.term.${term}`)}
+                    </button>
+                  ))}
+                  {cities.slice(0, 4).map((c) => (
+                    <button key={c.city} type="button" className="chip" onClick={() => setParams({ city: c.city }, { replace: true })}>
+                      {cityLabel(c.city)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )
           }
         />
       ) : (
-        <div className="mt-8 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-          {visible.map((salon) => (
-            <div key={salon.id} onMouseEnter={() => setActiveSalonId(Number(salon.id))}>
-              <SalonCard salon={salon} />
+        <>
+          <div className="mt-7 grid gap-x-5 gap-y-9 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {items.map((salon) => (
+              <SalonCard key={salon.id} salon={salon} width={300} onHover={() => setActiveSalonId(Number(salon.id))} />
+            ))}
+          </div>
+          {hasNext && (
+            <div className="mt-12 flex flex-col items-center gap-2">
+              <p className="text-[13px] text-ink-3">{t('list.showing', { shown: items.length, total })}</p>
+              <button
+                type="button"
+                className="btn-secondary btn-lg min-w-[12rem]"
+                onClick={() => fetchPage(page + 1, true)}
+                disabled={loadingMore}
+              >
+                {loadingMore ? `${t('common.loading')}…` : t('list.more')}
+              </button>
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
     </div>
   );

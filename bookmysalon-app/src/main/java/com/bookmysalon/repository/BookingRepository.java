@@ -20,6 +20,11 @@ import java.util.List;
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findBySalonId(Long salonId);
+
+    /** Active bookings overlapping [from, to) — drives the public busy-slot view. */
+    List<Booking> findBySalonIdAndStatusInAndStartTimeLessThanAndEndTimeGreaterThanOrderByStartTime(
+            Long salonId, java.util.Collection<com.bookmysalon.entity.BookingStatus> statuses,
+            LocalDateTime to, LocalDateTime from);
     List<Booking> findByCustomerId(Long customerId);
     List<Booking> findByStatus(BookingStatus status);
 

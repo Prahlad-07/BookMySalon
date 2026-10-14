@@ -17,4 +17,6 @@ public interface SalonService {
     List<SalonDto> getSalonsNearLocation(double latitude, double longitude, double radiusKm);
     SalonDto updateSalon(Long id, SalonDto salonDto);
     void deleteSalon(Long id);
+    com.bookmysalon.dto.response.PageResponse<SalonDto> searchSalons(com.bookmysalon.dto.SalonSearchCriteria criteria, int page, int size);
+    com.bookmysalon.dto.SalonInsightsDto getInsights();
 }

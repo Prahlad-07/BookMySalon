@@ -12,14 +12,15 @@ import { getDashboardPathByRole } from '../utils/roleRouting';
 import AuthLayout from '../components/AuthLayout';
 import { Field, Notice } from '../components/ui';
 import GoogleButton from '../components/GoogleButton';
+import { useT } from '../i18n';
 
 const ENABLE_GOOGLE_OAUTH = import.meta.env.VITE_ENABLE_GOOGLE_OAUTH === 'true';
 const SHOW_DEMO_ACCOUNTS = import.meta.env.VITE_SHOW_DEMO_ACCOUNTS !== 'false';
 
 const DEMO_USERS = [
-  { label: 'Customer', email: 'customer.test@gmail.com' },
-  { label: 'Salon owner', email: 'owner.test@gmail.com' },
-  { label: 'Admin', email: 'admin.test@gmail.com' },
+  { key: 'customer', label: 'role.CUSTOMER', email: 'customer.test@gmail.com' },
+  { key: 'owner', label: 'role.SALON_OWNER', email: 'owner.test@gmail.com' },
+  { key: 'admin', label: 'login.demoAdmin', email: 'admin.test@gmail.com' },
 ];
 const DEMO_PASSWORD = 'Test@12345';
 
@@ -28,18 +29,21 @@ export default function Login() {
   const location = useLocation();
   const navigate = useNavigate();
   const { login, error, user, loading, clearError } = useAuth();
+  const t = useT();
 
   const [identifier, setIdentifier] = useState(() => searchParams.get('email') || '');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [demoPending, setDemoPending] = useState('');
 
   useEffect(() => {
     clearError();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const redirectNotice = searchParams.get('error');
+  const redirectNotice =
+    searchParams.get('notice') === 'exists' ? t('login.existsNotice') : searchParams.get('error');
   const from = location.state?.from;
 
   const destinationFor = (role) => (from && from !== '/login' ? from : getDashboardPathByRole(role));
@@ -58,18 +62,29 @@ export default function Login() {
     if (loggedIn) navigate(destinationFor(loggedIn.role), { replace: true });
   };
 
+  // Demo accounts sign in straight away and land on that role's home page.
+  const demoLogin = async (demo) => {
+    if (demoPending || submitting) return;
+    setIdentifier(demo.email);
+    setPassword(DEMO_PASSWORD);
+    setDemoPending(demo.email);
+    const loggedIn = await login(demo.email, DEMO_PASSWORD);
+    setDemoPending('');
+    if (loggedIn) navigate(getDashboardPathByRole(loggedIn.role), { replace: true });
+  };
+
   const message = error || redirectNotice;
 
   return (
     <AuthLayout
-      eyebrow="Welcome back"
-      title="Sign in"
-      description="Pick up where you left off — your appointments, messages and salon are waiting."
+      eyebrow={t('login.eyebrow')}
+      title={t('login.title')}
+      description={t('login.description')}
       footer={
         <>
-          New to BookMySalon?{' '}
+          {t('login.newHere')}{' '}
           <Link to="/signup" className="link">
-            Create an account
+            {t('login.createAccount')}
           </Link>
         </>
       }
@@ -81,7 +96,7 @@ export default function Login() {
       )}
 
       <form onSubmit={submit} className="space-y-5" noValidate>
-        <Field label="Email or username" htmlFor="login-identifier">
+        <Field label={t('login.identifier')} htmlFor="login-identifier">
           <input
             id="login-identifier"
             className="field"
@@ -96,10 +111,10 @@ export default function Login() {
         <div>
           <div className="mb-1.5 flex items-baseline justify-between">
             <label htmlFor="login-password" className="label !mb-0">
-              Password
+              {t('auth.password')}
             </label>
             <Link to="/forgot-password" className="text-[13px] text-ink-3 hover:text-ink">
-              Forgot password?
+              {t('login.forgot')}
             </Link>
           </div>
           <div className="relative">
@@ -116,7 +131,7 @@ export default function Login() {
               type="button"
               onClick={() => setShowPassword((v) => !v)}
               className="absolute right-1 top-1/2 -translate-y-1/2 icon-btn"
-              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              aria-label={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}
             >
               {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
@@ -124,7 +139,7 @@ export default function Login() {
         </div>
 
         <button type="submit" className="btn-dark btn-lg w-full" disabled={submitting || !identifier || !password}>
-          {submitting ? 'Signing in…' : 'Sign in'}
+          {submitting ? t('login.signingIn') : t('login.submit')}
         </button>
       </form>
 
@@ -132,29 +147,35 @@ export default function Login() {
         <>
           <div className="my-6 flex items-center gap-4 text-xs text-ink-3">
             <span className="h-px flex-1 bg-line" />
-            or
+            {t('common.or')}
             <span className="h-px flex-1 bg-line" />
           </div>
-          <GoogleButton href={GOOGLE_AUTH_URL} />
+          <GoogleButton href={GOOGLE_AUTH_URL} label={t('auth.google')} />
         </>
       )}
 
       {SHOW_DEMO_ACCOUNTS && (
         <div className="mt-8 rounded-md border border-dashed border-line-strong p-4">
-          <p className="text-[13px] font-medium text-ink">Exploring the product?</p>
-          <p className="mt-0.5 text-[13px] text-ink-3">Fill in a demo account — the password is {DEMO_PASSWORD}.</p>
+          <p className="text-[13px] font-medium text-ink">{t('login.demoTitle')}</p>
+          <p className="mt-0.5 text-[13px] text-ink-3">{t('login.demoBody')}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {DEMO_USERS.map((demo) => (
               <button
                 key={demo.email}
+                data-demo-role={demo.key}
                 type="button"
                 className="btn-secondary btn-sm"
-                onClick={() => {
-                  setIdentifier(demo.email);
-                  setPassword(DEMO_PASSWORD);
-                }}
+                disabled={Boolean(demoPending) || submitting}
+                aria-busy={demoPending === demo.email}
+                onClick={() => demoLogin(demo)}
               >
-                {demo.label}
+                {demoPending === demo.email ? (
+                  <>
+                    <span className="spinner" aria-hidden="true" /> {t('login.signingIn')}
+                  </>
+                ) : (
+                  t(demo.label)
+                )}
               </button>
             ))}
           </div>

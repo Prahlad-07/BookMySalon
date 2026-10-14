@@ -9,5 +9,7 @@ export const buildWebSocketUrl = (path, params = {}) => {
       url.searchParams.set(key, value);
     }
   });
-  return `${url.pathname}${url.search}`;
+  // Keep the API host when it differs from the page's (e.g. Vercel frontend + Render API);
+  // returning only the path would point SockJS at the frontend's own domain.
+  return API_BASE_URL ? url.toString() : `${url.pathname}${url.search}`;
 };

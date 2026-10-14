@@ -24,7 +24,7 @@ export default defineConfig({
 
           if (id.includes('/lucide-react/')) return 'icons-vendor'
           if (id.includes('/axios/')) return 'network-vendor'
-          if (id.includes('/@stomp/') || id.includes('/sockjs-client/')) return 'realtime-vendor'
+          if (id.includes('/@stomp/')) return 'realtime-vendor'
 
           return undefined
         },

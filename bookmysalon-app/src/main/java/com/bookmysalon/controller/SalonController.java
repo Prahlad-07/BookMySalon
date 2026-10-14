@@ -60,7 +60,30 @@ public class SalonController {
         return ResponseEntity.ok(ApiResponse.ok(salons));
     }
 
-    @GetMapping("/{id}")
+    /**
+     * Paginated, filterable public listing. Filtering, sorting and paging run in the
+     * database against indexed columns, so cost stays flat as the catalogue grows.
+     */
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<com.bookmysalon.dto.response.PageResponse<SalonDto>>> searchSalons(
+            @RequestParam(value = "q", required = false) String q,
+            @RequestParam(value = "city", required = false) String city,
+            @RequestParam(value = "minRating", required = false) Double minRating,
+            @RequestParam(value = "maxPrice", required = false) Double maxPrice,
+            @RequestParam(value = "openNow", defaultValue = "false") boolean openNow,
+            @RequestParam(value = "sort", defaultValue = "rating") String sort,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "12") int size) {
+        var criteria = new com.bookmysalon.dto.SalonSearchCriteria(q, city, minRating, maxPrice, openNow, sort);
+        return ResponseEntity.ok(ApiResponse.ok(salonService.searchSalons(criteria, page, size)));
+    }
+
+    @GetMapping("/insights")
+    public ResponseEntity<ApiResponse<com.bookmysalon.dto.SalonInsightsDto>> insights() {
+        return ResponseEntity.ok(ApiResponse.ok(salonService.getInsights()));
+    }
+
+    @GetMapping("/{id:\\d+}")
     public ResponseEntity<ApiResponse<SalonDto>> getSalon(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.ok(salonService.getSalonById(id)));
     }

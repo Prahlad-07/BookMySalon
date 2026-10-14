@@ -66,7 +66,7 @@ public class PaymentServiceImpl implements PaymentService {
                               @Value("${stripe.webhook.secret:}") String webhookSecret,
                               @Value("${stripe.success-url:http://localhost:3000/payment/success}") String successUrl,
                               @Value("${stripe.cancel-url:http://localhost:3000/payment/cancel}") String cancelUrl,
-                              @Value("${stripe.currency:usd}") String currency) {
+                              @Value("${stripe.currency:inr}") String currency) {
         this.paymentOrderRepository = paymentOrderRepository;
         this.bookingRepository = bookingRepository;
         this.salonRepository = salonRepository;
@@ -74,7 +74,7 @@ public class PaymentServiceImpl implements PaymentService {
         this.webhookSecret = webhookSecret == null ? "" : webhookSecret.trim();
         this.successUrl = successUrl;
         this.cancelUrl = cancelUrl;
-        this.currency = (currency == null || currency.isBlank()) ? "usd" : currency.trim().toLowerCase();
+        this.currency = (currency == null || currency.isBlank()) ? "inr" : currency.trim().toLowerCase();
     }
 
     @Override

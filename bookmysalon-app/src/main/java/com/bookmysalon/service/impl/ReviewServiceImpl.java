@@ -30,6 +30,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final SalonRepository salonRepository;
+    private final com.bookmysalon.service.SalonStatsService salonStatsService;
 
     @Override
     public ReviewDto createReview(ReviewRequestDto reviewRequestDto, Long userId) {
@@ -69,7 +70,10 @@ public class ReviewServiceImpl implements ReviewService {
         review.setUserId(userId);
 
         try {
-            return mapToDto(reviewRepository.save(review));
+            // Flush here so a duplicate is caught below rather than at the stats query.
+            Review saved = reviewRepository.saveAndFlush(review);
+            salonStatsService.refresh(saved.getSalonId());
+            return mapToDto(saved);
         } catch (DataIntegrityViolationException ex) {
             throw new ConflictException("You have already reviewed this salon. Edit your existing review instead.");
         }
@@ -125,21 +129,48 @@ public class ReviewServiceImpl implements ReviewService {
             review.setRating(reviewRequestDto.getRating());
         }
 
-        return mapToDto(reviewRepository.save(review));
+        Review saved = reviewRepository.save(review);
+        salonStatsService.refresh(saved.getSalonId());
+        return mapToDto(saved);
     }
 
     @Override
     public void deleteReview(Long id) {
-        if (!reviewRepository.existsById(id)) {
-            throw new ReviewNotFoundException("Review not found with id: " + id);
-        }
-        reviewRepository.deleteById(id);
+        Review review = reviewRepository.findById(id)
+                .orElseThrow(() -> new ReviewNotFoundException("Review not found with id: " + id));
+        reviewRepository.delete(review);
+        reviewRepository.flush();
+        salonStatsService.refresh(review.getSalonId());
     }
 
     @Override
     @Transactional(readOnly = true)
     public Double getAverageRating(Long salonId) {
         return reviewRepository.averageRatingForSalon(salonId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReviewDto> getRecentReviews(int limit) {
+        int safe = Math.max(1, Math.min(limit, 24));
+        return reviewRepository.findRecent(4.0, org.springframework.data.domain.PageRequest.of(0, safe)).stream()
+                .map(r -> {
+                    ReviewDto dto = mapToDto(r);
+                    if (r.getSalon() != null) {
+                        dto.setSalonName(r.getSalon().getName());
+                        dto.setSalonCity(r.getSalon().getCity());
+                    }
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
+
+    /** Reviews are public, so show "Rohit S." rather than a full name. */
+    static String publicName(String fullName) {
+        if (fullName == null || fullName.isBlank()) return "Guest";
+        String[] parts = fullName.trim().split("\\s+");
+        if (parts.length == 1) return parts[0];
+        return parts[0] + " " + Character.toUpperCase(parts[parts.length - 1].charAt(0)) + ".";
     }
 
     private ReviewDto mapToDto(Review review) {
@@ -150,9 +181,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .rating(review.getRating())
                 .salonId(review.getSalonId())
                 .userId(review.getUserId())
-                .reviewerName(author != null && author.getFullName() != null && !author.getFullName().isBlank()
-                        ? author.getFullName()
-                        : "Guest")
+                .reviewerName(publicName(author == null ? null : author.getFullName()))
                 .createdAt(review.getCreatedAt())
                 .build();
     }

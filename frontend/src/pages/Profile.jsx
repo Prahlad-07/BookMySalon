@@ -10,8 +10,8 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { Avatar, Field, Notice, PageHeader } from '../components/ui';
-
-const ROLE_LABEL = { CUSTOMER: 'Customer', SALON_OWNER: 'Salon owner', ADMIN: 'Administrator' };
+import LanguageSwitcher from '../components/LanguageSwitcher';
+import { useT } from '../i18n';
 const errorOf = (err, fallback) => err?.response?.data?.error || fallback;
 
 function Section({ title, description, children }) {
@@ -30,6 +30,7 @@ export default function Profile() {
   const { user, setUser, logout, login } = useAuth();
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
+  const t = useT();
 
   const [details, setDetails] = useState({ fullName: '', phone: '' });
   const [savingDetails, setSavingDetails] = useState(false);
@@ -53,7 +54,7 @@ export default function Profile() {
 
   const saveDetails = async (event) => {
     event.preventDefault();
-    if (!details.fullName.trim()) return setDetailsMsg({ tone: 'error', text: 'Your name can’t be empty.' });
+    if (!details.fullName.trim()) return setDetailsMsg({ tone: 'error', text: t('profile.err.name') });
     try {
       setSavingDetails(true);
       const updated = await api.put('/api/user/me', { fullName: details.fullName.trim(), phone: details.phone.trim() });
@@ -63,9 +64,9 @@ export default function Profile() {
         fullName: updated.fullName,
         phone: updated.phone || '',
       }));
-      setDetailsMsg({ tone: 'success', text: 'Saved.' });
+      setDetailsMsg({ tone: 'success', text: t('profile.saved') });
     } catch (err) {
-      setDetailsMsg({ tone: 'error', text: errorOf(err, 'We couldn’t save your details.') });
+      setDetailsMsg({ tone: 'error', text: errorOf(err, t('profile.err.save')) });
     } finally {
       setSavingDetails(false);
     }
@@ -74,17 +75,17 @@ export default function Profile() {
 
   const savePassword = async (event) => {
     event.preventDefault();
-    if (pw.next.length < 8) return setPwMsg({ tone: 'error', text: 'Use at least 8 characters.' });
-    if (pw.next !== pw.confirm) return setPwMsg({ tone: 'error', text: 'The new passwords don’t match.' });
+    if (pw.next.length < 8) return setPwMsg({ tone: 'error', text: t('auth.err.min8') });
+    if (pw.next !== pw.confirm) return setPwMsg({ tone: 'error', text: t('auth.err.mismatch') });
     try {
       setSavingPw(true);
       await api.put('/api/user/me/password', { currentPassword: pw.current, newPassword: pw.next });
       // Other sessions were revoked server-side; refresh this one with the new password.
       await login(user.email, pw.next);
       setPw({ current: '', next: '', confirm: '' });
-      setPwMsg({ tone: 'success', text: 'Password updated. You’ve been signed out on other devices.' });
+      setPwMsg({ tone: 'success', text: t('profile.pwUpdated') });
     } catch (err) {
-      setPwMsg({ tone: 'error', text: errorOf(err, 'We couldn’t update your password.') });
+      setPwMsg({ tone: 'error', text: errorOf(err, t('profile.err.password')) });
     } finally {
       setSavingPw(false);
     }
@@ -99,7 +100,7 @@ export default function Profile() {
       logout();
       navigate('/', { replace: true });
     } catch (err) {
-      setDeleteError(errorOf(err, 'We couldn’t close your account.'));
+      setDeleteError(errorOf(err, t('profile.err.delete')));
       setConfirmDelete(false);
     } finally {
       setDeleting(false);
@@ -111,22 +112,22 @@ export default function Profile() {
 
   return (
     <div className="page">
-      <PageHeader eyebrow="Account" title="Settings" />
+      <PageHeader eyebrow={t('title.profile')} title={t('profile.title')} />
 
       <div className="mt-10 flex items-center gap-4">
         <Avatar name={user.fullName || user.name} size={56} />
         <div>
           <p className="text-[17px] font-semibold text-ink">{user.fullName || user.name}</p>
           <p className="text-sm text-ink-3">
-            {user.email} · {ROLE_LABEL[user.role] || 'Member'}
+            {user.email} · {t(`role.${user.role || 'MEMBER'}`)}
           </p>
         </div>
       </div>
 
       <div className="mt-6">
-        <Section title="Personal details" description="Salons see your name and phone number on your appointments.">
+        <Section title={t('profile.details')} description={t('profile.detailsBody')}>
           <form onSubmit={saveDetails} className="space-y-5">
-            <Field label="Full name" htmlFor="pf-name">
+            <Field label={t('auth.fullName')} htmlFor="pf-name">
               <input
                 id="pf-name"
                 className="field"
@@ -139,10 +140,12 @@ export default function Profile() {
                 }}
               />
             </Field>
-            <Field label="Phone" htmlFor="pf-phone" hint="Optional — used by salons to reach you about a booking.">
+            <Field label={t('profile.phone')} htmlFor="pf-phone" hint={t('profile.phoneHint')}>
               <input
                 id="pf-phone"
                 type="tel"
+                inputMode="tel"
+                placeholder="+91 98765 43210"
                 className="field"
                 value={details.phone}
                 autoComplete="tel"
@@ -152,21 +155,21 @@ export default function Profile() {
                 }}
               />
             </Field>
-            <Field label="Email" htmlFor="pf-email" hint="Your sign-in email can’t be changed here.">
+            <Field label={t('auth.email')} htmlFor="pf-email" hint={t('profile.emailHint')}>
               <input id="pf-email" className="field" value={user.email} disabled />
             </Field>
             <div className="flex items-center gap-4">
               <button type="submit" className="btn-dark" disabled={!dirty || savingDetails}>
-                {savingDetails ? 'Saving…' : 'Save changes'}
+                {savingDetails ? t('common.saving') : t('profile.saveChanges')}
               </button>
               {msg(detailsMsg)}
             </div>
           </form>
         </Section>
 
-        <Section title="Password" description="Changing your password signs you out everywhere else.">
+        <Section title={t('auth.password')} description={t('profile.passwordBody')}>
           <form onSubmit={savePassword} className="space-y-5">
-            <Field label="Current password" htmlFor="pf-cur">
+            <Field label={t('profile.currentPassword')} htmlFor="pf-cur">
               <input
                 id="pf-cur"
                 type="password"
@@ -177,7 +180,7 @@ export default function Profile() {
               />
             </Field>
             <div className="grid gap-5 sm:grid-cols-2">
-              <Field label="New password" htmlFor="pf-new">
+              <Field label={t('auth.newPassword')} htmlFor="pf-new">
                 <input
                   id="pf-new"
                   type="password"
@@ -187,7 +190,7 @@ export default function Profile() {
                   onChange={(e) => setPw((p) => ({ ...p, next: e.target.value }))}
                 />
               </Field>
-              <Field label="Confirm new password" htmlFor="pf-confirm">
+              <Field label={t('auth.confirmNewPassword')} htmlFor="pf-confirm">
                 <input
                   id="pf-confirm"
                   type="password"
@@ -200,18 +203,22 @@ export default function Profile() {
             </div>
             <div className="flex items-center gap-4">
               <button type="submit" className="btn-dark" disabled={savingPw || !pw.current || !pw.next}>
-                {savingPw ? 'Updating…' : 'Update password'}
+                {savingPw ? t('auth.updating') : t('auth.updatePassword')}
               </button>
               {msg(pwMsg)}
             </div>
           </form>
         </Section>
 
-        <Section title="Appearance" description="Choose how BookMySalon looks on this device.">
-          <div className="inline-flex rounded-md border border-line-strong p-1" role="radiogroup" aria-label="Theme">
+        <Section title={t('lang.label')} description={t('profile.languageBody')}>
+          <LanguageSwitcher variant="grid" />
+        </Section>
+
+        <Section title={t('profile.appearance')} description={t('profile.appearanceBody')}>
+          <div className="inline-flex rounded-md border border-line-strong p-1" role="radiogroup" aria-label={t('profile.theme')}>
             {[
-              ['light', 'Light'],
-              ['dark', 'Dark'],
+              ['light', t('profile.light')],
+              ['dark', t('profile.dark')],
             ].map(([value, label]) => (
               <button
                 key={value}
@@ -229,29 +236,27 @@ export default function Profile() {
           </div>
         </Section>
 
-        <Section title="Close account" description="Permanently delete your account and sign-in details.">
+        <Section title={t('profile.close')} description={t('profile.closeBody')}>
           {deleteError && (
             <div className="mb-4">
               <Notice tone="error">{deleteError}</Notice>
             </div>
           )}
           <p className="text-sm leading-relaxed text-ink-2">
-            {user.role === 'SALON_OWNER'
-              ? 'Delete or transfer your salon profile first. Closing your account can’t be undone.'
-              : 'Your upcoming appointments should be cancelled first. This can’t be undone.'}
+            {user.role === 'SALON_OWNER' ? t('profile.closeOwner') : t('profile.closeCustomer')}
           </p>
           <button type="button" className="btn-danger mt-4" onClick={() => setConfirmDelete(true)}>
-            Close my account
+            {t('profile.closeMine')}
           </button>
         </Section>
       </div>
 
       <ConfirmDialog
         open={confirmDelete}
-        title="Close your account?"
-        description="Your profile and sign-in details will be deleted. This can’t be undone."
-        confirmLabel="Close account"
-        cancelLabel="Keep account"
+        title={t('profile.closeTitle')}
+        description={t('profile.closeDialog')}
+        confirmLabel={t('profile.close')}
+        cancelLabel={t('profile.keep')}
         busy={deleting}
         onConfirm={deleteAccount}
         onCancel={() => setConfirmDelete(false)}

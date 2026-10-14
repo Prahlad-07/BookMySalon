@@ -18,4 +18,5 @@ public interface BookingService {
     BookingDto updateBooking(Long id, BookingDto bookingDto);
     void cancelBooking(Long id);
     Double calculateTotalPrice(Long salonId, java.util.Set<Long> serviceOfferingIds);
+    List<com.bookmysalon.dto.BusySlotDto> getBusySlots(Long salonId, java.time.LocalDate date);
 }

@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Link, Route, Routes, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
+import DemoModeBanner from './components/DemoModeBanner';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
 import SalonOwnerRoute from './components/SalonOwnerRoute';
@@ -9,6 +10,7 @@ import CustomerRoute from './components/CustomerRoute';
 import AdminRoute from './components/AdminRoute';
 import RouteEffects from './components/RouteEffects';
 import { PageLoader } from './components/ui';
+import { useT } from './i18n';
 
 const Home = lazy(() => import('./pages/Home'));
 const Login = lazy(() => import('./pages/Login'));
@@ -34,20 +36,30 @@ function FooterSlot() {
 }
 
 function NotFound() {
+  const t = useT();
   return (
     <div className="shell flex min-h-[70vh] flex-col items-start justify-center py-24">
-      <p className="eyebrow">Error 404</p>
-      <h1 className="display mt-4 text-[64px] text-ink sm:text-[88px]">This page took a day off.</h1>
-      <p className="lede mt-4 max-w-md">The link may be out of date, or the page has moved somewhere new.</p>
-      <div className="mt-8 flex gap-3">
+      <p className="eyebrow">{t('notFound.eyebrow')}</p>
+      <h1 className="display mt-4 text-[36px] text-ink sm:text-[44px]">{t('notFound.title')}</h1>
+      <p className="lede mt-4 max-w-md">{t('notFound.body')}</p>
+      <div className="mt-8 flex flex-wrap gap-3">
         <Link to="/" className="btn-dark">
-          Back to home
+          {t('notFound.home')}
         </Link>
         <Link to="/salons" className="btn-secondary">
-          Browse salons
+          {t('notFound.browse')}
         </Link>
       </div>
     </div>
+  );
+}
+
+function SkipLink() {
+  const t = useT();
+  return (
+    <a href="#main-content" className="skip-link">
+      {t('nav.skip')}
+    </a>
   );
 }
 
@@ -56,10 +68,9 @@ export default function App() {
     <Router>
       <AuthProvider>
         <RouteEffects />
-        <a href="#main-content" className="skip-link">
-          Skip to main content
-        </a>
+        <SkipLink />
         <div className="flex min-h-screen flex-col">
+          <DemoModeBanner />
           <Navbar />
 
           <main id="main-content" className="flex-1" tabIndex="-1">
@@ -72,25 +83,10 @@ export default function App() {
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
 
-                {['/salons', '/customer/dashboard'].map((path) => (
-                  <Route
-                    key={path}
-                    path={path}
-                    element={
-                      <ProtectedRoute>
-                        <SalonList />
-                      </ProtectedRoute>
-                    }
-                  />
-                ))}
-                <Route
-                  path="/salon/:salonId"
-                  element={
-                    <ProtectedRoute>
-                      <SalonDetail />
-                    </ProtectedRoute>
-                  }
-                />
+                {/* Browsing is public; booking, reviews and chat still require sign-in. */}
+                <Route path="/salons" element={<SalonList />} />
+                <Route path="/customer/dashboard" element={<SalonList />} />
+                <Route path="/salon/:salonId" element={<SalonDetail />} />
                 <Route
                   path="/bookings"
                   element={

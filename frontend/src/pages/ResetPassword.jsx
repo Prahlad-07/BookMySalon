@@ -9,6 +9,7 @@ import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import api from '../config/api';
 import AuthLayout from '../components/AuthLayout';
 import { Field, Notice } from '../components/ui';
+import { useT } from '../i18n';
 
 export default function ResetPassword() {
   const location = useLocation();
@@ -21,21 +22,20 @@ export default function ResetPassword() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [done, setDone] = useState(false);
+  const t = useT();
 
   const back = (
     <Link to="/login" className="inline-flex items-center gap-1.5 text-ink-2 hover:text-ink">
-      <ArrowLeft size={15} /> Back to sign in
+      <ArrowLeft size={15} /> {t('auth.backToSignIn')}
     </Link>
   );
 
   if (!token) {
     return (
-      <AuthLayout eyebrow="Account recovery" title="This link isn’t complete" footer={back}>
-        <p className="text-ink-2">
-          The reset link is missing its security token. Open the link from your email again, or request a new one.
-        </p>
+      <AuthLayout eyebrow={t('auth.recovery')} title={t('reset.incompleteTitle')} footer={back}>
+        <p className="text-ink-2">{t('reset.incompleteBody')}</p>
         <Link to="/forgot-password" className="btn-dark btn-lg mt-8 w-full">
-          Request a new link
+          {t('reset.requestNew')}
         </Link>
       </AuthLayout>
     );
@@ -43,8 +43,8 @@ export default function ResetPassword() {
 
   const submit = async (event) => {
     event.preventDefault();
-    if (password.length < 8) return setError('Use at least 8 characters.');
-    if (password !== confirm) return setError('Passwords don’t match.');
+    if (password.length < 8) return setError(t('auth.err.min8'));
+    if (password !== confirm) return setError(t('auth.err.mismatch'));
     try {
       setSubmitting(true);
       setError('');
@@ -52,7 +52,7 @@ export default function ResetPassword() {
       setDone(true);
       setTimeout(() => navigate('/login', { replace: true }), 1800);
     } catch (err) {
-      setError(err?.response?.data?.error || 'This link has expired or was already used. Request a new one.');
+      setError(err?.response?.status === 429 ? t('common.rateLimited') : t('reset.err.expired'));
     } finally {
       setSubmitting(false);
     }
@@ -61,9 +61,9 @@ export default function ResetPassword() {
 
   return (
     <AuthLayout
-      eyebrow="Account recovery"
-      title="Choose a new password"
-      description="Use at least 8 characters. For your security, you’ll be signed out on other devices."
+      eyebrow={t('auth.recovery')}
+      title={t('reset.title')}
+      description={t('reset.description')}
       footer={back}
     >
       {error && (
@@ -72,12 +72,12 @@ export default function ResetPassword() {
         </div>
       )}
       {done ? (
-        <Notice tone="success">Password updated. Taking you to sign in…</Notice>
+        <Notice tone="success">{t('reset.done')}</Notice>
       ) : (
         <form onSubmit={submit} className="space-y-5" noValidate>
           <div>
             <label htmlFor="rp-password" className="label">
-              New password
+              {t('auth.newPassword')}
             </label>
             <div className="relative">
               <input
@@ -93,13 +93,13 @@ export default function ResetPassword() {
                 type="button"
                 onClick={() => setShow((v) => !v)}
                 className="icon-btn absolute right-1 top-1/2 -translate-y-1/2"
-                aria-label={show ? 'Hide password' : 'Show password'}
+                aria-label={show ? t('auth.hidePassword') : t('auth.showPassword')}
               >
                 {show ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
           </div>
-          <Field label="Confirm new password" htmlFor="rp-confirm">
+          <Field label={t('auth.confirmNewPassword')} htmlFor="rp-confirm">
             <input
               id="rp-confirm"
               type={show ? 'text' : 'password'}
@@ -110,7 +110,7 @@ export default function ResetPassword() {
             />
           </Field>
           <button type="submit" className="btn-dark btn-lg w-full" disabled={submitting}>
-            {submitting ? 'Updating…' : 'Update password'}
+            {submitting ? t('auth.updating') : t('auth.updatePassword')}
           </button>
         </form>
       )}

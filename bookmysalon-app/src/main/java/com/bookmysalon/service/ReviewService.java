@@ -18,4 +18,5 @@ public interface ReviewService {
     ReviewDto updateReview(Long id, ReviewRequestDto reviewRequestDto);
     void deleteReview(Long id);
     Double getAverageRating(Long salonId);
+    List<ReviewDto> getRecentReviews(int limit);
 }

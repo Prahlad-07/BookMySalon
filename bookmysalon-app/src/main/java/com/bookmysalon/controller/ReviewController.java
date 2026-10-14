@@ -39,7 +39,13 @@ public class ReviewController {
         return ResponseEntity.ok(ApiResponse.ok(review, "Review created successfully"));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/recent")
+    public ResponseEntity<ApiResponse<List<ReviewDto>>> getRecentReviews(
+            @RequestParam(value = "limit", defaultValue = "6") int limit) {
+        return ResponseEntity.ok(ApiResponse.ok(reviewService.getRecentReviews(limit)));
+    }
+
+    @GetMapping("/{id:\\d+}")
     public ResponseEntity<ApiResponse<ReviewDto>> getReview(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.ok(reviewService.getReviewById(id)));
     }

@@ -10,6 +10,7 @@ import {
   getAccessToken,
   persistAuthSession,
 } from '../utils/authSession';
+import { useT } from '../i18n';
 
 const AuthContext = createContext();
 
@@ -120,6 +121,15 @@ const normalizeUser = (rawUser = {}) => {
 };
 
 export const AuthProvider = ({ children }) => {
+  const t = useT();
+  // Status-based messages are translated; anything else is the server's own wording.
+  const describeError = (err, fallbackKey, unauthorizedKey) => {
+    const status = err?.response?.status;
+    if (err && !err.response && err.request) return t('common.network');
+    if (status === 429) return t('common.rateLimited');
+    if (unauthorizedKey && (status === 401 || status === 403)) return t(unauthorizedKey);
+    return extractErrorMessage(err, t(fallbackKey));
+  };
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -175,7 +185,7 @@ export const AuthProvider = ({ children }) => {
       setError(null);
 
       if (!identifier || !password) {
-        setError('Email/username and password are required');
+        setError(t('auth.err.required'));
         return null;
       }
 
@@ -189,7 +199,7 @@ export const AuthProvider = ({ children }) => {
       persistAuthSession(response);
       return await hydrateAuthenticatedUser(response);
     } catch (err) {
-      const errorMessage = extractErrorMessage(err, 'Login failed. Please try again.');
+      const errorMessage = describeError(err, 'auth.err.login', 'auth.err.invalid');
       setError(errorMessage);
       return null;
     }
@@ -200,8 +210,8 @@ export const AuthProvider = ({ children }) => {
       setError(null);
 
       if (!data || !data.email || !data.password || !data.name) {
-        setError('All required fields must be filled');
-        return { ok: false, code: 'VALIDATION_ERROR', error: 'All required fields must be filled' };
+        setError(t('auth.err.required'));
+        return { ok: false, code: 'VALIDATION_ERROR', error: t('auth.err.required') };
       }
 
       const name = data.name?.trim();
@@ -227,9 +237,10 @@ export const AuthProvider = ({ children }) => {
       const normalized = await hydrateAuthenticatedUser(response);
       return { ok: true, user: normalized };
     } catch (err) {
-      const errorMessage = extractErrorMessage(err, 'Signup failed. Please try again.');
+      const serverMessage = extractErrorMessage(err, '');
+      const emailExists = err?.response?.status === 409 || serverMessage.toLowerCase().includes('already exists');
+      const errorMessage = describeError(err, 'auth.err.signup');
       setError(errorMessage);
-      const emailExists = errorMessage.toLowerCase().includes('email already exists');
       return {
         ok: false,
         code: emailExists ? 'EMAIL_EXISTS' : 'SIGNUP_FAILED',
@@ -242,7 +253,7 @@ export const AuthProvider = ({ children }) => {
     try {
       setError(null);
       if (!data || !data.email || !data.password || !data.name) {
-        setError('Name, email and password are required');
+        setError(t('auth.err.required'));
         return null;
       }
       const role = normalizeRequestedRole(data.role);
@@ -262,7 +273,7 @@ export const AuthProvider = ({ children }) => {
       const response = await api.post('/api/auth/signup/initiate', payload);
       return response;
     } catch (err) {
-      const errorMessage = extractErrorMessage(err, 'Unable to send OTP. Please try again.');
+      const errorMessage = describeError(err, 'auth.err.otpSend');
       setError(errorMessage);
       return null;
     }
@@ -273,7 +284,7 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       return await api.post('/api/auth/signup/resend-otp', { sessionToken });
     } catch (err) {
-      const errorMessage = extractErrorMessage(err, 'Unable to resend OTP. Please try again.');
+      const errorMessage = describeError(err, 'auth.err.otpSend');
       setError(errorMessage);
       return null;
     }
@@ -293,7 +304,7 @@ export const AuthProvider = ({ children }) => {
       await hydrateAuthenticatedUser(response);
       return true;
     } catch (err) {
-      const errorMessage = extractErrorMessage(err, 'OTP verification failed.');
+      const errorMessage = describeError(err, 'auth.err.otpVerify');
       setError(errorMessage);
       return false;
     }

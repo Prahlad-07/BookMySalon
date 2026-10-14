@@ -6,6 +6,10 @@
 package com.bookmysalon.service.impl;
 
 import com.bookmysalon.dto.SalonDto;
+import com.bookmysalon.dto.SalonInsightsDto;
+import com.bookmysalon.dto.SalonSearchCriteria;
+import com.bookmysalon.dto.response.PageResponse;
+import com.bookmysalon.entity.ServiceOffering;
 import com.bookmysalon.entity.Salon;
 import com.bookmysalon.exception.SalonNotFoundException;
 import com.bookmysalon.repository.ReviewRepository;
@@ -13,15 +17,23 @@ import com.bookmysalon.repository.SalonRepository;
 import com.bookmysalon.repository.ServiceOfferingRepository;
 import com.bookmysalon.service.SalonService;
 import lombok.RequiredArgsConstructor;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Subquery;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,10 +42,15 @@ import java.util.stream.Collectors;
 public class SalonServiceImpl implements SalonService {
 
     private static final double EARTH_RADIUS_KM = 6371.0;
+    private static final int MAX_PAGE_SIZE = 48;
 
     private final SalonRepository salonRepository;
     private final ReviewRepository reviewRepository;
     private final ServiceOfferingRepository serviceOfferingRepository;
+
+    /** Salons keep local opening hours; "open now" is evaluated in this zone. */
+    @Value("${app.timezone:Asia/Kolkata}")
+    private String timezone = "Asia/Kolkata";
 
     @Override
     public SalonDto createSalon(SalonDto salonDto) {
@@ -76,6 +93,11 @@ public class SalonServiceImpl implements SalonService {
         salon.setOwnerId(salonDto.getOwnerId());
         salon.setOpenTime(salonDto.getOpenTime());
         salon.setCloseTime(salonDto.getCloseTime());
+        salon.setDescription(trimToLength(salonDto.getDescription(), 1000));
+        salon.setRatingAvg(0d);
+        salon.setReviewCount(0);
+        salon.setServiceCount(0);
+        salon.setRankScore(4.0);
 
         try {
             Salon savedSalon = salonRepository.save(salon);
@@ -90,26 +112,25 @@ public class SalonServiceImpl implements SalonService {
     public SalonDto getSalonById(Long id) {
         Salon salon = salonRepository.findById(id)
                 .orElseThrow(() -> new SalonNotFoundException("Salon not found with id: " + id));
-        double[] rating = ratingFor(id);
-        return mapToDto(salon, null, rating[0], (long) rating[1], serviceOfferingRepository.countBySalonId(id));
+        return mapToDto(salon, null);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<SalonDto> getAllSalons() {
-        return withStats(salonRepository.findAll());
+        return salonRepository.findAll().stream().map(s -> mapToDto(s, null)).collect(Collectors.toList());
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<SalonDto> getSalonsByOwnerId(Long ownerId) {
-        return withStats(salonRepository.findByOwnerId(ownerId));
+        return salonRepository.findByOwnerId(ownerId).stream().map(s -> mapToDto(s, null)).collect(Collectors.toList());
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<SalonDto> getSalonsByCity(String city) {
-        return withStats(salonRepository.findByCity(city));
+        return salonRepository.findByCity(city).stream().map(s -> mapToDto(s, null)).collect(Collectors.toList());
     }
 
     @Override
@@ -118,57 +139,100 @@ public class SalonServiceImpl implements SalonService {
         validateCoordinates(latitude, longitude);
         validateRadius(radiusKm);
 
-        List<SalonDistance> nearby = salonRepository.findByLatitudeIsNotNullAndLongitudeIsNotNull().stream()
+        // Prefilter with an indexed bounding box, then compute exact distances on the survivors.
+        double latDelta = Math.toDegrees(radiusKm / EARTH_RADIUS_KM);
+        double lngDelta = Math.toDegrees(radiusKm / (EARTH_RADIUS_KM * Math.cos(Math.toRadians(latitude))));
+        return salonRepository.findByLatitudeBetweenAndLongitudeBetween(
+                        latitude - latDelta, latitude + latDelta, longitude - lngDelta, longitude + lngDelta).stream()
                 .map(salon -> new SalonDistance(salon,
                         haversineDistanceKm(latitude, longitude, salon.getLatitude(), salon.getLongitude())))
-                .filter(salonDistance -> salonDistance.distanceKm <= radiusKm)
-                .sorted(Comparator.comparingDouble(salonDistance -> salonDistance.distanceKm))
+                .filter(sd -> sd.distanceKm <= radiusKm)
+                .sorted(Comparator.comparingDouble(sd -> sd.distanceKm))
+                .map(sd -> mapToDto(sd.salon, roundDistance(sd.distanceKm)))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<SalonDto> searchSalons(SalonSearchCriteria criteria, int page, int size) {
+        int safeSize = Math.max(1, Math.min(size, MAX_PAGE_SIZE));
+        int safePage = Math.max(0, page);
+        Page<Salon> result = salonRepository.findAll(
+                specFor(criteria), PageRequest.of(safePage, safeSize, sortFor(criteria == null ? null : criteria.sort())));
+        return PageResponse.of(result, s -> mapToDto(s, null));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public SalonInsightsDto getInsights() {
+        Object[] reviews = reviewRepository.platformStats().stream().findFirst().orElse(new Object[]{0, 0});
+        List<SalonInsightsDto.CityCount> cities = salonRepository.countByCity().stream()
+                .map(row -> new SalonInsightsDto.CityCount((String) row[0], ((Number) row[1]).longValue()))
                 .toList();
-
-        Map<Long, double[]> ratings = ratingMap();
-        Map<Long, Long> serviceCounts = serviceCountMap();
-        return nearby.stream()
-                .map(sd -> {
-                    double[] r = ratings.getOrDefault(sd.salon.getId(), new double[]{0, 0});
-                    return mapToDto(sd.salon, roundDistance(sd.distanceKm), r[0], (long) r[1],
-                            serviceCounts.getOrDefault(sd.salon.getId(), 0L));
-                })
-                .collect(Collectors.toList());
+        return new SalonInsightsDto(
+                salonRepository.count(),
+                cities.size(),
+                reviews[1] == null ? 0 : ((Number) reviews[1]).longValue(),
+                reviews[0] == null ? 0 : round1(((Number) reviews[0]).doubleValue()),
+                cities);
     }
 
-    private List<SalonDto> withStats(List<Salon> salons) {
-        Map<Long, double[]> ratings = ratingMap();
-        Map<Long, Long> serviceCounts = serviceCountMap();
-        return salons.stream()
-                .map(salon -> {
-                    double[] r = ratings.getOrDefault(salon.getId(), new double[]{0, 0});
-                    return mapToDto(salon, null, r[0], (long) r[1],
-                            serviceCounts.getOrDefault(salon.getId(), 0L));
-                })
-                .collect(Collectors.toList());
+    private Specification<Salon> specFor(SalonSearchCriteria c) {
+        return (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (c == null) return cb.and();
+
+            if (c.q() != null && !c.q().isBlank()) {
+                String like = "%" + c.q().trim().toLowerCase(Locale.ROOT) + "%";
+                Subquery<Long> serviceMatch = query.subquery(Long.class);
+                var so = serviceMatch.from(ServiceOffering.class);
+                serviceMatch.select(so.get("salonId"))
+                        .where(cb.equal(so.get("salonId"), root.get("id")), cb.like(cb.lower(so.get("name")), like));
+                predicates.add(cb.or(
+                        cb.like(cb.lower(root.get("name")), like),
+                        cb.like(cb.lower(root.get("address")), like),
+                        cb.like(cb.lower(root.get("city")), like),
+                        cb.exists(serviceMatch)));
+            }
+            if (c.city() != null && !c.city().isBlank()) {
+                predicates.add(cb.equal(cb.lower(root.get("city")), c.city().trim().toLowerCase(Locale.ROOT)));
+            }
+            if (c.minRating() != null && c.minRating() > 0) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("ratingAvg"), c.minRating()));
+            }
+            if (c.maxPrice() != null && c.maxPrice() > 0) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("minPrice"), c.maxPrice()));
+            }
+            if ("price".equalsIgnoreCase(c.sort())) {
+                // Price ordering only makes sense for salons that have published a menu.
+                predicates.add(cb.isNotNull(root.get("minPrice")));
+            }
+            if (c.openNow()) {
+                LocalTime now = LocalTime.now(zone());
+                predicates.add(cb.lessThanOrEqualTo(root.get("openTime"), now));
+                predicates.add(cb.greaterThan(root.get("closeTime"), now));
+            }
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
     }
 
-    private Map<Long, double[]> ratingMap() {
-        Map<Long, double[]> map = new HashMap<>();
-        for (Object[] row : reviewRepository.ratingSummaryBySalon()) {
-            map.put(((Number) row[0]).longValue(),
-                    new double[]{round1(((Number) row[1]).doubleValue()), ((Number) row[2]).doubleValue()});
+    private Sort sortFor(String sort) {
+        String key = sort == null ? "rating" : sort.toLowerCase(Locale.ROOT);
+        return switch (key) {
+            case "reviews" -> Sort.by(Sort.Order.desc("reviewCount"), Sort.Order.desc("ratingAvg"), Sort.Order.asc("id"));
+            case "price" -> Sort.by(Sort.Order.asc("minPrice"), Sort.Order.desc("rankScore"), Sort.Order.asc("id"));
+            case "newest" -> Sort.by(Sort.Order.desc("createdAt"), Sort.Order.desc("id"));
+            case "name" -> Sort.by(Sort.Order.asc("name"), Sort.Order.asc("id"));
+            default -> Sort.by(Sort.Order.desc("rankScore"), Sort.Order.desc("reviewCount"), Sort.Order.asc("id"));
+        };
+    }
+
+    private ZoneId zone() {
+        try {
+            return ZoneId.of(timezone == null ? "Asia/Kolkata" : timezone);
+        } catch (Exception ex) {
+            return ZoneId.of("Asia/Kolkata");
         }
-        return map;
-    }
-
-    private Map<Long, Long> serviceCountMap() {
-        Map<Long, Long> map = new HashMap<>();
-        for (Object[] row : serviceOfferingRepository.countGroupBySalon()) {
-            map.put(((Number) row[0]).longValue(), ((Number) row[1]).longValue());
-        }
-        return map;
-    }
-
-    private double[] ratingFor(Long salonId) {
-        double avg = reviewRepository.averageRatingForSalon(salonId);
-        long count = reviewRepository.countBySalonId(salonId);
-        return new double[]{round1(avg), count};
     }
 
     private double round1(double value) {
@@ -212,6 +276,7 @@ public class SalonServiceImpl implements SalonService {
             }
             salon.setCity(normalizedCity);
         }
+        if (salonDto.getDescription() != null) salon.setDescription(trimToLength(salonDto.getDescription(), 1000));
         if (salonDto.getOpenTime() != null) salon.setOpenTime(salonDto.getOpenTime());
         if (salonDto.getCloseTime() != null) salon.setCloseTime(salonDto.getCloseTime());
         validateOperatingHours(salon.getOpenTime(), salon.getCloseTime());
@@ -239,10 +304,10 @@ public class SalonServiceImpl implements SalonService {
     }
 
     private SalonDto mapToDto(Salon salon) {
-        return mapToDto(salon, null, 0d, 0L, 0L);
+        return mapToDto(salon, null);
     }
 
-    private SalonDto mapToDto(Salon salon, Double distanceKm, double averageRating, long reviewCount, long serviceCount) {
+    private SalonDto mapToDto(Salon salon, Double distanceKm) {
         List<String> safeImages = salon.getImages() == null
                 ? new ArrayList<>()
                 : new ArrayList<>(salon.getImages());
@@ -261,10 +326,19 @@ public class SalonServiceImpl implements SalonService {
                 .openTime(salon.getOpenTime())
                 .closeTime(salon.getCloseTime())
                 .distanceKm(distanceKm)
-                .averageRating(averageRating)
-                .reviewCount(reviewCount)
-                .serviceCount(serviceCount)
+                .averageRating(salon.getRatingAvg() == null ? 0d : salon.getRatingAvg())
+                .reviewCount(salon.getReviewCount() == null ? 0L : salon.getReviewCount().longValue())
+                .serviceCount(salon.getServiceCount() == null ? 0L : salon.getServiceCount().longValue())
+                .description(salon.getDescription())
+                .minPrice(salon.getMinPrice())
+                .createdAt(salon.getCreatedAt())
                 .build();
+    }
+
+    private static String trimToLength(String value, int max) {
+        if (value == null) return null;
+        String trimmed = value.trim();
+        return trimmed.length() > max ? trimmed.substring(0, max) : trimmed;
     }
 
     private void validateCoordinates(Double latitude, Double longitude) {
